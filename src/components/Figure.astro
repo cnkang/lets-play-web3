@@ -1,0 +1,19 @@
+---
+// Locale-specific diagram with a visible caption (figcaption) and real alt text.
+import { href } from '../data/site'
+interface Props { name: string; alt: string; n?: number | string }
+const { name, alt, n } = Astro.props
+const lang = Astro.url.pathname.includes('/en/') ? 'en' : 'zh'
+const src = href(`diagrams/${lang}/${name}.svg`)
+const label = lang === 'zh' ? '图' : 'Figure'
+const open = lang === 'zh' ? '在新窗口打开大图' : 'Open the full-size diagram in a new tab'
+---
+<figure class="figure">
+  <div class="figure-frame" tabindex="0" role="group" aria-label={`${label} ${n ?? ''}`.trim()}>
+    <img src={src} alt={alt} width="960" height="540" loading="lazy" decoding="async" />
+  </div>
+  <figcaption>
+    {n !== undefined && <strong>{label} {n}{lang === 'zh' ? '｜' : ' · '}</strong>}<slot />
+    <span class="fig-actions"><a href={src} target="_blank" rel="noopener">{open}</a></span>
+  </figcaption>
+</figure>

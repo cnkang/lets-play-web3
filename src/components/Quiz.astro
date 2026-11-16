@@ -1,0 +1,17 @@
+---
+import { quiz } from '../data/quiz'
+interface Props { lang: 'zh' | 'en' }
+const { lang } = Astro.props
+const items = quiz[lang]
+---
+<ol class="quiz">
+  {items.map((it, i) => (
+    <li>
+      <p><strong>{it.q}</strong></p>
+      <details>
+        <summary>{lang === 'zh' ? `查看第 ${i + 1} 题答案` : `Show the answer to question ${i + 1}`}</summary>
+        <p>{it.a}</p>
+      </details>
+    </li>
+  ))}
+</ol>

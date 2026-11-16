@@ -1,0 +1,22 @@
+---
+// A lab box for hands-on experiments. Usage in MDX (no import needed):
+//   <Lab title="部署 Counter" goal="看懂一次链上状态变化" network="Sepolia">
+//   1. 步骤……
+//   结果：<Tx h="0x…" />
+//   </Lab>
+interface Props { title: string; goal?: string; network?: string; status?: 'done' | 'planned' }
+const { title, goal, network = 'Sepolia', status = 'done' } = Astro.props
+const zh = !Astro.url.pathname.includes('/en/')
+const tag = zh ? '实验' : 'Lab'
+const statusText = status === 'planned' ? (zh ? '计划中' : 'Planned') : (zh ? '已完成' : 'Done')
+const net = zh ? `${network} 测试网` : `${network} testnet`
+---
+<div class={`lab lab-${status}`} role="group" aria-label={`${tag}${zh ? '：' : ': '}${title}`}>
+  <div class="lab-head">
+    <span class="lab-tag">{tag}</span>
+    <p class="lab-title">{title}</p>
+    <span class="lab-meta">{net} · {statusText}</span>
+  </div>
+  {goal && <p class="lab-goal"><strong>{zh ? '目标：' : 'Goal: '}</strong>{goal}</p>}
+  <div class="lab-body"><slot /></div>
+</div>

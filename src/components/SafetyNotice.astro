@@ -1,0 +1,27 @@
+---
+interface Props { lang: 'zh' | 'en'; headingLevel?: 2 | 3 }
+const { lang, headingLevel = 2 } = Astro.props
+const H = `h${headingLevel}`
+---
+<section class="safety" aria-labelledby={`safety-${lang}`}>
+  <H id={`safety-${lang}`}>{lang === 'zh' ? '先读这一段：安全须知' : 'Read this first: safety notice'}</H>
+  {lang === 'zh' ? (
+    <ul>
+      <li>本书所有链上操作<strong>只在 Ethereum Sepolia 测试网</strong>（chainId 11155111）上进行，从未使用主网。</li>
+      <li>第一阶段<strong>预算严格为 0 美元</strong>：没有买币，没有任何法币支出。</li>
+      <li>测试网 ETH（SepETH）和书中的测试代币<strong>没有市场价值</strong>，不是收益。</li>
+      <li>本书<strong>不构成投资建议</strong>，也不是第三方安全审计证书。</li>
+      <li><strong>永远不要</strong>把真实钱包的助记词或私钥导入任何实验环境、网页、聊天或代码仓库。</li>
+      <li>这是个人学习资料，<strong>不是</strong> Ethereum、Etherscan 或任何公司的官方产品。</li>
+    </ul>
+  ) : (
+    <ul>
+      <li>Every on-chain action in this book happened <strong>only on the Ethereum Sepolia testnet</strong> (chainId 11155111). Mainnet was never used.</li>
+      <li>The phase-1 <strong>budget was strictly $0</strong>: no crypto was bought and no fiat money was spent.</li>
+      <li>Test ETH (SepETH) and the test tokens in this book have <strong>no market value</strong>. They are not earnings.</li>
+      <li>This book is <strong>not financial advice</strong> and not a third-party security audit.</li>
+      <li><strong>Never</strong> import a real wallet's seed phrase or private key into any lab, website, chat or code repository.</li>
+      <li>These are personal study notes, <strong>not</strong> an official product of Ethereum, Etherscan or any company.</li>
+    </ul>
+  )}
+</section>
