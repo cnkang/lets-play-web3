@@ -1,0 +1,100 @@
+---
+title: "UBOX V3: redenomination"
+description: "10,000 old units = 1 new unit via a global scale rather than enumerating holders; storage stays in old units while reads and transfers use new units; decimals stays 18; historical Transfer events are not rewritten and would be 10,000 times too large if read as new units. Snapshot - supply 100, A 99.99, B 0.01, implementation V3. Medium finding F-V3-001."
+navTitle: "14 · UBOX V3: redenomination"
+part: upgradeable
+order: 140
+status: published
+---
+
+<p class="lead">"Knock four zeros off" as a contract upgrade: you can change the bookkeeping from now on, but not the logs already written into history.</p>
+
+## Goal and difficulty
+
+V3's job: make **10,000 old UBOX = 1 new UBOX**.
+
+The difficulty is that ERC-20 **has no list of holders you can enumerate**. Hard-coding "divide A's and B's balances by 10,000" would miss any future holder and could easily break the invariant "sum of balances = total supply".
+
+## Design: a global scale
+
+- **Raw balances stay stored in old units**; no storage is rewritten.
+- A new global factor `scale = 10000` lives in **slot 58**, after the existing `__gap` (slots 8–57), without reordering any old slot.
+- `balanceOf` / `totalSupply` / `allowance` return "raw value ÷ 10,000".
+- `transfer` / `approve` / `burn` and V2's batch functions all work in **new units**: passing 1e18 means one new token, and 10,000 times as many raw units are moved.
+- **`decimals()` stays 18.** Reading `balanceOf()` directly shows the new number.
+
+An alternative that was not chosen: change `decimals()` to 22. Wallets would also display amounts 10,000 times smaller, but `balanceOf()` would still return the old raw number. The goal here was for `balanceOf()` itself to show the new figure.
+
+<Figure name="redenomination" n="6" alt="Left: raw proxy storage in old units, A 999,900e18, B 100e18, supply 1,000,000e18. Divided by scale 10000, the right side reads A 99.99, B 0.01, supply 100, with decimals still 18. Warning below: historical Transfer logs stay in old units and are 10,000 times too large if read as new units.">
+Storage is not rewritten; every read divides by the scale. Historical logs stay in old units and are never rewritten.
+</Figure>
+
+## A one-time initializeV3
+
+- V1's `initialize()` had already set `_initialized` to 1, and V1 does not use OpenZeppelin's `Initializable`, so this is not `reinitializer(2)`: it checks `_scale == 0` and then writes `_scale = 10000`.
+- It **must not** call V1's `initialize` again, and it neither mints nor transfers.
+- The V3 implementation's constructor locks `_scale` in **the implementation's own storage**, so nobody can initialise the implementation directly.
+- So that V3 could override getters such as `balanceOf`, the V1 **source** turned the original public variables into internal variables in the same slots plus virtual functions. That changes neither the storage layout nor the already-deployed V1/V2 bytecode, but it means the current source no longer reproduces the historical V1/V2 exactly (Chapter 15 shows the consequence).
+
+## On-chain: just two transactions
+
+- V3 implementation (exactly as predicted at nonce 17): <Addr a="0x16E3D2f25e28253b467C66c462973e4ca86fad28" />
+- The proxy address did not change; the implementation slot now points to V3.
+
+<T label="UBOX V3 deployment and upgrade transactions">
+
+| Nonce | Time (Singapore) | Action | Transaction | Block | Gas used | Fee (wei) |
+| ---: | --- | --- | --- | ---: | ---: | ---: |
+| 17 | 2026-11-12 14:23:00 | Deploy V3 implementation | <Tx h="0xad0fd9cbb6c1c9ef9df16ab039d1dfa54eac7c95327c976ac961fcfcbe6f28f9" short /> | 12117040 | 14,639,984 | 1,010,158,896 |
+| 18 | 14:23:12 | upgradeAndCall(initializeV3) | <Tx h="0x5765d84eaff6cab6851f4c3dd7675dae11cf54c7514e084a9a054db9a89295f1" short /> | 12117041 | 156,185 | 10,776,765 |
+
+</T>
+
+The upgrade emitted `Upgraded(V3)` and `Redenominated(10000)` and **no Transfer event at all**, confirming nothing was minted or moved. `initializeV3()` ran exactly once. Both transactions used exactly the gas predicted by the pre-upgrade simulation.
+
+## Snapshot: read through the proxy (new units)
+
+<T label="Snapshot values read through the UBOX proxy">
+
+| Field | Raw return value | Meaning |
+| --- | --- | --- |
+| name / symbol | 可升级沙盒代币 / UBOX | — |
+| decimals | 18 | Unchanged |
+| totalSupply | 100000000000000000000 | **100 UBOX** |
+| balanceOf(A) | 99990000000000000000 | **99.99 UBOX** |
+| balanceOf(B) | 10000000000000000 | **0.01 UBOX** |
+| scale | 10000 | 10,000 old = 1 new |
+| Implementation | V3 `0x16E3D2f25e28253b467C66c462973e4ca86fad28` | V4 not on-chain |
+
+</T>
+
+Worked example: A's raw balance 999,900e18 ÷ 10,000 = 99.99e18. And 99.99 + 0.01 = 100.
+
+The simulation also tried "A sends 1 new UBOX to B" (which would give A 98.99, B 1.01, supply still 100). **That demo transfer was never authorised for broadcast** and does not exist on-chain.
+
+## Historical events are not rewritten
+
+This is the most important point of the chapter:
+
+- The `Transfer` log for "100 to B" in Chapter 12's successful batch records **100e18 in old units**.
+- After the redenomination, B's `balanceOf` is **0.01**.
+- Anyone who reads that old log **as new units** will think B received 100: **10,000 times too much**.
+
+A redenomination changes the bookkeeping and the unit of new events **from now on**. It cannot rewrite logs already on-chain, and it cannot set any market price. When reading historical data, convert separately on each side of the upgrade.
+
+## Dust and findings
+
+- **Dust**: raw balances that are not multiples of 10,000 are truncated for display, so they look like 0 yet cannot be moved (recorded in P0 as Low findings F-V3-002 and F-V3-003). **At the snapshot every known holder's raw balance was divisible by 10,000**, so this does not affect current holders.
+- **Medium finding F-V3-001**: `approve(spender, type(uint256).max)` reverts with `"amount overflow"` because `value × 10000` overflows; V3 has no "infinite allowance" sentinel. Many protocols rely on max approvals, so **do not plug UBOX into a protocol that depends on max approve**. It is a compatibility and numeric-boundary issue, not damaged assets; at the snapshot all UBOX allowances on-chain were 0.
+
+<Callout type="note" title="Everyday analogy: converting points">
+
+A shop stores loyalty points in a tiny base unit and the app shows them divided by 10,000. If the underlying balance is not a multiple of 10,000, the app hides a small remainder: that is dust. And when a payment service tries to set the industry-standard "unlimited standing approval", the internal conversion overflows at the maximum value and the integration fails: that is F-V3-001.
+
+</Callout>
+
+<Callout type="warn" title="One more time">
+
+V1's `initialize` was **not** called during the V3 upgrade and **must never** be called again. Every upgrade is a public transaction with a hash, events and an implementation-slot change, and the old V2 bytecode is still at its original address.
+
+</Callout>

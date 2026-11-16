@@ -1,0 +1,92 @@
+---
+title: "Upgradeable UBOX: proxy, V1 and V2"
+description: "Upgradeability must be designed in at deployment; initialize is not a constructor; V1 and a transparent proxy came first, then V2 via upgradeAndCall without calling initialize again. The proxy address 0xc3F20D5488784D922aC3428a54125715fA98db04 never changed. Admin power and storage-layout risk."
+navTitle: "13 · Upgradeable UBOX: proxy, V1 and V2"
+part: upgradeable
+order: 130
+status: published
+---
+
+<p class="lead">Think of a proxy as "the shop's street address stays the same while the back-office till system is replaced".</p>
+
+## Upgradeability must be designed in at deployment
+
+Chapters 8 and 9 showed that once an ordinary contract is deployed, its logic is frozen at that address. UBOX used a proxy pattern from the start: the address users always call is fixed as the **proxy**, and the logic lives in a replaceable **implementation contract**.
+
+It used OpenZeppelin 5.6.1's `TransparentUpgradeableProxy` and `ProxyAdmin` rather than a home-made proxy, so the storage slots (ERC-1967) and upgrade interface can be checked against the official ones.
+
+<Figure name="proxy" n="5" alt="Users call the fixed UBOX proxy. The proxy keeps balances and other storage and runs the current V3 implementation via delegatecall; V1 and V2 code remains but is unused; V4 is local only. ProxyAdmin, owned by account A, can call upgradeAndCall to switch implementations.">
+Users talk to a fixed proxy; the proxy runs the implementation's code against its own storage; upgrade power sits with ProxyAdmin.
+</Figure>
+
+- The **proxy** holds all the state: balances, allowances, the name… Users, wallets and other contracts only know this address.
+- The **implementation** only provides code. The proxy borrows it with `delegatecall`, but reads and writes **the proxy's own storage**.
+- **ProxyAdmin** is the only contract that can point the proxy at a new implementation. Its owner is account A.
+
+## initialize is not a constructor
+
+A constructor only writes into **the implementation contract's own storage**, never into the proxy. So upgradeable contracts use an ordinary function, `initialize()`, to set the name, supply and owner, called once through the proxy. It must be **callable only once**; running it again might mint again or change the owner.
+
+## Step 1: deploy V1 and the proxy (no V2 yet)
+
+<T label="The three core UBOX addresses">
+
+| Role | Address |
+| --- | --- |
+| Proxy (the token address users use) | <Addr a="0xc3F20D5488784D922aC3428a54125715fA98db04" /> |
+| V1 implementation | <Addr a="0xdaBaDC03042B010eFF67Bf2553798d75e817300a" /> |
+| ProxyAdmin (owner: account A) | <Addr a="0x6DEAe6C7fAa9fabe1983082277922CDcf90BBEE9" /> |
+
+</T>
+
+Token name `可升级沙盒代币` ("upgradeable sandbox token"), symbol `UBOX`, 18 decimals; after `initialize` all 1,000,000 were minted to A. All three addresses matched the predictions from A's nonces 11 and 12; ProxyAdmin is created inside the proxy's constructor and does not use one of A's nonces.
+
+<T label="UBOX V1 deployment transactions">
+
+| Nonce | Time (Singapore) | Action | Transaction | Block | Gas used | Fee (wei) |
+| ---: | --- | --- | --- | ---: | ---: | ---: |
+| 11 | 2026-11-12 11:12:24 | Deploy V1 implementation | <Tx h="0xdf571b52c1d2c323b1ef40bb8305c62be7f447fa605a758f5137334c38cacd66" short /> | 12116097 | 10,625,841 | 701,305,506 |
+| 12 | 11:12:36 | Deploy proxy and initialize | <Tx h="0xaeb0216f26dfe3270faf68bb4b280ab61e763b371f869d989061205f5a9bb0db" short /> | 12116098 | 7,451,338 | 491,788,308 |
+
+</T>
+
+Three problems came up and were fixed during simulation, all before broadcasting: the Chinese name needs `unicode"..."`; `_initialized` was first a `bool`, which the compiler packed into the same storage slot as `owner`, so a simulation that wrote "one variable per slot" read garbage, and it became a `uint256` alone in slot 0; and when simulating two contract creations in a row, the nonce has to be set to "after V1 is deployed", or you hit `CreateCollision`.
+
+## Step 2: upgrade to V2 (without calling initialize again)
+
+V2 adds no state variables and does not reorder storage. It only adds the atomic `batchTransfer` / `batchTransferFrom` used in Chapter 12.
+
+- V2 implementation: <Addr a="0x0711Ef7C97b061fd3C87026ad38703dd253E779F" />
+- A upgraded via `ProxyAdmin.upgradeAndCall(proxy, V2, 0x)` with empty calldata `0x`: **initialize was not called again and no transfer was made**. V1's initialize had already run; calling it again would fail with "already initialized" and could even trigger minting logic.
+
+<T label="UBOX V2 upgrade transactions">
+
+| Nonce | Time (Singapore) | Action | Transaction | Block | Gas used | Fee (wei) |
+| ---: | --- | --- | --- | ---: | ---: | ---: |
+| 13 | 2026-11-12 11:56:36 | Deploy V2 implementation | <Tx h="0xcc60956bd0b5b285ec61ca2eaaf6c074df07b92f50303c5e7112fba58ad71878" short /> | 12116317 | 12,703,689 | 838,443,474 |
+| 14 | 11:57:00 | upgradeAndCall(…, 0x) | <Tx h="0x91e5ec0b662fa6622841386e81b410cafe5ef2a433fba8fe309e30093990cb61" short /> | 12116319 | 41,724 | 2,753,784 |
+
+</T>
+
+After the upgrade the name, supply, balances and owner were all unchanged, and **so was the proxy address**: still `0xc3F20D5488784D922aC3428a54125715fA98db04`. The upgrade transaction used only 41,724 gas, far less than deploying a whole new proxy: that is the benefit of keeping the address and state and swapping only the logic.
+
+## Every upgrade stays on-chain
+
+- An upgrade is an **ordinary on-chain transaction**: it has a hash, costs gas, emits an `Upgraded` event and rewrites the ERC-1967 implementation slot. There is no "silent upgrade".
+- The old V1 code **remains at its original address**; the proxy simply no longer points to it.
+- The `stateOverride` used in simulations only pretends locally that some code or storage exists on-chain; it **does not change the real chain**.
+
+## A double-edged sword
+
+- **Benefit**: fixing bugs or adding features does not force users to switch addresses.
+- **Cost**: if the admin key is stolen or abused, the rules the application runs later can change (including transfer rules, and in theory even what `name()` returns).
+- **Technical risk**: an incompatible storage layout in a new version (reordering, inserting variables) makes old data "read from the wrong place". The rule is **append only, never reorder**.
+- **Governance**: who holds upgrade power? Is it a multisig? Is there a delay, an announcement, a way to exit?
+
+In this lab the ProxyAdmin owner is a single test account, A. That is a deliberately accepted teaching model, **not** a decentralised issuance.
+
+<Callout type="warn" title="When you use an upgradeable token">
+
+Beyond the name and symbol, check: is it a proxy? Which implementation address is current? Who is the admin? Beginners should treat "upgradeable" as an **extra risk setting**, not as automatically more advanced or safer.
+
+</Callout>
