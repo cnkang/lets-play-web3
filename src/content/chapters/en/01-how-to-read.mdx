@@ -1,0 +1,63 @@
+---
+title: "How to read this book"
+description: "The two sources behind this book, the reading path, the safety notice, and the questions you should be able to answer. Every on-chain experiment ran only on the Ethereum Sepolia testnet with a $0 budget."
+navTitle: "1 · How to read this book"
+part: everyday
+order: 10
+status: published
+---
+
+<p class="lead">First understand why you might need it, then how it works, and finally check it against real testnet experiments. This book keeps all three on one line.</p>
+
+<SafetyNotice lang="en" />
+
+## Two sources of information
+
+The content comes from two places. Please keep them apart as you read:
+
+1. **General knowledge and everyday analogies**: blockchain basics added to explain ideas, such as "a hash is like a content fingerprint" or "a contract is like a vending machine". Analogies help understanding, but an analogy is not a definition.
+2. **Real Sepolia experiments**: from the afternoon of 11 November to the afternoon of 12 November 2026 (Singapore time), contracts were deployed, transactions sent and upgrades performed on the Ethereum Sepolia testnet (chainId 11155111), then reviewed in "Phase 0" (P0). Every concrete contract address, transaction hash, block number, balance and test result in this book comes from that lab notebook and its review reports, and each one links to Sepolia Etherscan so you can check it yourself.
+
+<Snapshot lang="en" />
+
+## Reading path
+
+<T label="Reading path">
+
+| Read first | What you get | Chapters |
+| --- | --- | --- |
+| What blockchains are actually good for | Shared ledger vs ordinary database | 2–4 |
+| Wallets, transactions, contracts | Who signs, who executes, who pays; how to confirm something really landed | 5–8 |
+| Tokens and allowances | ERC-20, approval is not payment, burning, atomicity | 9–12 |
+| Upgradeable contracts | Proxies, upgrades and redenomination: benefits and costs | 13–14 |
+| Evidence and wrap-up | What tests, source matching and reviews each prove | 15 and appendices |
+| What comes next | The reserved P1 DeFi chapter | Last chapter |
+
+</T>
+
+Each chapter can be read on its own, but reading in order works best because later experiments use earlier ideas. The experiments are not tucked away in a separate "lab log": each one lives in the chapter it illustrates. The Counter contract follows the chapter on smart contracts, and the allowance revocation follows "Approval is not payment".
+
+## Phase-1 rules
+
+The whole lab followed a few rules. The rules are themselves habits worth learning:
+
+- **The budget was strictly $0.** No crypto was bought, no mainnet funds were used, and no real wallet seed phrase or private key was imported.
+- **Only the Ethereum Sepolia testnet** was used, together with free, open-source, widely used tools (solc, viem, the OpenZeppelin contracts library, Foundry).
+- **Every on-chain transaction was simulated first and broadcast only after explicit confirmation.** Signing in, signing, approving and broadcasting all required confirmation first; if safety could not be confirmed, work stopped.
+- Every experiment recorded the network, what was done, the transaction hash or contract address, the actual cost, what was learned and the next step.
+- Test-account private keys lived only in a local, Git-ignored, permission-restricted folder. They were never printed or written into any public record. This book contains no private keys, seed phrases or API keys.
+
+## After reading, you should be able to answer
+
+- Why do a group of merchants sometimes need a shared ledger, and sometimes not at all?
+- Looking at one transaction in a block explorer, can you tell "the transaction succeeded" from "a balance changed" from "only an approval was granted"?
+- How do holding tokens, approving tokens and upgrading a contract differ as kinds of power?
+- Why can neither a transfer to the wrong address nor any confirmed transaction be undone?
+- Why can a review still have findings when all 49 unit tests pass?
+- Why does "passed in a local simulation" not mean "live on-chain"?
+
+<Callout type="warn" title="Reminder">
+
+A blockchain is not a price-prediction tool. This book covers infrastructure, hands-on practice and risk only. It says nothing about any token's price or returns.
+
+</Callout>

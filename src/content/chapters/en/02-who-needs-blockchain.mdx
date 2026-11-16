@@ -1,0 +1,50 @@
+---
+title: "Who actually needs a blockchain?"
+description: "Think of a blockchain as a way to keep shared books when the participants do not fully trust each other. A community loyalty-points story shows when it is worth it and when an ordinary database is better."
+navTitle: "2 · Who actually needs a blockchain?"
+part: everyday
+order: 20
+status: published
+---
+
+<p class="lead">Start by treating a blockchain as a way to keep shared books when the participants do not fully trust one another, not as magic new technology.</p>
+
+## A community loyalty-points story
+
+Imagine a few local shops issuing loyalty points together: you earn points at the café, redeem them at the corner shop, and the gym accepts them too.
+
+- If everyone trusts one platform to keep the books, an **ordinary database** is enough: the platform records an entry and everyone follows it.
+- If no shop is willing to hand final control of the ledger to another shop, because it fears quiet edits or later denial, then a blockchain is worth discussing: every shop can independently check the same history, and no single shop can easily rewrite it.
+
+## Three questions to ask
+
+Before choosing a blockchain, ask:
+
+1. Are there **several independent parties** who must keep one consistent shared state?
+2. Do you need it to be **publicly verifiable**, to reduce one-sided edits and endless reconciliation?
+3. Are those benefits **worth the costs** in fees, performance, privacy and operational complexity?
+
+If any answer is "no", an ordinary system is usually the better choice.
+
+## A comparison table
+
+<T label="Everyday scenarios: ordinary system vs on-chain">
+
+| Scenario | When an ordinary system fits better | What on-chain might add |
+| --- | --- | --- |
+| A bank's internal ledger | One bank manages everything centrally | Usually no blockchain needed |
+| Points honoured across organisations | A platform already trusted by everyone | Many parties verify the same transaction history |
+| Self-executing digital vouchers | One company runs everything | Public rules that anyone can check |
+| Product provenance and anti-counterfeiting | The data captured at the source is hard to guarantee | Records are hard for one party to rewrite, but **the source is not guaranteed to be true** |
+
+</T>
+
+<Callout type="note" title="Key idea">
+
+The goal is not only to know what a blockchain can do, but also when it is not worth it. If everyone already trusts the same record-keeper, a central database is simpler, faster, cheaper and better for privacy.
+
+</Callout>
+
+## How this connects to the labs
+
+All the later experiments run on the Sepolia **testnet**. Its "money" has no market value; the point is to see with your own eyes what jointly verifiable bookkeeping looks like: anyone can look up every transaction in a block explorer. That is the "publicly verifiable" of this chapter. The price is that every change costs a fee (gas), which Chapter 6 explains.
