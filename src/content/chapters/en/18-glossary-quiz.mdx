@@ -1,0 +1,54 @@
+---
+title: "Appendix C · Glossary and self-check"
+description: "One-line explanations of the terms in this book, plus 12 self-check questions with answers - shared ledgers, private-key signing, approve, proxy upgrades, tests vs bugs, V4 not on-chain, keyless addresses, non-unique names, burn, atomicity, historical events and fees for failed transactions."
+navTitle: "Appendix C · Glossary and self-check"
+part: wrapup
+order: 180
+status: published
+---
+
+<p class="lead">If you can answer in your own words, you have really understood it.</p>
+
+## Glossary
+
+<T label="Glossary">
+
+| Term | In one line |
+| --- | --- |
+| Block / hash | A unit of transaction records, and a content "fingerprint" |
+| Node / consensus | A computer that independently validates data, and the rules for jointly deciding which history is accepted |
+| Proof of stake (PoS) | Ethereum's consensus: validators stake ETH and propose and attest to blocks by protocol rules |
+| Wallet / private key | A signing tool, and the secret that controls an address |
+| Seed phrase | A list of words that restores a whole wallet; even more sensitive than one key |
+| Address | A public "house number" you can share |
+| Gas / fee | The unit of execution work; fee = gasUsed × effective gas price |
+| Base fee / tip | The part that is burned, and the part paid to the validator |
+| Nonce | An account's transaction counter, starting at 0 and rising with each mined transaction |
+| Mempool | Where transactions wait before being mined; a hash there is not yet a fact |
+| EVM / smart contract | The environment that runs on-chain programs, and rule code deployed on-chain |
+| Revert | Undoing all state changes of an execution when a check fails; gas is still paid |
+| `eth_call` / simulation | Read-only execution: no signature, no cost, no change to the chain |
+| ERC-20 | The common interface standard for fungible tokens |
+| allowance / approve | An amount a spender may use, and the function that sets it; not a payment |
+| transferFrom / burnFrom | A spender moving or burning tokens within the allowance |
+| Burn | Destroying tokens: lowers both a balance and total supply |
+| Atomicity | All operations in one transaction take effect together or not at all |
+| Proxy / implementation | A stable entrance, and the replaceable logic behind it |
+| ProxyAdmin | The only admin contract that can switch a proxy's implementation |
+| initialize | The run-once setup function that replaces the constructor in upgradeable contracts |
+| Storage layout | Where state variables sit in storage slots; upgrades may only append, never reorder |
+| Redenomination / scale | Changing the unit of account; in UBOX V3, 10,000 old = 1 new |
+| Dust | A remainder too small to show after conversion |
+| Unit / fuzz / invariant tests | Specific cases / random inputs / properties after any call sequence |
+| Fork / Sepolia | A local copy of chain state for simulation / a public testnet |
+| Source verification / exact match / match | Proving source compiles to the on-chain bytecode; metadata also matches / only bytecode matches |
+| GUID | A queue ID returned after submitting verification, not a success mark |
+| Faucet | A service that gives out free test coins |
+
+</T>
+
+## Self-check (try before looking at the answers)
+
+The first 6 questions come from the original study notes; the last 6 come from the experiments this book adds.
+
+<Quiz lang="en" />
