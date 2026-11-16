@@ -33,7 +33,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Secret scan (fact check is skipped in CI: sources are not in this repo)
+      - name: "Secret scan (fact check is skipped in CI: sources are not in this repo)"
         run: node scripts/check-facts.mjs
       - name: Decode OG images (assets/og/*.png.b64), content check (zh + en pairs) and build
         run: npm run build
