@@ -1,0 +1,56 @@
+---
+# Copy to src/content/chapters/en/<slug>.mdx; the Chinese file uses the SAME slug.
+# (or run: npm run new:chapter -- <slug> --part <part-id> --order <number>)
+title: "Chapter title (page <h1> and browser title)"
+description: "One or two sentences: used by search results, social cards and llms.txt."
+navTitle: "20 · Short title shown in the contents"
+part: p1-defi          # an id from src/content/parts.json
+order: 200             # sort key; multiples of 10 leave room for later insertions
+status: draft          # draft = only in `npm run dev`; upcoming = listed as "Coming soon"; published = live
+# updated: "2026-12-01" # optional: last content update
+---
+
+<p class="lead">One sentence on what the reader will understand by the end.</p>
+
+## Start with an everyday analogy
+
+Intuition first, vocabulary second.
+
+## How it works
+
+Plain Markdown works: **bold**, `code`, lists and tables.
+
+<Callout type="note" title="Tip">
+Callouts come in three types: `note`, `warn` and `danger`.
+</Callout>
+
+## Hands-on lab
+
+<Lab title="Lab name" goal="What this lab verifies">
+
+1. First step…
+2. Second step…
+
+Result: what you saw on chain.
+
+</Lab>
+
+{/*
+Components (no import needed, available in every chapter):
+
+  <Addr a="0x + 40 hex chars" />              address: monospace + Etherscan link + copy button
+  <Tx h="0x + 64 hex chars" />                transaction; add `short` for a shortened display
+  <Figure name="approve" n="8" alt="What the diagram shows">Caption</Figure>
+                                              diagram file: public/diagrams/{zh,en}/<name>.svg
+  <T label="What the table is for">(Markdown table)</T>   wide tables scroll, keyboard-focusable
+  <Callout type="warn" title="Title">…</Callout>
+  <Lab title="…" goal="…" network="Sepolia" status="done|planned">…</Lab>
+  <SafetyNotice lang="en" />  <Snapshot lang="en" />
+
+Every 0x address / hash must exist in the lab notebook, or `npm run check:facts` fails.
+*/}
+
+## Summary
+
+- Point one
+- Point two
