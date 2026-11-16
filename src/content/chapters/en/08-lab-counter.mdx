@@ -1,0 +1,83 @@
+---
+title: "Lab: the Counter contract"
+description: "The first on-chain contract, Counter (0xAf6f88Cf8bf6e9211CD11B375AECBa37d61CD00f) - deployment, increment, reset and the low-tip exercise; count() is 2 and owner is account A; why deploying costs far more than calling."
+navTitle: "8 · Lab: the Counter contract"
+part: accounts
+order: 80
+status: published
+---
+
+<p class="lead">Start by reading one on-chain state change, rather than equating smart contracts with finance from day one.</p>
+
+## What the contract does
+
+Counter is a teaching contract only a dozen lines long:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract Counter {
+    uint256 public count;
+    address public owner;
+    event Incremented(address indexed by, uint256 newCount);
+
+    constructor() { owner = msg.sender; }
+
+    function increment() external {
+        count += 1;
+        emit Incremented(msg.sender, count);
+    }
+
+    function reset() external {
+        require(msg.sender == owner, "not owner");
+        count = 0;
+    }
+}
+```
+
+Anyone may call `increment` (add one and emit `Incremented`); only the deployer, `owner`, may call `reset` (set to zero). It was compiled with solc 0.8.34.
+
+## On-chain result
+
+Contract address (computed in advance from account A's nonce 0, and matching exactly after deployment):
+
+<Addr a="0xAf6f88Cf8bf6e9211CD11B375AECBa37d61CD00f" />
+
+Read-only check at the snapshot: **`count()` = 2**, **`owner()` = account A**.
+
+<Figure name="counter" n="3" alt="Five circles show count: 0 after deploy, 1 after increment, 0 after reset, 1 after an increment with a 1 wei tip, 2 after an increment with a 2 wei tip. Notes: reads are free; reset does not erase history and only the owner may call it.">
+Each Counter step is a mined transaction; reading <code>count()</code> needs no transaction.
+</Figure>
+
+<T label="The five Counter transactions">
+
+| Nonce | Time (Singapore) | Action | Transaction | Block | Gas used | Fee (wei) |
+| ---: | --- | --- | --- | ---: | ---: | ---: |
+| 0 | 2026-11-11 17:48:24 | Deploy Counter | <Tx h="0x5619a1084d03bbf2101514963485178160ffb59a3876b2920123055ec09c65a6" short /> | 12110961 | 1,652,641 | 115,684,870 |
+| 1 | 17:49:00 | increment (0→1) | <Tx h="0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73" short /> | 12110964 | 127,229 | 8,651,572 |
+| 2 | 18:01:24 | reset (→0) | <Tx h="0x6051310d025382a9b0b943fac0e8791036db4d3ededd27dedf333b616d60017a" short /> | 12111025 | 23,626 | 1,653,820 |
+| 3 | 18:14:36 | increment, 1 wei tip (0→1) | <Tx h="0xd61e57686959b7c4c9d774a6aa35b0fb9dac72e8317055146da4676a9e4e4b31" short /> | 12111091 | 127,229 | 2,671,809 |
+| 4 | 18:32:36 | increment, 2 wei tip (1→2) | <Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short /> | 12111181 | 29,309 | 762,034 |
+
+</T>
+
+All five succeeded. Use the links or the Copy buttons for full hashes; Appendix A lists every transaction in full.
+
+## What the numbers teach
+
+- **The chain keeps the books for you**: `count`, `owner` and the event logs all live on-chain. Changing state means paying gas yourself.
+- **Deploying costs far more than calling**: deployment used 1,652,641 gas, reset only 23,626. Most of the cost is writing the contract's code into chain state, not the few lines of arithmetic.
+- **The same function can cost different gas**: the increment from 0 to 1 used 127,229 gas, from 1 to 2 only 29,309. Writing a storage slot from zero to non-zero is expensive; changing an already non-zero value is much cheaper.
+- **Confirmed transactions cannot be undone**: reset sets the number back to zero but cannot erase the earlier increment transactions or events. The history is still there.
+- **This contract cannot gain features**: to add batch operations or upgradeability you must choose an upgradeable pattern at deployment time, which leads straight to UBOX (Chapter 13).
+
+## Everyday equivalent
+
+Picture a public counter outside a shop that every partner merchant can check: each call changes the count by one. If the count tracks raffle entries or completed public tasks, an on-chain counter reduces disputes about one side changing the number. But it cannot prove that a real person ever stood at the counter.
+
+<Callout type="note" title="Reflection question">
+
+If you implemented this with an auto-increment column in PostgreSQL, who could change that column? What did you pay for switching to an on-chain counter?
+
+</Callout>

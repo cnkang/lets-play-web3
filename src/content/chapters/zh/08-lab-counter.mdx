@@ -1,0 +1,83 @@
+---
+title: "实验：Counter 计数器"
+description: "第一份上链合约 Counter（0xAf6f88Cf8bf6e9211CD11B375AECBa37d61CD00f）的部署、increment、reset 与低小费练习；count() 为 2，owner 为账户 A；为什么部署比调用贵得多。"
+navTitle: "8　实验：Counter 计数器"
+part: accounts
+order: 80
+status: published
+---
+
+<p class="lead">从「能读懂一次链上状态变化」开始，而不是一上来就把智能合约等同于金融。</p>
+
+## 合约做了什么
+
+Counter 是一个教学用的计数器，源码只有十几行：
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract Counter {
+    uint256 public count;
+    address public owner;
+    event Incremented(address indexed by, uint256 newCount);
+
+    constructor() { owner = msg.sender; }
+
+    function increment() external {
+        count += 1;
+        emit Incremented(msg.sender, count);
+    }
+
+    function reset() external {
+        require(msg.sender == owner, "not owner");
+        count = 0;
+    }
+}
+```
+
+任何人都能 `increment`（加一并发出 `Incremented` 事件），只有部署者 `owner` 能 `reset`（清零）。实际用 solc 0.8.34 编译。
+
+## 链上结果
+
+合约地址（由账户 A 的 nonce 0 预先算出，部署后完全一致）：
+
+<Addr a="0xAf6f88Cf8bf6e9211CD11B375AECBa37d61CD00f" />
+
+快照时只读核对：**`count()` = 2**，**`owner()` = 账户 A**。
+
+<Figure name="counter" n="3" alt="五个圆圈表示 count 的值：部署后 0，increment 后 1，reset 后 0，1 wei 小费 increment 后 1，2 wei 小费 increment 后 2。下方说明读操作免费、reset 不抹掉历史且只有 owner 能调用。">
+Counter 每一步都是一笔已上链的交易；读取 <code>count()</code> 不需要交易。
+</Figure>
+
+<T label="Counter 的五笔交易">
+
+| nonce | 时间（新加坡） | 操作 | 交易 | 区块 | gas used | 手续费（wei） |
+| ---: | --- | --- | --- | ---: | ---: | ---: |
+| 0 | 2026-11-11 17:48:24 | 部署 Counter | <Tx h="0x5619a1084d03bbf2101514963485178160ffb59a3876b2920123055ec09c65a6" short /> | 12110961 | 1,652,641 | 115,684,870 |
+| 1 | 17:49:00 | increment（0→1） | <Tx h="0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73" short /> | 12110964 | 127,229 | 8,651,572 |
+| 2 | 18:01:24 | reset（→0） | <Tx h="0x6051310d025382a9b0b943fac0e8791036db4d3ededd27dedf333b616d60017a" short /> | 12111025 | 23,626 | 1,653,820 |
+| 3 | 18:14:36 | increment，小费 1 wei（0→1） | <Tx h="0xd61e57686959b7c4c9d774a6aa35b0fb9dac72e8317055146da4676a9e4e4b31" short /> | 12111091 | 127,229 | 2,671,809 |
+| 4 | 18:32:36 | increment，小费 2 wei（1→2） | <Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short /> | 12111181 | 29,309 | 762,034 |
+
+</T>
+
+五笔都成功。完整哈希可以点开链接或用「复制」按钮获取；附录 A 有全部交易的完整列表。
+
+## 从数字里能学到什么
+
+- **链在替你记账**：`count` 和 `owner` 都写在链上，事件日志也在链上。要改状态必须自己付 gas。
+- **部署远比调用贵**：部署用了 1,652,641 gas，reset 只用 23,626 gas。主要成本是把合约代码写进链上状态，而不是那几行加减逻辑。
+- **同一个函数的 gas 会变**：从 0 变成 1 的 increment 用了 127,229 gas，从 1 变成 2 只用了 29,309 gas。原因是存储槽从零写成非零更贵，已经非零再改就便宜得多。
+- **已确认的交易不能撤销**：reset 把数字清零，但抹不掉之前 increment 的交易和事件，历史仍在。
+- **这段合约不能再加功能**：想增加批量操作或升级能力，必须在部署时就采用可升级模式——这直接引出了后面的 UBOX（第 13 章）。
+
+## 生活对应
+
+把它想成一家店门口「所有合作商户都能核对」的公共计数器：调用一次，计数变化一次。如果计数涉及活动抽奖总次数、公开任务完成次数，链上计数能减少「单方改数」的争议。但它证明不了柜台前真的来过一个人。
+
+<Callout type="note" title="复盘问题">
+
+如果用普通 PostgreSQL 的一个自增字段来实现，谁能改这个字段？换成链上计数器之后，你又付出了什么代价？
+
+</Callout>
