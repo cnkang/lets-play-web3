@@ -1,0 +1,214 @@
+# BUILD-NOTES
+
+Build log and acceptance notes for **「一起玩 Web3」 / Let’s Play Web3** (Astro static site; working title until 2026-11-16: “Web3 Sandbox Guide”). Times are Asia/Singapore (UTC+8). Intended future public repository: `lets-play-web3` (the local folder keeps its old name).
+
+## Commands
+
+```bash
+npm ci
+npm run dev            # http://localhost:4321/zh/   (search needs a build)
+npm run build          # check-content → astro build → pagefind  → dist/ (46 HTML pages)
+npm run check:content  # every chapter has zh + en with the same slug; frontmatter valid
+npm run new:chapter -- <slug> --part <id> --order <n>   # scaffold a draft pair from templates/
+npm run preview        # http://localhost:4321/zh/
+npm run check:facts    # every 0x address/hash must exist in the lab sources + secret scan
+npm run assets         # decode assets/og/*.png.b64 → *.png (automatic before dev/build/preview)
+npm run diagrams       # regenerate public/diagrams/{zh,en}/*.svg and public/og/*.svg (PNG: scripts/qa/render-og.mjs)
+npm run appendix       # regenerate Appendix A tables from 实验记录.md
+
+# Project-Pages-style build check
+BASE=/lets-play-web3/ SITE_URL=https://example.github.io npm run build
+```
+
+- Preview URL (local): **http://localhost:4321/zh/** (English: http://localhost:4321/en/)
+- Toolchain used: Node 24.22.1, Astro 7.4.11, @astrojs/mdx 8.1.5, Pagefind 1.6.0, @fontsource-variable/plus-jakarta-sans 5.3, @fontsource-variable/noto-sans-sc 5.3. `engines.node >= 22.23.4` (Astro 7's minimum).
+- Build result (2026-11-13): **pass**. 46 pages; Pagefind indexed 38 chapter pages in 2 languages. Also passes with `BASE=/lets-play-web3/`: all asset, link, canonical, hreflang, OG, sitemap and robots URLs carry the base.
+- `npm run check:facts`: 211 hex values checked against 20 source files — all found; no secrets.
+- Re-run 2026-11-16 after the rebrand: build pass (46 pages, 38 indexed); also with `BASE=/lets-play-web3/ SITE_URL=https://example.github.io` (canonical, 3 hreflang, OG, JSON-LD, 42 sitemap URLs, robots `Sitemap:`, CSS/font/diagram URLs all carry the base). `check:facts`: 211 hex values against 19 source files (the optional Word-review text in /tmp was not present) — all found; no secrets.
+
+## Rebrand and visual refresh (2026-11-16)
+
+- **Name**: 「一起玩 Web3」 (zh) / **Let’s Play Web3** (en), chosen by the owner (「一起学」 was felt too serious). Applied to header wordmark, footer/byline (default author “Kang” since 2026-11-17, a schema.org Person; `AUTHOR_NAME` overrides), `<title>`, OG/Twitter, JSON-LD WebSite/Book/`workTranslation`/BreadcrumbList, root page, 404, search description, llms.txt/llms-full.txt, README, package.json (`lets-play-web3`), OG images. Chapter facts and experiment data unchanged.
+- **Palette** (tokens at the top of `src/styles/global.css`, ratios vs paper): light — paper `#f6f5fe`, ink `#1a1540` (15.8:1), ink-2 `#3b3666` (10.2), ink-3 `#55507e` (6.9), brand violet `#5a2be0` (6.8; white on brand 7.4), brand-strong `#4218c2`, coral text `#b13d1c` (5.5), decorative coral `#ff7a59` (never text), mint-teal `#0d6656`, focus ring magenta `#c0266d`. Dark — paper `#100d22`, ink `#eeedff`, brand `#ab9bff` (8.0; dark text on brand 8.0), coral `#ff9f80`, teal `#6fdcc0`, focus `#ffb3d0`. All text tokens ≥ 4.5:1 on every surface tint in both themes; UI boundaries ≥ 3:1.
+- **Type**: Plus Jakarta Sans (Latin/UI/headings) + Noto Sans SC (Chinese), self-hosted variable fonts with unicode-range subsets; serif fonts removed. Prose 17 px / line-height 1.9 (zh), 17.4 px / 1.75 (en), 70ch measure.
+- **Shape**: 16/24 px radii, pill buttons and nav, soft violet-tinted shadows, gradient h2 accent bar, product-style wordmark (“一起玩 **Web3**”) with a 32 px rounded-square “play” mark + coral dot (also `favicon.svg`), stays crisp at 16 px.
+- **Home hero**: flat tinted band (so text contrast is measurable — axe reports 0 incomplete items); soft glows and abstract shapes only appear ≥ 1200 px and only in the margins / behind the diagram, never behind text. Motion (hover lift) is disabled under `prefers-reduced-motion`.
+- **Diagrams** retinted to the new palette (colour values only; a script diff confirmed that only `#rrggbb` values changed in all 14 SVGs). OG PNGs (1200×630, zh/en) redrawn with the new name and colours.
+- Fixed in passing: `.prose p/ul/ol { margin:0 }` was overriding paragraph spacing (now `:where()`); the coarse-pointer 44 px rule for copy buttons was losing to `.chip .copy-btn` (now 44 px on touch, verified with touch emulation).
+
+## Content model: adding chapters without code changes (2026-11-16)
+
+- Chapters are content-collection files `src/content/chapters/{zh,en}/<slug>.mdx` (same slug in both). Frontmatter: `title`, `description`, `navTitle?`, `part`, `order`, `status` (`published` | `upcoming` | `draft`), `updated?`.
+- Parts: `src/content/parts.json` (id, order, phase, zh, en). Phases: `src/content/phases.json` (P0 basics, P1 DeFi; add P2 … as needed). Contents show a phase tag when there is more than one phase.
+- `src/data/chapters.ts#getBook()` is the single source for contents, prev/next, chapter routes, sitemap (with `updated` → `lastmod`), hreflang, llms.txt/llms-full.txt, JSON-LD (`dateModified`). Pagefind indexes whatever pages are built.
+- `upcoming`: listed in the contents as “即将推出 / Coming soon” (not a link), no page, not in sitemap/search; listed under “Coming soon” in llms.txt. `draft`: only in `astro dev` (noindex + banner); excluded from production builds.
+- Pairing check: `scripts/check-content.mjs` runs first in `npm run build` (and in CI) and fails with the exact missing file; the same rules are enforced again inside Astro. `ALLOW_UNPAIRED=1` downgrades to a warning and skips the unpaired chapter. Tested: zh-only file → clear failure; upcoming pair → “coming soon”, no page/sitemap entry; draft pair → absent from build.
+- Components available in every chapter without imports: `Lab` (new experiment box), `Addr`, `Tx`, `Callout`, `Figure`, `T`, `SafetyNotice`, `Snapshot`, `Quiz`.
+- Templates: `templates/chapter.{zh,en}.mdx`; scaffold with `npm run new:chapter`. Chinese guide: `CONTRIBUTING.md` (adding chapters, parts/phases, statuses, components, appending experiments to Appendix A, diagrams, pre-commit checklist).
+- `scripts/gen_appendix.py` now writes the new frontmatter, documents how to append experiments, and stops with a list of missing block numbers / English labels instead of a bare assert (output verified byte-identical to the committed appendix).
+
+## How SITE_URL and BASE work
+
+- `astro.config.mjs` reads `SITE_URL` → Astro `site` and `BASE` → Astro `base` (normalised to `/x/` or `/`), after loading an optional local `.env` (git-ignored). Defaults: `http://localhost:4321` and `/`.
+- `src/data/site.ts`: `href(path)` = BASE + path (for in-site links and assets); `absolute(path)` = SITE_URL + BASE + path (canonical, hreflang, OG, JSON-LD, sitemap, robots, llms.txt).
+- `trailingSlash: 'always'`, `build.format: 'directory'`: every page URL ends with `/`.
+- The GitHub workflow sets `SITE_URL=https://<owner>.github.io`, `BASE=/<repo>/`, `REPO_URL`. Cloudflare Pages: set `SITE_URL=https://<project>.pages.dev`, `BASE=/` in project env vars.
+- No `github.io` / `pages.dev` host is hard-coded in content (only in docs/examples).
+
+## SEO / GEO artifacts
+
+| Artifact | Where |
+| --- | --- |
+| Unique `<title>` + meta description per page, in the page's language | chapter frontmatter / page props |
+| `<html lang="zh-CN|en" dir="ltr">`, one `<h1>` per page | BaseLayout |
+| canonical; hreflang `zh-CN`, `en`, `x-default`(→ zh) on every paired page | BaseLayout (omitted on noindex pages) |
+| Open Graph + Twitter card, `og:locale` + `og:locale:alternate`, 1200×630 PNG | `public/og/{zh,en}.png` |
+| JSON-LD: WebSite (+SearchAction) and Book on home; TechArticle+LearningResource and BreadcrumbList on chapters; FAQPage on Appendix C (quiz); all with `inLanguage` | pages |
+| `sitemap.xml` with `xhtml:link` alternates (home, 19 chapters, accessibility × 2 langs = 42 URLs) | `src/pages/sitemap.xml.ts` |
+| `robots.txt` with `Sitemap:` from SITE_URL | `src/pages/robots.txt.ts` |
+| `llms.txt` (index) and `llms-full.txt` (plain text of every chapter), with snapshot date, testnet-only caveat, Etherscan "Pending", Sourcify 5+3, V4 local-only | `src/data/llms.ts` |
+| Real `404.html` (bilingual, noindex), not an SPA fallback | `src/pages/404.astro` |
+| Search page is `noindex` and excluded from the sitemap | `search.astro` |
+| Visible attribution, publish date and snapshot on every chapter; FAQ in real HTML (`<details>`); no ratings; "not affiliated" footer | layout / chapter page |
+| Root `/` → `/zh/` (meta refresh 0 + visible links + canonical) | `src/pages/index.astro` |
+| Minimal JS: one small inline module (theme, menu, copy) + Pagefind only on the search page; fonts are self-hosted variable fonts with `unicode-range` subsets and `font-display: swap` | |
+
+## Chapters (zh / en) — same slug in both languages (order/part now come from each file's frontmatter)
+
+| Slug | 中文 | English |
+| --- | --- | --- |
+| 01-how-to-read | 这本书怎么读 | How to read this book |
+| 02-who-needs-blockchain | 生活中谁需要区块链？ | Who actually needs a blockchain? |
+| 03-blocks-hashes-consensus | 区块、哈希与共识 | Blocks, hashes and consensus |
+| 04-nodes-trust | 节点与信任边界 | Nodes and trust boundaries |
+| 05-wallets-keys-signatures | 钱包、私钥与签名 | Wallets, keys and signatures |
+| 06-gas-nonce-explorer | Gas、nonce 与区块浏览器 | Gas, nonce and block explorers |
+| 07-smart-contracts-evm | 智能合约与 EVM | Smart contracts and the EVM |
+| 08-lab-counter | 实验：Counter 计数器 | Lab: the Counter contract |
+| 09-lab-mbox-erc20 | 实验：MBox 与 ERC-20 | Lab: MBox and ERC-20 |
+| 10-approve-vs-payment | 授权不是付款 | Approval is not payment |
+| 11-lab-mbox-burn | 实验：MBox-Burn 销毁与撤销授权 | Lab: MBox-Burn, burning and revoking |
+| 12-atomicity-batch | 两笔交易不等于一笔：原子性 | Two calls are not one transaction: atomicity |
+| 13-upgradeable-ubox | 可升级的 UBOX：代理、V1 与 V2 | Upgradeable UBOX: proxy, V1 and V2 |
+| 14-ubox-v3-redenomination | UBOX V3：面额重标 | UBOX V3: redenomination |
+| 15-evidence-p0 | 证据、源码匹配与 P0 收尾 | Evidence, source matching and the P0 wrap-up |
+| 16-appendix-addresses-txs | 附录 A　地址与交易总表 | Appendix A · Addresses and transactions |
+| 17-credentials-api-keys | 附录 B　账号、凭证与 API 密钥 | Appendix B · Accounts, credentials and API keys |
+| 18-glossary-quiz | 附录 C　术语速查与自测 | Appendix C · Glossary and self-check |
+| 19-next-p1-defi | 下一站：P1 DeFi（尚未开始） | Next stop: P1 DeFi (not started yet) |
+
+Plus: home, search, accessibility statement (both languages), root redirect, 404.
+
+Diagrams (original SVG, zh/en, `role="img"` + `<title>`/`<desc>` + figcaption): Fig. 1 blocks (ch3), 2 wallet flow (ch5), 3 Counter (ch8), 4 approve/transferFrom/revoke (ch10), 5 proxy (ch13), 6 redenomination (ch14), 7 test layers (ch15).
+
+## Facts policy and omissions
+
+- Sources only: `web3-sandbox/实验记录.md`, `web3-sandbox/docs/新手指南-账号凭证与API密钥.md`, `web3-sandbox/reports/p0/*`, and the extracted text of the user's Word review. Appendix A tables are generated from the notebook by `scripts/gen_appendix.py`.
+- Snapshot: 2026-11-12 15:39:55 (UTC+8), Sepolia block 12117419 — stated on home, chapters, footer, llms.txt. No live-state claims.
+- Etherscan verification: described as submitted and **"Pending in queue"**; never as verified. Sourcify: 8/8, 5 `exact_match` + 3 `match` (ProxyAdmin, V1, V2).
+- Deliberately **omitted** (not verifiable from the sources or excluded by the brief): faucet brand name (only "0.05 SepETH from 0x52f1…EedD"); any Sepolia end-of-life / deprecation timeline; the hash of the replaced (never-mined) nonce-4 transaction — the book only says the mined nonce-4 transaction matches the replacement script's design (gas limit 140000, tip 2 wei); a wall-clock time for D-01 (only block 12117312 is given); Handler fuzz reverts are described as "suspected residual oracle edge in the test scaffolding", not as a contract bug.
+
+## WCAG 2.2 AA checklist (self-assessment, not a certification)
+
+Tools: axe-core 4.14.0 via puppeteer-core in Google Chrome 156 (headless), tags `wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa, best-practice`. Pages: home, ch1, ch8, ch10, ch12, Appendix A (16), Appendix B (17), quiz (18), ch19, search, accessibility — **both locales** — plus `404.html` and root; each in **light and dark** at **1280 and 375 px** = 96 runs. Scripts in `scripts/qa/`.
+
+**axe result (re-run 2026-11-16 after the rebrand, same 96 runs): 0 violations, 0 incomplete colour-contrast items, no page-level horizontal scroll.** (First 2026-11-16 run had 0 violations but “incomplete” items caused by gradient/pseudo-element backgrounds behind hero text; the hero was rebuilt on a flat tint.) Previous final run (2026-11-13): 0 / 0. Earlier runs found and fixed: Shiki `github-light` token contrast (switched to GitHub high-contrast light/dark themes), an empty table header cell, a heading before the `<h1>` (contents label is now a `<p>`), hidden-but-unnamed mobile labels, body horizontal overflow at ≤375 px (grid item min-content, header width, sr-only text escaping scroll containers).
+
+| SC | Criterion | Result | Evidence |
+| --- | --- | --- | --- |
+| 1.1.1 | Non-text content | Pass | SVGs `role="img"` + `<title>`/`<desc>`; `<img alt>`; decorative icons `aria-hidden` |
+| 1.2.x | Time-based media | N/A | No audio/video |
+| 1.3.1 | Info and relationships | Pass | Landmarks, headings h1→h2→h3 without skips, `<th>` tables, labelled lists/regions |
+| 1.3.2 | Meaningful sequence | Pass | DOM order = visual order |
+| 1.3.3 | Sensory characteristics | Pass | No shape/colour-only instructions |
+| 1.3.4 | Orientation | Pass | No orientation lock |
+| 1.3.5 | Identify input purpose | N/A | Only a search field (no personal data) |
+| 1.4.1 | Use of colour | Pass | Links underlined in prose; status uses text ("reverted") |
+| 1.4.2 | Audio control | N/A | |
+| 1.4.3 | Contrast (minimum) | Pass | axe 0 issues light+dark; ink on paper ≥ 4.5:1 by design tokens |
+| 1.4.4 | Resize text | Pass | rem-based; 200% zoom ≈ 640 px layout, covered by 320 px check |
+| 1.4.5 | Images of text | Pass | Text in SVG diagrams duplicated in captions/body |
+| 1.4.10 | Reflow | Pass | No body horizontal scroll at 320/360/375/414/768/1024/1440 (scripted check); tables/code/diagrams scroll in their own focusable region with a hint |
+| 1.4.11 | Non-text contrast | Pass | Borders/focus ring/controls ≥ 3:1 |
+| 1.4.12 | Text spacing | Pass | No fixed-height text boxes |
+| 1.4.13 | Content on hover/focus | N/A | No tooltips/popovers |
+| 2.1.1 | Keyboard | Pass | Manual + scripted Tab pass; menu, theme, language, copy, quiz `<details>`, search |
+| 2.1.2 | No keyboard trap | Pass | Menu traps focus only while open; Esc releases (scripted) |
+| 2.1.4 | Character key shortcuts | N/A | None |
+| 2.2.1 / 2.2.2 | Timing / pause | N/A | Root redirect is immediate (0 s); no moving content |
+| 2.3.1 | Three flashes | Pass | None |
+| 2.4.1 | Bypass blocks | Pass | Skip link is first focusable (scripted: first Tab = "Skip to content") |
+| 2.4.2 | Page titled | Pass | Unique localized titles |
+| 2.4.3 | Focus order | Pass | Logical; menu focus returns to button |
+| 2.4.4 | Link purpose | Pass | Explorer links have hidden "(opens in new tab)" text; prev/next labelled |
+| 2.4.5 | Multiple ways | Pass | Sidebar contents, home contents, prev/next, search, sitemap |
+| 2.4.6 | Headings and labels | Pass | |
+| 2.4.7 | Focus visible | Pass | 3 px outline + offset in both themes |
+| 2.4.11 | Focus not obscured (min) | Pass | `scroll-padding-top` = header height; scripted Tab (400 stops) through Appendix A (zh) and ch10 (en) at 375/1024/1440 px on 2026-11-16: 0 focused elements hidden under the sticky header; skip link is `position: fixed` above the header (z-index 100 > 50) |
+| 2.5.1 / 2.5.2 | Pointer gestures / cancellation | Pass | Single-tap controls; activation on up-event (native) |
+| 2.5.3 | Label in name | Pass | Language switch visible "EN"/"中"/"English"/"中文" is in the accessible name |
+| 2.5.4 | Motion actuation | N/A | |
+| 2.5.7 | Dragging movements | Pass / N/A | No drag interactions; scroll regions also scroll by keyboard |
+| 2.5.8 | Target size (min) | Pass | Header controls, menu, TOC (≤1023 px), quiz summaries 44 px; copy buttons 28 px on fine pointers and 44 px on coarse pointers (verified via touch emulation, `scripts/qa/keyboard-check.mjs`); desktop sidebar links 40 px |
+| 3.1.1 / 3.1.2 | Language of page / parts | Pass | `lang` per locale; English section of the 404 has `lang="en"`; language-switch label carries `lang`/`hreflang` |
+| 3.2.1 / 3.2.2 | On focus / on input | Pass | No context change on focus/input; search runs on submit/typing without navigation |
+| 3.2.3 / 3.2.4 | Consistent navigation / identification | Pass | Same header, footer and controls on all pages |
+| 3.2.6 | Consistent help | Pass | "Accessibility statement & feedback" link in the same footer position on every page |
+| 3.3.1–3.3.4 | Input errors / labels | Pass / N/A | Search has a visible label; no forms that submit data |
+| 3.3.7 | Redundant entry | N/A | No multi-step processes |
+| 3.3.8 | Accessible authentication (min) | N/A | No login |
+| 4.1.2 | Name, role, value | Pass | Menu button `aria-expanded`+`aria-controls`; theme toggle `aria-pressed`; `aria-current` on the current nav item and chapter. The language switch is a single link to the counterpart page (so `aria-current` does not apply); the current language is exposed via `<html lang>` and the link names the target language |
+| 4.1.3 | Status messages | Pass | Copy result and search result count via `aria-live`/`role="status"` |
+
+### Viewport checks
+
+320, 360, 375, 414, 768, 1024, 1440 px (scripted `scrollWidth === innerWidth` on 16 representative pages incl. home ×2, Appendix A ×2, search ×2, accessibility ×2, 404 and root; re-run 2026-11-16) — no body horizontal scroll. Keyboard (2026-11-16, both languages): first Tab = skip link; mobile menu traps focus for 80 Tab + 10 Shift+Tab presses; Esc closes and returns focus to the menu button (`aria-expanded=false`). Screenshots reviewed at 320 (home), 375 (Appendix A table, open mobile menu), 768 (quiz, dark), 1440 (home contents, Appendix A). Body text 18 px (prose) / ≥16 px (UI); `viewport-fit=cover` + safe-area insets; no `user-scalable=no`.
+
+### Known gaps
+
+- Lighthouse was not run (axe-core only). Screen-reader testing with NVDA/VoiceOver was not performed — only the accessibility tree via axe and scripted keyboard checks.
+- Hex addresses/hashes are read character by character by screen readers (mitigated by copy buttons and explorer links).
+- Copy buttons are 28 px on fine pointers (meets 2.5.8's 24 px, below the 44 px preference); 44 px on touch.
+- The OG PNGs are rendered with headless Chrome (`scripts/qa/render-og.mjs`); they are not regenerated by `npm run build`.
+- Pagefind's index is client-side; search needs JavaScript (contents/prev-next work without it).
+- On GitHub *project* Pages, `robots.txt` lives under the base path, which crawlers don't read; use a custom domain or Cloudflare for a root robots.txt.
+
+## Open decisions
+
+1. **Author attribution** — decided 2026-11-17: “Kang” (Person) by default; `AUTHOR_NAME` overrides.
+2. **Repository** — https://github.com/cnkang/lets-play-web3 (public). `REPO_URL` defaults to it; the workflow also sets it. Expected site: https://cnkang.github.io/lets-play-web3/ once Pages (Source: GitHub Actions) is enabled.
+3. **Hosting**: GitHub Pages (project path `/lets-play-web3/`) is the chosen first host; Cloudflare Pages / a custom domain remain possible later (pick one canonical host to avoid duplicate content).
+4. **Publishing (2026-11-17)**: the tree was published to `cnkang/lets-play-web3` through the GitHub connector's text-only file API (no git credentials on the build box). Binary OG images are therefore stored as `assets/og/*.png.b64` and decoded by `scripts/binary-assets.mjs` before dev/build/preview (byte-identical, sha256-checked); `public/og/*.png` is git-ignored.
+
+## File tree (excluding node_modules, dist, .git)
+
+```
+.
+├── .env.example            # public URLs only
+├── .github/workflows/deploy.yml
+├── .gitignore  .nvmrc
+├── BUILD-NOTES.md  README.md  CONTRIBUTING.md (中文：怎样加章节 / 实验)
+├── templates/chapter.{zh,en}.mdx
+├── assets/og/{zh,en}.png.b64   # base64 source of the OG PNGs (decoded before dev/build)
+├── astro.config.mjs        # static output, SITE_URL/BASE, trailing slash, Shiki themes
+├── package.json  package-lock.json
+├── wrangler.toml           # optional, Cloudflare Pages direct upload
+├── public/
+│   ├── favicon.svg
+│   ├── diagrams/{zh,en}/{blocks,wallet-flow,counter,approve,proxy,redenomination,test-layers}.svg
+│   └── og/{zh,en}.svg sources (PNG decoded from assets/og/*.png.b64)
+├── scripts/
+│   ├── build_diagrams.py   gen_appendix.py   check-facts.mjs   check-content.mjs   new-chapter.mjs
+│   └── qa/ (axe-check, overflow-check, focus-not-obscured, keyboard-check, render-og, README)
+└── src/
+    ├── components/ Addr Tx CopyChip Figure Callout Lab T SafetyNotice Snapshot BookToc Quiz (.astro)
+    ├── content.config.ts
+    ├── content/parts.json  content/phases.json
+    ├── content/chapters/{zh,en}/01…19-*.mdx
+    ├── content/pages/{zh,en}/accessibility.mdx
+    ├── data/ book.ts (UI strings) chapters.ts (getBook) site.ts quiz.ts llms.ts
+    ├── layouts/BaseLayout.astro
+    ├── pages/ index.astro 404.astro sitemap.xml.ts robots.txt.ts llms.txt.ts llms-full.txt.ts
+    │   └── [lang]/ index.astro search.astro accessibility.astro chapters/[slug].astro
+    └── styles/global.css
+```

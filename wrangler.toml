@@ -1,0 +1,16 @@
+# Optional Cloudflare Pages config. NOT needed for local development or preview
+# (use `npm run dev` / `npm run preview`). The site is plain static files in dist/.
+#
+# Cloudflare Pages dashboard settings (Git integration):
+#   Build command:          npm run build
+#   Build output directory: dist
+#   Environment variables:  NODE_VERSION=24
+#                           SITE_URL=https://<project>.pages.dev   (or your custom domain)
+#                           BASE=/
+#                           REPO_URL=https://github.com/<you>/lets-play-web3   (optional)
+#
+# Direct upload instead of Git integration:
+#   npx wrangler pages deploy dist --project-name lets-play-web3
+name = "lets-play-web3"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-11-01"
