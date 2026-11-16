@@ -1,0 +1,41 @@
+---
+// Real 404 page (GitHub Pages and Cloudflare Pages both serve /404.html).
+// Bilingual on purpose: we cannot know which edition the visitor came from.
+import '../styles/global.css'
+import { href } from '../data/site'
+---
+<!doctype html>
+<html lang="zh-CN" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>找不到页面 · Page not found · 一起玩 Web3 · Let’s Play Web3</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href={href('favicon.svg')} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到正文</a>
+    <main id="main" tabindex="-1">
+      <div class="shell">
+        <div class="article prose">
+          <h1>找不到这个页面</h1>
+          <p>链接可能写错了，或者这一章还没有写。你可以：</p>
+          <ul>
+            <li><a href={href('zh/')}>回到中文版首页</a></li>
+            <li><a href={href('zh/chapters/01-how-to-read/')}>从第 1 章开始读</a></li>
+            <li><a href={href('zh/search/')}>搜索全书</a></li>
+          </ul>
+          <section lang="en" aria-labelledby="en-404">
+            <h2 id="en-404">Page not found</h2>
+            <p>The link may be mistyped, or that chapter has not been written yet. You can:</p>
+            <ul>
+              <li><a href={href('en/')}>Go to the English home page</a></li>
+              <li><a href={href('en/chapters/01-how-to-read/')}>Start with Chapter 1</a></li>
+              <li><a href={href('en/search/')}>Search the book</a></li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

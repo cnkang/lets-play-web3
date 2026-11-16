@@ -1,0 +1,28 @@
+---
+// Root: send visitors to the default (Chinese) edition. A real page with a
+// visible link (not a JS-only redirect), canonical pointing at /zh/.
+import '../styles/global.css'
+import { href, absolute } from '../data/site'
+const target = href('zh/')
+---
+<!doctype html>
+<html lang="zh-CN" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>一起玩 Web3 · Let’s Play Web3</title>
+    <meta name="description" content="一起玩 Web3 / Let’s Play Web3：中英双语区块链入门教材（仅 Sepolia 测试网）。" />
+    <link rel="canonical" href={absolute('zh/')} />
+    <link rel="alternate" hreflang="zh-CN" href={absolute('zh/')} />
+    <link rel="alternate" hreflang="en" href={absolute('en/')} />
+    <link rel="alternate" hreflang="x-default" href={absolute('zh/')} />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="icon" type="image/svg+xml" href={href('favicon.svg')} />
+  </head>
+  <body>
+    <main id="main" class="shell">
+      <h1>一起玩 Web3 · <span lang="en">Let’s Play Web3</span></h1>
+      <p><a href={target}>进入中文版</a> · <a href={href('en/')} lang="en" hreflang="en">Read in English</a></p>
+    </main>
+  </body>
+</html>
