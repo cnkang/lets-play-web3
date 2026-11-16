@@ -1,0 +1,61 @@
+---
+title: "Next stop: P1 DeFi (not started yet)"
+description: "A reserved chapter. Phase 0 is wrapped up; Phase 1 (DeFi) has not started. Planned topics - DEX / AMM, swaps and price impact, slippage, liquidity, impermanent loss, and always revoking allowances after each experiment."
+navTitle: "Next stop: P1 DeFi (not started yet)"
+part: p1-defi
+order: 190
+status: published
+---
+
+<p class="lead">This chapter is reserved for later. The P1 DeFi experiments <strong>have not started yet</strong>, and nothing below is an on-chain result.</p>
+
+<Callout type="warn" title="Status: not started">
+
+This chapter has no deployments, no transactions and no addresses. When P1 is actually done, its experiments will be added to this book as new chapters, with verifiable transactions and block numbers like the ones before.
+
+</Callout>
+
+## What P0 gave you
+
+You have already deployed contracts, read state, made transfers and approvals, upgraded a proxy, run tests and verified source. For the next phase, aim for **one minimal, observable trading loop**:
+
+1. understand how a DEX / AMM works;
+2. prepare test tokens;
+3. approve a **limited** amount (never infinite);
+4. simulate a swap first;
+5. observe inputs, outputs and the change in reserves;
+6. **revoke the allowance**;
+7. review the fees and slippage.
+
+## Planned topics
+
+<T label="Planned P1 topics">
+
+| Topic | Everyday analogy | Suggested order |
+| --- | --- | --- |
+| DEX / AMM | A currency exchange machine with no counter staff | Understand the AMM model locally first |
+| Swaps and price impact | Changing a little money vs a big order that moves the rate | Record reserves before and after |
+| Slippage | The gap between the quoted and the final price | Set an acceptable range |
+| Liquidity | The float an exchange counter keeps on hand | Watch deposits and withdrawals first |
+| Impermanent loss | Two kinds of stock whose values move with prices | Work it out on paper, then experiment |
+| Cleaning up allowances | Cancelling automatic deductions | **Required at the end of every round** |
+
+</T>
+
+## Principles to keep
+
+- **Low cost**: testnet only, budget still $0.
+- **Verifiable**: number every new experiment and record its goal, steps, transaction hashes, blocks, outputs and risks.
+- **Few approvals**: approve limited amounts and `approve(spender, 0)` right after use.
+- **Simulate locally first**: a passing simulation is not an on-chain result; write the two up separately.
+- Keep phase 1 as the "2026-11-12 historical snapshot" and **never overwrite old evidence with new results**; keep theory, project evidence, assumptions and open questions apart.
+- Never present testnet amounts, passing tests or source verification as earnings or an audit guarantee.
+
+## Where to read more
+
+- Ethereum developer docs: [ethereum.org/en/developers/docs](https://ethereum.org/en/developers/docs/)
+- Solidity: [docs.soliditylang.org](https://docs.soliditylang.org/)
+- Foundry: [getfoundry.sh](https://getfoundry.sh/)
+- The ERC-20 standard: [eips.ethereum.org/EIPS/eip-20](https://eips.ethereum.org/EIPS/eip-20)
+- Sourcify: [docs.sourcify.dev](https://docs.sourcify.dev/)
+- Sepolia Etherscan: [sepolia.etherscan.io](https://sepolia.etherscan.io/)

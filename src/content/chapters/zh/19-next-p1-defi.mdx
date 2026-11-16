@@ -1,0 +1,61 @@
+---
+title: "下一站：P1 DeFi（尚未开始）"
+description: "预留章节。第一阶段（P0）已经收尾；P1 DeFi 尚未开始。计划的主题：DEX / AMM、兑换与价格影响、滑点、流动性、无常损失，以及每轮实验结束必须撤销授权。"
+navTitle: "下一站：P1 DeFi（尚未开始）"
+part: p1-defi
+order: 190
+status: published
+---
+
+<p class="lead">这一章是给以后预留的。P1 DeFi 实验<strong>还没有开始</strong>，下面没有任何链上结果。</p>
+
+<Callout type="warn" title="状态：尚未开始">
+
+本章没有部署、没有交易、没有地址。等 P1 真正做完，新的实验会作为新的章节加进这本书，并像前面一样附上可核对的交易和区块号。
+
+</Callout>
+
+## P0 给你打下的基础
+
+你已经亲手经历了：部署合约、读取状态、转账与授权、代理升级、测试，以及源码核实。下一阶段建议只做一个**最小、可观察的交易闭环**：
+
+1. 了解 DEX / AMM 的原理；
+2. 准备测试代币；
+3. **限额**授权（不要无限授权）；
+4. 先模拟一次兑换（Swap）；
+5. 观察输入、输出和储备的变化；
+6. **撤销授权**；
+7. 复盘手续费与滑点。
+
+## 计划中的主题
+
+<T label="P1 计划主题">
+
+| 主题 | 生活类比 | 建议顺序 |
+| --- | --- | --- |
+| DEX / AMM | 不需要柜台的自动兑换机 | 先在本地理解 AMM 模型 |
+| 兑换与价格影响 | 小额换汇，与大单改变兑换比例 | 记录交易前后的储备 |
+| 滑点（slippage） | 报价与最终成交价之间的差 | 设置可以接受的范围 |
+| 流动性（liquidity） | 兑换柜台的备用金 | 先观察注资与退出 |
+| 无常损失（impermanent loss） | 两种库存的价值随价格波动 | 先做纸面推演，再做实验 |
+| 清理授权 | 取消自动代扣权限 | **每轮实验结束必做** |
+
+</T>
+
+## 继续坚持的原则
+
+- **低成本**：仍然只用测试网，预算仍然是 0。
+- **可核查**：每个新实验都编号，记录目标、步骤、交易哈希、区块、输出和风险。
+- **少授权**：限额授权，用完立刻 `approve(spender, 0)`。
+- **先本地模拟**：模拟通过不等于链上生效，两者分开写。
+- 保留第一阶段作为「2026-11-12 历史快照」，**不要用新结果覆盖旧证据**；把理论解释、项目实证、假设与待核实事项分开保存。
+- 不要把测试网资产数额、测试通过或开源验证写成收益或审计保证。
+
+## 参考入口
+
+- Ethereum 开发者文档：[ethereum.org/en/developers/docs](https://ethereum.org/en/developers/docs/)
+- Solidity：[docs.soliditylang.org](https://docs.soliditylang.org/)
+- Foundry：[getfoundry.sh](https://getfoundry.sh/)
+- ERC-20 标准：[eips.ethereum.org/EIPS/eip-20](https://eips.ethereum.org/EIPS/eip-20)
+- Sourcify：[docs.sourcify.dev](https://docs.sourcify.dev/)
+- Sepolia Etherscan：[sepolia.etherscan.io](https://sepolia.etherscan.io/)
