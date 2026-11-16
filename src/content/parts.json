@@ -1,0 +1,8 @@
+[
+  { "id": "everyday", "order": 10, "phase": "p0", "zh": "第一部分 · 从生活出发", "en": "Part I · Start from everyday life" },
+  { "id": "accounts", "order": 20, "phase": "p0", "zh": "第二部分 · 账户、交易与合约", "en": "Part II · Accounts, transactions, contracts" },
+  { "id": "tokens", "order": 30, "phase": "p0", "zh": "第三部分 · 代币与授权", "en": "Part III · Tokens and allowances" },
+  { "id": "upgradeable", "order": 40, "phase": "p0", "zh": "第四部分 · 可升级合约", "en": "Part IV · Upgradeable contracts" },
+  { "id": "wrapup", "order": 50, "phase": "p0", "zh": "第五部分 · 证据与收尾", "en": "Part V · Evidence and wrap-up" },
+  { "id": "p1-defi", "order": 60, "phase": "p1", "zh": "接下来", "en": "What comes next" }
+]

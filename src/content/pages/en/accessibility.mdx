@@ -1,0 +1,40 @@
+---
+title: "Accessibility statement"
+description: "This site targets WCAG 2.2 Level AA. What we designed for, how we self-tested, known limitations, and how to report a barrier. The site has not been certified by a third party."
+---
+
+<p class="lead">We want everyone, including people using a keyboard, a screen reader, magnification or a small phone, to be able to read this whole book.</p>
+
+## Target
+
+This site targets **WCAG 2.2 Level AA** (Web Content Accessibility Guidelines 2.2, Level AA). This is a **self-assessment**; the site has not been audited or certified by a third party.
+
+## What we did
+
+- Every page has a "Skip to content" link, the first thing to receive focus when you press Tab, and uses header, navigation, main and footer landmarks.
+- Everything works with a keyboard alone, with a clearly visible focus outline; the sticky header never hides the focused element.
+- The mobile contents menu closes with Esc, keeps focus inside while open, and returns focus to its button when closed.
+- The current chapter and section are marked with `aria-current`; the page language is set in the `lang` attribute, and the language switch announces the target language and opens the same page in that language.
+- Body text has at least 4.5:1 contrast and interface parts at least 3:1. Light mode is the default; dark mode meets the same contrast and remembers your choice.
+- Click and tap targets are at least 44×44 pixels; nothing needs hovering or dragging.
+- Every diagram has a title, a text alternative and a caption in both languages. Tables use header cells; wide tables and diagrams scroll inside their own area so the page never scrolls sideways.
+- Pages work from 320 pixels wide to desktop, text can be zoomed to 200%, and the system "reduce motion" setting is respected.
+- The search box has a visible label and the number of results is announced. The contents and previous/next links always work, so search is never required.
+
+## How we tested
+
+- Automated checks with axe-core on the home page, a chapter, the appendix, the self-check page and the 404 page, in both languages and in light and dark modes.
+- A manual keyboard pass: Tab / Shift+Tab order, visible focus, focus not hidden by the header, and Esc plus focus wrapping in the mobile menu.
+- Layout checks at 320, 375, 768, 1024 and 1440 pixels wide.
+
+Automated tools only catch some problems, so we do not claim full conformance.
+
+## Known limitations
+
+- On-chain addresses and transaction hashes are long hexadecimal strings that screen readers spell out character by character; each has a Copy button and a block-explorer link.
+- The accessibility of external sites (such as Sepolia Etherscan) is outside our control.
+- The site has no forms that need a login or a CAPTCHA, so criteria such as Accessible Authentication do not apply.
+
+## Reporting a problem
+
+If something gets in your way, please open an issue in this site's source repository with the page address, your device and assistive technology, and what happened. We will look at it as soon as we can. This way of reporting is in the same place in the footer on every page.
