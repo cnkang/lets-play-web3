@@ -1,0 +1,31 @@
+# dependencies
+node_modules/
+
+# Astro build output and caches
+dist/
+.astro/
+.cache/
+*.tsbuildinfo
+
+# secrets — never commit any of these
+.env
+.env.*
+!.env.example
+.secrets/
+*.key
+*.pem
+*.p12
+accounts.secret*.json
+
+# Open Graph PNGs are decoded from assets/og/*.png.b64 by scripts/binary-assets.mjs
+# (runs automatically before dev/build/preview); the .b64 files are tracked.
+public/og/*.png
+
+# local tooling / OS noise
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.vscode/
+.idea/
+/tmp/
