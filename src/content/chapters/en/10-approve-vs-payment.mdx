@@ -1,0 +1,50 @@
+---
+title: "Approval is not payment"
+description: "Holder, spender and recipient; approve only records an allowance and leaves balances unchanged; transferFrom or burnFrom is what moves tokens; three risks of allowances and one habit - revoke with approve(spender, 0) when you are done."
+navTitle: "10 · Approval is not payment"
+part: tokens
+order: 100
+status: published
+---
+
+<p class="lead">Three roles: holder, spender, recipient. Approving and spending are two separate actions.</p>
+
+## Why do wallets keep asking you to "approve" rather than "pay"?
+
+Many decentralised exchanges and services first ask the holder to **approve** a smart contract to use up to some amount of a token (`approve`), and only later, when you act, does that contract call `transferFrom`.
+
+- **`approve` is not a payment**: it only writes into the token contract "B may move up to this much of A's tokens". **Balances do not change at all.**
+- What actually moves balances is a later `transferFrom` (move) or `burnFrom` (destroy) sent by the spender.
+- An approval **stays valid** until the allowance is used up or the holder sends another `approve` to change it.
+
+So although an approval is not "money already gone", a long-lived approval is a standing permission for future deductions.
+
+<Figure name="approve" n="4" alt="Five steps: A calls approve(B,500), allowance 500, balances unchanged; B calls burnFrom(A,100), allowance 400; B calls transferFrom moving 100 from A to B, allowance 300; B calls transferFrom moving 200 from A to A, allowance 100; A calls approve(B,0), allowance 0.">
+The real history of allowance(A, B) on MBox-Burn in the lab. Approving and spending are different transactions; revoking takes another approve(B, 0), effective only once it is mined.
+</Figure>
+
+## An allowance is an overwritable "remaining amount"
+
+- After part of it is used, the rest **stays valid**: in the lab B burned 100 and 400 remained.
+- A new `approve` **overwrites; it does not add**. If the allowance is 100 and you `approve(B, 500)`, the result is 500, not 600.
+- To clear it, send `approve(B, 0)`.
+
+## Three risks and one habit
+
+1. **Too large an allowance**: if the approved contract has a bug or malicious logic, a bigger allowance means a bigger possible loss.
+2. **Approving the wrong address**: a familiar name does not make an address trustworthy (remember Chapter 9: names are not unique).
+3. **Forgotten approvals**: after you stop using a service, the allowance may still be usable.
+
+**One habit**: at the end of every experiment, check `allowance`; when it is no longer needed, send `approve(spender, 0)` to revoke it.
+
+<Callout type="warn" title="Revoking has a time window too">
+
+A revocation must be sent by the **holder**, and takes effect only once it is mined. Until then, the old allowance can still be used.
+
+</Callout>
+
+## Everyday analogy
+
+You authorise a food-delivery platform to deduct "up to 100 loyalty points a month". Nothing is deducted at that moment; points are only taken when the platform actually places an order. Later you stop using it and set the deductible limit to 0. That withdraws permission; it does not hand 100 points to anyone.
+
+The next chapter is this whole process as a real experiment on Sepolia.
