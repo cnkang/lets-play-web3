@@ -1,0 +1,89 @@
+---
+title: "Lab: MBox-Burn, burning and revoking"
+description: "The MBox-Burn lab (0x2AE6BbE8b524381535D1f443fe95018b1f64e3F2) - burn is not a transfer to address zero; approve 500, burnFrom 100, the leftover allowance later fell to 100; decision D-01 revoked it with approve(B, 0) in block 12117312, leaving balances and supply unchanged."
+navTitle: "11 · Lab: MBox-Burn, burning and revoking"
+part: tokens
+order: 110
+status: published
+---
+
+<p class="lead">Burning really lowers total supply; revoking an allowance changes only the allowance, never balances.</p>
+
+## Deploying a burnable token
+
+The deployed MBox has no burn function and cannot get one later, so a separate token with `burn` / `burnFrom` was deployed:
+
+- Contract address: <Addr a="0x2AE6BbE8b524381535D1f443fe95018b1f64e3F2" />
+- Name: `超级无敌宇宙第一老马斯克看了都不知道该叫什么的焚烧Token` (the MBox name with "焚烧", "burn", added), symbol `MBox-Burn`, initial supply 1,000,000, all to account A
+
+Right after deployment, A burned 1,000 of its own tokens: `totalSupply` fell from 1,000,000 to **999,000**. The old MBox contract was not touched.
+
+## burn is not "transfer to 0x0"
+
+- **`burn`** lowers **both** the holder's balance and `totalSupply`, and emits `Transfer(holder → 0x0, amount)`.
+- **A plain `transfer` to the zero address** (if a contract allows it) changes balances only and does **not** lower `totalSupply`.
+
+Both can show a "transfer to 0x0" event in an explorer. Whether supply actually fell must be read from `totalSupply()`, not inferred from the event. This lab used a dedicated `burn`, so supply really went down.
+
+## approve 500, burnFrom 100
+
+1. A first sent B **0.0001 SepETH** to pay for test gas (B never used a faucet).
+2. A called `approve(B, 500)`: allowance 500, balances unchanged.
+3. B called `burnFrom(A, 100)`: A lost 100, supply fell another 100 to **998,900**, and **400** of the allowance remained.
+
+Two `transferFrom` calls in Chapter 12 later used 300 of those 400, **leaving 100**. That 100 allowance stayed in place after the lab; nobody cleared it.
+
+## D-01: revoking the leftover 100
+
+The P0 review recorded this leftover allowance as a Low finding (F-ALLOW-001): not a compromised contract but a leftover from the experiment. If B signed, it could still move up to 100 test tokens. Decision **D-01** approved revoking it. After re-reading the allowance, nonce and balances and simulating again, A broadcast **exactly one** `approve(B, 0)`:
+
+<Tx h="0x4571e581958308c820ab16da26aa9d1a2622caa7c720ebe164b5d2c29a3747f2" />
+
+- Block **12117312**, status success; gasUsed 24,538, effective gas price 69 wei, fee 1,693,122 wei
+- `allowance(A, B)`: **100 → 0**
+- Balances and supply **unchanged**: A 998,800, B 100, `totalSupply` 998,900
+- A's nonce 19 → **20**
+
+## All MBox-Burn transactions
+
+<T label="MBox-Burn transactions">
+
+| Sender | Time (Singapore) | Action | Transaction | Block | Fee (wei) |
+| --- | --- | --- | --- | ---: | ---: |
+| A (nonce 7) | 2026-11-12 10:17:36 | Deploy MBox-Burn | <Tx h="0xd6582fecf142f8879e0d9259c79c3a07885ed0ef9d67ceb6d94d98cdd80d8c20" short /> | 12115825 | 555,368,628 |
+| A (nonce 8) | 10:17:48 | A burns 1,000 | <Tx h="0xe11a7f5e583e272633f5b1ef420597b496d594b976a6c698e3289de568f3b03b" short /> | 12115826 | 2,857,684 |
+| A (nonce 9) | 10:32:12 | Send B 0.0001 SepETH | <Tx h="0xdeb796869c494aac1311ea91248f54be4e1fd922d311ec73c9c949440fa4b77d" short /> | 12115897 | 13,912,800 |
+| A (nonce 10) | 10:32:24 | approve(B, 500) | <Tx h="0x36e04d365cc5c032ecaf752d938856a33ef00bc14432383c75b074258ae96fb9" short /> | 12115898 | 8,749,968 |
+| B (nonce 0) | 10:32:36 | burnFrom(A, 100) | <Tx h="0x8cd1de93ef180aa1c3590f8eb1dbafb6d63f5358f9b132d91c2a26c98130f259" short /> | 12115899 | 3,815,208 |
+| A (nonce 19) | — | D-01 approve(B, 0) | <Tx h="0x4571e581958308c820ab16da26aa9d1a2622caa7c720ebe164b5d2c29a3747f2" short /> | 12117312 | 1,693,122 |
+
+</T>
+
+B's two `transferFrom` calls are in Chapter 12.
+
+## MBox-Burn at the snapshot
+
+<T label="MBox-Burn state at the snapshot">
+
+| Item | Value |
+| --- | --- |
+| totalSupply | 998,900 |
+| balanceOf(A) | 998,800 |
+| balanceOf(B) | 100 |
+| allowance(A, B) | **0** (revoked) |
+
+</T>
+
+998,900 = 1,000,000 − 1,000 (A's own burn) − 100 (B's burnFrom).
+
+## Three things you can check yourself
+
+- **Transaction details**: the network is Sepolia, the sender is A, the target is the MBox-Burn contract, the status is success.
+- **Event or contract read**: the `Approval` event, or read `allowance(A, B)` directly and see that it is 0.
+- **Balances and supply**: changing an allowance **should not** change the holder's assets.
+
+<Callout type="note" title="Least privilege">
+
+The core security lesson here is "least necessary privilege". It often matters more than piling ever more features into a token contract.
+
+</Callout>

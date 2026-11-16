@@ -1,0 +1,84 @@
+---
+title: "Two calls are not one transaction: atomicity"
+description: "Two separate transferFrom calls are not atomic; UBOX V2's batchTransfer is - an intentionally failing batch (100 to B plus 2,000,000 to C) reverted entirely, and a successful batch sent 100 to B and 200 to A itself. Confirmed transactions cannot be undone."
+navTitle: "12 · Two calls are not one transaction: atomicity"
+part: tokens
+order: 120
+status: published
+---
+
+<p class="lead">"Two calls" are not "one transaction". All-or-nothing behaviour is called atomicity.</p>
+
+## Lab 1: two separate transferFrom calls (not atomic)
+
+Using the 400 still approved on MBox-Burn, B moved tokens out of A's balance in **two ordinary transactions**:
+
+<T label="Two separate transferFrom calls (MBox-Burn)">
+
+| Sender | Time (Singapore) | Action | Transaction | Block | Allowance | Fee (wei) |
+| --- | --- | --- | --- | ---: | --- | ---: |
+| B (nonce 1) | 2026-11-12 10:51:24 | transferFrom(A→B, 100) | <Tx h="0x678e1de0786a5fa5eda737f1be0638e3feb86acd0da4c153e8ce45bf7cc20bbd" short /> | 12115993 | 400 → 300 | 10,998,894 |
+| B (nonce 2) | 10:51:36 | transferFrom(A→A, 200) | <Tx h="0x2974d0c2ba1d18cf89cc7fed7747c539d2591962fcf6bc2e0bdc843616ca5e97" short /> | 12115994 | 300 → 100 | 2,555,716 |
+
+</T>
+
+Both succeeded. Result: A held 998,800, B held 100, 100 of the allowance remained, and total supply stayed 998,900. A's nonce did not change, because B signed both.
+
+**The key point**: these are two independent transactions. Once the first is mined, the 100 it moved is **not returned automatically** even if the second one fails (allowance too low, not enough gas, a node problem…).
+
+<Callout type="note" title="Self-transfer: an event, but zero net change">
+
+The second call moved 200 from A to A. Balances did not change, yet the chain still recorded a `Transfer(A, A, 200)` event. Do not equate "there is an event" with "assets changed".
+
+</Callout>
+
+## Lab 2: an intentionally failing batchTransfer (atomic)
+
+After the upgrade to V2 (Chapter 13), the UBOX token gained `batchTransfer`: it pays several recipients **inside one transaction**, and if any item fails the whole call reverts.
+
+A sent a batch whose second item could not possibly succeed:
+
+- **100** to B
+- **2,000,000** to a temporary address C (more than the total supply of 1,000,000)
+
+<Tx h="0x7dd2f8636c730acd9b1dbe095a1d6ebd6f9b327f5090042bcd448a80f60c1243" />
+
+- 2026-11-12 12:32:12 Singapore time, block **12116493**, status **reverted (failed)**, which is exactly what the experiment wanted
+- Revert reason (confirmed by an `eth_call` before sending): `insufficient balance`
+- Gas used **51,719**, fee **3,516,892 wei**; A's nonce 15 → 16
+- Afterwards A still had 1,000,000, B still 0, C still 0: the first item's 100 **did not** reach B either
+
+Demo address C (generated in memory, key never stored, received nothing): <Addr a="0x6E7F8eF4353DB8012Dea3F70eb523aB1A3051711" />
+
+<Callout type="warn" title="A failed transaction is still a transaction">
+
+It used nonce 15, paid for gas and is visible in the explorer; only its state changes were rolled back. Also, `estimateGas` itself fails for a call that is certain to fail, so the gas limit here (322,418) was set from the success-path estimate × 1.2. Unused gas limit is not charged.
+
+</Callout>
+
+## Lab 3: a successful batchTransfer
+
+The same function, this time with two items that can both succeed: **100** to B and **200** to A itself.
+
+<Tx h="0xd7789d9824d35afe60240767af5cf7dab098a2492349da62db8e6b267860679f" />
+
+- 2026-11-12 12:47:24 Singapore time, block **12116568**, status **success**
+- Gas used 152,264, fee 10,201,688 wei; A's nonce 16 → 17
+- Afterwards: A **999,900**, B **100**, total supply **1,000,000** (in the old units, before the V3 upgrade)
+- Events: `Transfer(A→B, 100)` and `Transfer(A→A, 200)`
+
+The 200 self-transfer is subtracted and added inside the same atomic transaction, netting to zero, but its event is still emitted.
+
+## Confirmed transactions cannot be undone
+
+Success or failure, once a transaction is mined and confirmed it **cannot be reversed**. The 100 sent to B in the successful batch cannot be "cancelled"; getting it back would need B to send a brand-new transfer, and the original stays in history forever.
+
+<T label="Non-atomic vs atomic">
+
+| Aspect | Two separate transferFrom calls | One batchTransfer |
+| --- | --- | --- |
+| Number of transactions | 2 | 1 |
+| If something fails midway | The already-mined one is not undone | The whole call reverts; nothing takes effect |
+| Good for | Unrelated operations | Operations that must be all-or-nothing |
+
+</T>

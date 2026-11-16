@@ -1,0 +1,89 @@
+---
+title: "实验：MBox-Burn 销毁与撤销授权"
+description: "MBox-Burn（0x2AE6BbE8b524381535D1f443fe95018b1f64e3F2）实验：burn 不等于转到零地址；approve 500、burnFrom 100、剩余额度后来降到 100；D-01 用 approve(B, 0) 撤销（区块 12117312），余额与供应不变。"
+navTitle: "11　实验：MBox-Burn 销毁与撤销授权"
+part: tokens
+order: 110
+status: published
+---
+
+<p class="lead">销毁会让总供应真的下降；撤销授权只改额度，不动余额。</p>
+
+## 部署一枚能销毁的代币
+
+已经部署的 MBox 没有销毁功能，也不能事后加上，所以另外部署了一个带 `burn` / `burnFrom` 的代币：
+
+- 合约地址：<Addr a="0x2AE6BbE8b524381535D1f443fe95018b1f64e3F2" />
+- 名称：`超级无敌宇宙第一老马斯克看了都不知道该叫什么的焚烧Token`，符号 `MBox-Burn`，初始供应 1,000,000 枚，全部给账户 A
+
+部署之后，A 自己销毁了 1,000 枚：`totalSupply` 从 1,000,000 降到 **999,000**。旧的 MBox 合约没有任何变化。
+
+## burn 不等于「转到 0x0」
+
+- **`burn`** 会**同时减少**持有人余额和 `totalSupply`，并发出 `Transfer(持有人 → 0x0, 数量)` 事件。
+- **普通 `transfer` 到零地址**（如果合约允许）只改变余额，**不减少** `totalSupply`。
+
+两种情况都可能在浏览器上看到「转到 0x0」的事件。供应到底有没有减少，要读 `totalSupply()`，不能只看事件。本实验用的是专门的 `burn`，所以供应确实下降了。
+
+## approve 500，burnFrom 100
+
+1. A 先给 B 转了 **0.0001 SepETH** 作为测试 gas（B 没有单独领水龙头）。
+2. A 调用 `approve(B, 500)`：额度 500，余额不变。
+3. B 调用 `burnFrom(A, 100)`：A 减少 100，供应再降 100 到 **998,900**，额度剩 **400**。
+
+剩下的 400 后来又被第 12 章的两笔 `transferFrom` 用掉 300，**还剩 100**。这 100 的授权在实验之后一直留着，没有清零。
+
+## D-01：撤销遗留的 100 授权
+
+P0 复核把这笔遗留授权记为一个 Low 级发现（F-ALLOW-001）：不是合约被攻破，而是实验残留——B 若签名，仍然可以动用最多 100 枚测试币。决策 **D-01** 批准撤销：重新读取额度、nonce、余额并模拟之后，由 A 广播**仅此一笔** `approve(B, 0)`：
+
+<Tx h="0x4571e581958308c820ab16da26aa9d1a2622caa7c720ebe164b5d2c29a3747f2" />
+
+- 区块 **12117312**，状态成功；gasUsed 24,538，有效气价 69 wei，手续费 1,693,122 wei
+- `allowance(A, B)`：**100 → 0**
+- 余额和供应**都不变**：A 998,800，B 100，`totalSupply` 998,900
+- A 的 nonce 19 → **20**
+
+## 全部 MBox-Burn 交易
+
+<T label="MBox-Burn 相关交易">
+
+| 发送者 | 时间（新加坡） | 操作 | 交易 | 区块 | 手续费（wei） |
+| --- | --- | --- | --- | ---: | ---: |
+| A（nonce 7） | 2026-11-12 10:17:36 | 部署 MBox-Burn | <Tx h="0xd6582fecf142f8879e0d9259c79c3a07885ed0ef9d67ceb6d94d98cdd80d8c20" short /> | 12115825 | 555,368,628 |
+| A（nonce 8） | 10:17:48 | A 销毁 1,000 | <Tx h="0xe11a7f5e583e272633f5b1ef420597b496d594b976a6c698e3289de568f3b03b" short /> | 12115826 | 2,857,684 |
+| A（nonce 9） | 10:32:12 | 给 B 转 0.0001 SepETH | <Tx h="0xdeb796869c494aac1311ea91248f54be4e1fd922d311ec73c9c949440fa4b77d" short /> | 12115897 | 13,912,800 |
+| A（nonce 10） | 10:32:24 | approve(B, 500) | <Tx h="0x36e04d365cc5c032ecaf752d938856a33ef00bc14432383c75b074258ae96fb9" short /> | 12115898 | 8,749,968 |
+| B（nonce 0） | 10:32:36 | burnFrom(A, 100) | <Tx h="0x8cd1de93ef180aa1c3590f8eb1dbafb6d63f5358f9b132d91c2a26c98130f259" short /> | 12115899 | 3,815,208 |
+| A（nonce 19） | — | D-01 approve(B, 0) | <Tx h="0x4571e581958308c820ab16da26aa9d1a2622caa7c720ebe164b5d2c29a3747f2" short /> | 12117312 | 1,693,122 |
+
+</T>
+
+B 的两笔 `transferFrom` 见第 12 章。
+
+## 快照时的 MBox-Burn
+
+<T label="快照时的 MBox-Burn 状态">
+
+| 项目 | 值 |
+| --- | --- |
+| totalSupply | 998,900 |
+| balanceOf(A) | 998,800 |
+| balanceOf(B) | 100 |
+| allowance(A, B) | **0**（已撤销） |
+
+</T>
+
+998,900 = 1,000,000 − 1,000（A 自己 burn）− 100（B 的 burnFrom）。
+
+## 自己核查可以看三类信息
+
+- **交易详情**：网络是 Sepolia，发起人是 A，目标是 MBox-Burn 合约，状态成功。
+- **事件或合约读取**：`Approval` 事件，或直接读 `allowance(A, B)`，确认已经是 0。
+- **余额与供应**：授权的变化**不应**改变持有人的资产。
+
+<Callout type="note" title="最小必要权限">
+
+这项练习的核心安全意义是「最小必要权限」。它的重要性，往往高于把代币合约的功能越写越复杂。
+
+</Callout>
