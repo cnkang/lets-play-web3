@@ -1,0 +1,118 @@
+---
+import { render } from 'astro:content'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import BookToc from '../../../components/BookToc.astro'
+import Addr from '../../../components/Addr.astro'
+import Tx from '../../../components/Tx.astro'
+import Figure from '../../../components/Figure.astro'
+import Callout from '../../../components/Callout.astro'
+import T from '../../../components/T.astro'
+import SafetyNotice from '../../../components/SafetyNotice.astro'
+import Snapshot from '../../../components/Snapshot.astro'
+import Quiz from '../../../components/Quiz.astro'
+import Lab from '../../../components/Lab.astro'
+import { ui, langs, type Lang } from '../../../data/book'
+import { getBook, partOf } from '../../../data/chapters'
+import { href, absolute, htmlLang, authorFor, authorLd, PUBLISHED, SNAPSHOT_ISO } from '../../../data/site'
+import { quiz } from '../../../data/quiz'
+
+export async function getStaticPaths() {
+  // One page per language for every published (or, in dev, draft) chapter.
+  const book = await getBook()
+  return book.pages.flatMap((c) => langs.map((lang) => ({ params: { lang, slug: c.slug }, props: { entry: c.entries[lang] } })))
+}
+
+const { entry } = Astro.props
+const { lang, slug } = Astro.params as { lang: Lang; slug: string }
+const t = ui[lang]
+const { Content, headings } = await render(entry)
+const book = await getBook()
+const idx = book.pages.findIndex((c) => c.slug === slug)
+const prev = idx > 0 ? book.pages[idx - 1] : undefined
+const next = idx < book.pages.length - 1 ? book.pages[idx + 1] : undefined
+const part = partOf(book, slug)
+const isDraft = entry.data.status === 'draft'
+const modified = entry.data.updated ?? PUBLISHED
+const author = authorLd(lang)
+const byline = authorFor(lang)
+const title = entry.data.title
+const path = `chapters/${slug}/`
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3)
+
+const jsonLd: object[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': ['TechArticle', 'LearningResource'],
+    headline: title,
+    name: title,
+    description: entry.data.description,
+    inLanguage: htmlLang[lang],
+    url: absolute(`${lang}/${path}`),
+    mainEntityOfPage: absolute(`${lang}/${path}`),
+    datePublished: PUBLISHED,
+    dateModified: modified,
+    author,
+    publisher: author,
+    image: absolute(`og/${lang}.png`),
+    learningResourceType: lang === 'zh' ? '教材章节' : 'Textbook chapter',
+    educationalLevel: lang === 'zh' ? '初学者' : 'Beginner',
+    isAccessibleForFree: true,
+    temporalCoverage: SNAPSHOT_ISO,
+    about: ['Ethereum Sepolia testnet', 'smart contracts', 'ERC-20'],
+    isPartOf: { '@type': 'WebSite', name: t.siteTitle, url: absolute(`${lang}/`) }
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t.siteTitle, item: absolute(`${lang}/`) },
+      { '@type': 'ListItem', position: 2, name: title, item: absolute(`${lang}/${path}`) }
+    ]
+  }
+]
+if (slug === '18-glossary-quiz') {
+  jsonLd.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    inLanguage: htmlLang[lang],
+    mainEntity: quiz[lang].map((x) => ({ '@type': 'Question', name: x.q, acceptedAnswer: { '@type': 'Answer', text: x.a } }))
+  })
+}
+// Every MDX component is available in every chapter without an import.
+const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz, Lab }
+---
+<BaseLayout lang={lang} title={title} description={entry.data.description} path={path} jsonLd={jsonLd} ogType="article" currentSlug={slug} noindex={isDraft}
+  navKey={slug === '16-appendix-addresses-txs' ? 'appendix' : slug === '18-glossary-quiz' ? 'glossary' : slug === '01-how-to-read' ? 'start' : undefined}>
+  <div class="shell chapter-grid">
+    <aside class="sidebar">
+      <BookToc lang={lang} current={slug} idPrefix="side-toc" />
+    </aside>
+    <article class="article" aria-labelledby="chapter-title" data-pagefind-body>
+      <header class="article-head">
+        <p class="eyebrow">{part?.[lang]}</p>
+        {isDraft && <p class="callout warn">{lang === 'zh' ? '草稿：只在本地开发模式可见，正式构建不会包含本章。' : 'Draft: visible in local dev only; production builds leave this chapter out.'}</p>}
+        <h1 id="chapter-title">{title}</h1>
+        <p class="meta-line">
+          <span>{lang === 'zh' ? `整理：${byline}` : `By ${byline}`}</span>
+          <span>{lang === 'zh' ? '页面发布：' : 'Published: '}<time datetime={PUBLISHED}>{PUBLISHED}</time>{modified !== PUBLISHED && <>{lang === 'zh' ? ' · 更新：' : ' · Updated: '}<time datetime={modified}>{modified}</time></>}</span>
+          <span>{lang === 'zh' ? '链上快照：' : 'Chain snapshot: '}<time datetime={SNAPSHOT_ISO}>2026-11-12 15:39:55 (UTC+8)</time>{lang === 'zh' ? '，区块 12117419' : ', block 12117419'}</span>
+        </p>
+      </header>
+      <div class="prose">
+        <Content components={components} />
+      </div>
+      <nav class="pager" aria-label={lang === 'zh' ? '章节翻页' : 'Chapter navigation'}>
+        {prev ? <a class="prev" href={href(`${lang}/chapters/${prev.slug}/`)} rel="prev"><span class="dir">← {t.prev}</span><span class="ttl">{prev.nav[lang]}</span></a> : <span />}
+        {next && <a class="next" href={href(`${lang}/chapters/${next.slug}/`)} rel="next"><span class="dir">{t.next} →</span><span class="ttl">{next.nav[lang]}</span></a>}
+      </nav>
+    </article>
+    {toc.length > 1 && (
+      <nav class="onpage" aria-labelledby="onpage-title">
+        <h2 id="onpage-title">{t.onThisPage}</h2>
+        <ol>
+          {toc.map((h) => <li class={`depth-${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}
+        </ol>
+      </nav>
+    )}
+  </div>
+</BaseLayout>

@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { langs, type Lang } from '../../data/book'
+import { href } from '../../data/site'
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }))
+}
+const { lang } = Astro.params as { lang: Lang }
+const zh = lang === 'zh'
+const title = zh ? '搜索全书' : 'Search the book'
+---
+<BaseLayout lang={lang} title={title} description={zh ? '在「一起玩 Web3」中文版中全文搜索章节、地址与术语。' : 'Full-text search across the English edition of Let’s Play Web3: chapters, addresses and terms.'} path="search/" navKey="search" noindex>
+  <div class="shell">
+    <div class="article" data-pagefind-ignore="all">
+      <h1>{title}</h1>
+      <p>{zh ? '搜索只是辅助：你也可以随时通过页面顶部的「目录」或首页的目录找到每一章。' : 'Search is only a helper: every chapter is also reachable from the contents in the menu and on the home page.'}</p>
+      <form class="search-form" role="search" action="" method="get" id="search-form">
+        <label for="q">{zh ? '输入关键词（例如 approve、nonce、0xc3F2…）' : 'Enter a keyword (for example approve, nonce, 0xc3F2…)'}</label>
+        <input id="q" name="q" type="search" autocomplete="off" enterkeyhint="search" />
+      </form>
+      <p id="search-status" role="status" aria-live="polite" class="snapshot" style="margin-top:1rem"></p>
+      <ol id="search-results" class="search-results" aria-label={zh ? '搜索结果' : 'Search results'}></ol>
+      <noscript><p>{zh ? '搜索需要 JavaScript。请改用目录浏览。' : 'Search needs JavaScript. Please use the contents instead.'}</p></noscript>
+    </div>
+  </div>
+  <script define:vars={{ pf: href('pagefind/pagefind.js'), zh }}>
+    const msg = zh
+      ? { idle: '输入关键词后按回车，或稍等片刻自动显示结果。', none: '没有找到结果。', n: (k) => `找到 ${k} 条结果。`, unavailable: '搜索索引只在 npm run build 之后可用（开发模式下没有索引）。请使用目录浏览。' }
+      : { idle: 'Type a keyword and press Enter, or wait a moment for results.', none: 'No results found.', n: (k) => `${k} result${k === 1 ? '' : 's'} found.`, unavailable: 'The search index only exists after npm run build (not in dev mode). Please use the contents.' }
+    const form = document.getElementById('search-form')
+    const input = document.getElementById('q')
+    const status = document.getElementById('search-status')
+    const list = document.getElementById('search-results')
+    status.textContent = msg.idle
+    let pagefind
+    async function load() {
+      if (pagefind) return pagefind
+      try { pagefind = await import(/* @vite-ignore */ pf); await pagefind.init?.() } catch { pagefind = null }
+      return pagefind
+    }
+    let timer
+    async function run() {
+      const q = input.value.trim()
+      const url = new URL(location.href)
+      if (q) url.searchParams.set('q', q); else url.searchParams.delete('q')
+      history.replaceState(null, '', url)
+      list.innerHTML = ''
+      if (!q) { status.textContent = msg.idle; return }
+      const p = await load()
+      if (!p) { status.textContent = msg.unavailable; return }
+      const r = await p.search(q)
+      const data = await Promise.all(r.results.slice(0, 20).map((x) => x.data()))
+      status.textContent = data.length ? msg.n(data.length) : msg.none
+      for (const d of data) {
+        const li = document.createElement('li')
+        const a = document.createElement('a')
+        a.href = d.url
+        a.textContent = d.meta?.title || d.url
+        const p2 = document.createElement('p')
+        p2.innerHTML = d.excerpt
+        li.append(a, p2)
+        list.append(li)
+      }
+    }
+    form.addEventListener('submit', (e) => { e.preventDefault(); run() })
+    input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(run, 300) })
+    const initial = new URL(location.href).searchParams.get('q')
+    if (initial) { input.value = initial; run() }
+  </script>
+</BaseLayout>

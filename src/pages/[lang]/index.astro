@@ -1,0 +1,107 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import BookToc from '../../components/BookToc.astro'
+import SafetyNotice from '../../components/SafetyNotice.astro'
+import Snapshot from '../../components/Snapshot.astro'
+import { ui, langs, type Lang } from '../../data/book'
+import { href, absolute, htmlLang, authorLd } from '../../data/site'
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }))
+}
+const { lang } = Astro.params as { lang: Lang }
+const t = ui[lang]
+const zh = lang === 'zh'
+const description = zh
+  ? '一本写给初学者的中英双语区块链教材：用日常类比讲原理，再用真实的 Ethereum Sepolia 测试网实验（Counter、ERC-20、授权、可升级代理、面额重标）逐一验证。仅测试网，不构成投资建议。'
+  : 'A bilingual beginner blockchain textbook: everyday analogies first, then real Ethereum Sepolia testnet experiments (Counter, ERC-20, allowances, an upgradeable proxy, redenomination). Testnet only, not financial advice.'
+const cards = zh
+  ? [
+      { t: '先问「为什么需要」', d: '用社区积分、商场联合收银、自动售货机这些日常场景，弄清区块链什么时候值得用、什么时候不值得。', s: '02-who-needs-blockchain' },
+      { t: '每个结论都有链上证据', d: 'Counter、MBox、MBox-Burn、可升级的 UBOX：8 个合约地址、全部广播交易，都附 Sepolia Etherscan 链接。', s: '08-lab-counter' },
+      { t: '把安全习惯练成肌肉记忆', d: '授权不是付款；转错地址无法找回；可升级意味着管理员权力；测试全过也不等于没有漏洞。', s: '10-approve-vs-payment' },
+      { t: '一本会继续长的书', d: '第一阶段（P0）已经收尾。下一阶段 P1 DeFi 会作为新章节接着写进同一本书。', s: '19-next-p1-defi' }
+    ]
+  : [
+      { t: 'Ask "why" before "how"', d: 'Community points, a shared mall checkout, a vending machine: everyday scenes that show when a blockchain is worth it and when it is not.', s: '02-who-needs-blockchain' },
+      { t: 'Every claim has on-chain evidence', d: 'Counter, MBox, MBox-Burn and the upgradeable UBOX: 8 contract addresses and every broadcast transaction, each linked to Sepolia Etherscan.', s: '08-lab-counter' },
+      { t: 'Turn safety into habit', d: 'Approval is not payment; a wrong address cannot be undone; upgradeable means an admin holds power; passing tests do not prove there are no bugs.', s: '10-approve-vs-payment' },
+      { t: 'A book that keeps growing', d: 'Phase 0 is wrapped up. Phase 1 (DeFi) will be added to this same book as new chapters.', s: '19-next-p1-defi' }
+    ]
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: t.siteTitle,
+    alternateName: zh ? 'Let’s Play Web3' : '一起玩 Web3',
+    url: absolute(`${lang}/`),
+    description,
+    inLanguage: htmlLang[lang],
+    publisher: authorLd(lang),
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: absolute(`${lang}/search/`) + '?q={search_term_string}',
+      'query-input': 'required name=search_term_string'
+    }
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    name: t.siteTitle,
+    inLanguage: htmlLang[lang],
+    url: absolute(`${lang}/`),
+    bookFormat: 'https://schema.org/EBook',
+    isAccessibleForFree: true,
+    author: authorLd(lang),
+    workTranslation: { '@type': 'Book', name: zh ? 'Let’s Play Web3' : '一起玩 Web3', inLanguage: zh ? 'en' : 'zh-CN', url: absolute(`${zh ? 'en' : 'zh'}/`) }
+  }
+]
+---
+<BaseLayout lang={lang} title={t.siteTitle} description={description} path="" jsonLd={jsonLd}>
+  <section class="hero-band" aria-labelledby="hero-title">
+   <div class="hero-deco" aria-hidden="true"><span class="glow"></span><span class="d1"></span><span class="d2"></span><span class="d3"></span><span class="d4"></span></div>
+   <div class="hero">
+    <div>
+      <p class="kicker"><span class="pill">{t.siteTitle}</span><span>{zh ? '一本连续教材 · 中英双语 · 仅 Sepolia 测试网' : 'A continuous textbook · Chinese & English · Sepolia testnet only'}</span></p>
+      <h1 id="hero-title">{zh ? '从生活理解区块链，再亲手在测试网上验证' : 'Understand blockchains through everyday life, then verify it yourself on a testnet'}</h1>
+      <p class="sub">
+        {zh
+          ? '写给懂一点电脑和网络、但刚接触区块链的读者。每一章先用日常类比讲清原理，再拿真实的 Ethereum Sepolia 实验来核对：地址、交易哈希、区块号都能点开查看。'
+          : 'For readers who know a little about computers and networks but are new to blockchains. Each chapter explains an idea with an everyday analogy, then checks it against real Ethereum Sepolia experiments: every address, transaction hash and block number can be opened and verified.'}
+      </p>
+      <div class="btn-row">
+        <a class="btn primary" href={href(`${lang}/chapters/01-how-to-read/`)}>{zh ? '从第 1 章开始读' : 'Start with Chapter 1'}</a>
+        <a class="btn ghost" href={href(`${lang}/chapters/16-appendix-addresses-txs/`)}>{zh ? '查看地址与交易总表' : 'See every address and transaction'}</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <img src={href(`diagrams/${lang}/proxy.svg`)} width="960" height="540"
+        alt={zh ? '示意图：用户始终调用同一个代理地址，代理把调用转给可替换的实现合约 V1、V2、V3，升级由 ProxyAdmin 控制。' : 'Diagram: users always call the same proxy address; the proxy forwards calls to a replaceable implementation (V1, V2, V3); upgrades are controlled by ProxyAdmin.'} />
+    </div>
+   </div>
+  </section>
+
+  <div class="home-section notes-stack">
+    <SafetyNotice lang={lang} />
+    <Snapshot lang={lang} />
+  </div>
+
+  <section class="home-section" aria-labelledby="why-title">
+    <h2 id="why-title">{zh ? '这本书有什么不同' : 'What makes this book different'}</h2>
+    <ul class="cards">
+      {cards.map((c) => (
+        <li class="card">
+          <h3><a href={href(`${lang}/chapters/${c.s}/`)}>{c.t}</a></h3>
+          <p>{c.d}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="home-section" aria-labelledby="contents-title">
+    <h2 id="contents-title">{zh ? '目录' : 'Contents'}</h2>
+    <div class="home-toc-wrap">
+      <BookToc lang={lang} idPrefix="home-toc" />
+    </div>
+  </section>
+</BaseLayout>

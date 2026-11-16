@@ -1,0 +1,29 @@
+---
+import { getCollection, render } from 'astro:content'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { langs, type Lang } from '../../data/book'
+import { REPO_URL } from '../../data/site'
+export async function getStaticPaths() {
+  const pages = await getCollection('pages')
+  return langs.map((lang) => ({ params: { lang }, props: { entry: pages.find((p) => p.id === `${lang}/accessibility`)! } }))
+}
+const { lang } = Astro.params as { lang: Lang }
+const { entry } = Astro.props
+const { Content } = await render(entry)
+---
+<BaseLayout lang={lang} title={entry.data.title} description={entry.data.description} path="accessibility/" navKey="a11y">
+  <div class="shell">
+    <article class="article">
+      <h1>{entry.data.title}</h1>
+      <div class="prose">
+        <Content />
+        {REPO_URL ? (
+          <p><a href={`${REPO_URL}/issues`}>{lang === 'zh' ? '在 GitHub 提交无障碍问题' : 'Report an accessibility problem on GitHub'}</a></p>
+        ) : (
+          <p>{lang === 'zh' ? '（源码仓库公开发布后，这里会显示提交问题的链接。）' : '(A link for reporting problems will appear here once the source repository is published.)'}</p>
+        )}
+        <p class="meta-line">{lang === 'zh' ? '本声明更新于 2026-11-13。' : 'This statement was last updated on 2026-11-13.'}</p>
+      </div>
+    </article>
+  </div>
+</BaseLayout>
