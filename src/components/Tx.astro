@@ -1,0 +1,6 @@
+---
+import CopyChip from './CopyChip.astro'
+interface Props { h: string; short?: boolean }
+const { h, short = false } = Astro.props
+---
+<CopyChip value={h} kind="tx" short={short} />

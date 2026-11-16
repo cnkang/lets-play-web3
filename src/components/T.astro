@@ -1,0 +1,10 @@
+---
+// Accessible table wrapper: a keyboard-focusable, labelled scroll region with a
+// visible hint on narrow screens. Usage in MDX: <T label="…"> markdown table </T>
+interface Props { label: string }
+const { label } = Astro.props
+const lang = Astro.url.pathname.includes('/en/') ? 'en' : 'zh'
+const hint = lang === 'zh' ? '表格较宽：可在表格内左右滑动查看。' : 'Wide table: scroll sideways inside the table.'
+---
+<div class="table-wrap" role="region" aria-label={label} tabindex="0"><slot /></div>
+<p class="table-hint" aria-hidden="true">{hint}</p>

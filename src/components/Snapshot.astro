@@ -1,0 +1,11 @@
+---
+interface Props { lang: 'zh' | 'en' }
+const { lang } = Astro.props
+---
+<p class="snapshot">
+  {lang === 'zh' ? (
+    <Fragment><span aria-hidden="true">📌 </span><strong>快照说明：</strong>除非章节另有说明，链上数字都截至 <time datetime="2026-11-12T15:39:55+08:00">2026-11-12 15:39:55（新加坡时间，UTC+8）</time>、Sepolia 区块 <strong>12117419</strong>。这是历史记录，不是实时链上状态。</Fragment>
+  ) : (
+    <Fragment><span aria-hidden="true">📌 </span><strong>Snapshot:</strong> unless a chapter says otherwise, on-chain figures are as of <time datetime="2026-11-12T15:39:55+08:00">2026-11-12 15:39:55 Singapore time (UTC+8)</time>, Sepolia block <strong>12117419</strong>. This is a historical record, not live chain state.</Fragment>
+  )}
+</p>
