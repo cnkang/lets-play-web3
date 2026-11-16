@@ -1,0 +1,46 @@
+---
+title: "Nodes and trust boundaries"
+description: "What a node is, what a blockchain can and cannot prove, and four things it does not solve on its own: real-world truth, privacy, lost keys and buggy contracts."
+navTitle: "4 · Nodes and trust boundaries"
+part: everyday
+order: 40
+status: published
+---
+
+<p class="lead">"Hard for one party to tamper with" does not mean "always true, always safe, never changeable".</p>
+
+## What a node is
+
+A **node** is a computer running blockchain software that stores or validates on-chain data. With an ordinary web request you usually have to trust whatever the server returns; with a blockchain, different nodes can each check that transactions follow the same rules. Nodes differ in their roles and in how much data they keep: some keep the full history (archive nodes), others only recent state.
+
+The labs in this book used a **free public RPC node**:
+
+```text
+https://ethereum-sepolia-rpc.publicnode.com
+```
+
+It needs no API key. The trade-offs are limited speed and reliability and **no archive data**: asking for the state at an old block may fail. That is why the P0 review rebuilt the upgrade path locally instead of paying for an archive node (see Chapter 15).
+
+## Everyday analogy: a shared mall checkout
+
+Suppose three shops share a points ledger that no single shop can rewrite. Shop A claims it added 10 points for a customer; the other shops can check by the rules whether that change is valid.
+
+But that does not prove the customer **really** bought anything. Facts that happen offline still have to be entered by a trusted person, device or institution.
+
+## Four things a blockchain does not solve on its own
+
+1. **Real-world truth** (the oracle problem): a false report made before data goes on-chain is still recorded faithfully.
+2. **Privacy**: addresses and interactions on a public chain can usually be traced by anyone.
+3. **Lost keys**: losing a private key is not like forgetting a website password. There is no "reset password" button.
+4. **Buggy contracts**: code can be executed in public, and it can also execute **the wrong logic** in public.
+
+<Callout type="warn" title="The key distinction">
+
+"Hard to tamper with unilaterally" does not mean "always true", "always safe" or "never changeable". In Chapter 13 you will see that the admin of an upgradeable contract can legitimately change the rules behind the same address.
+
+</Callout>
+
+## Where this shows up in the labs
+
+- Chapter 9: 1,000 MBox were sent to an address that has **no private key**, so they can never be moved: an extreme case of a lost key.
+- Chapters 14–15: the P0 review still found a Medium-severity issue. Putting code on-chain does not make design flaws disappear.

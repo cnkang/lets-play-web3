@@ -1,0 +1,46 @@
+---
+title: "Blocks, hashes and consensus"
+description: "Use a bound ledger book to understand blocks and hashes, why hashes alone are not enough without consensus, and why Ethereum's proof of stake is not simply \"computers voting on who is right\"."
+navTitle: "3 · Blocks, hashes and consensus"
+part: everyday
+order: 30
+status: published
+---
+
+<p class="lead">Understand blocks as pages that reference the page before, not as a magic safe that can never go wrong.</p>
+
+## A bound ledger book
+
+Bind each day's records into a book: every page lists that day's transactions and time, and **copies a summary of the previous page**.
+
+A **hash** works like a content fingerprint: the same content always gives the same fingerprint, and changing even one character usually gives a completely different one. Because each page records the previous page's fingerprint, editing any page in the past makes every later fingerprint stop matching, so the edit is easy to detect.
+
+<Figure name="blocks" n="1" alt="Three blocks left to right; each holds the previous block's fingerprint, its transactions and its own fingerprint, with arrows linking each fingerprint into the next block.">
+Blocks hold transaction data and are linked by the previous block's hash. H(…) in the figure is a symbol, not a real value.
+</Figure>
+
+## Why is consensus still needed?
+
+If you keep a hash-linked log on your own, you can simply rewrite it from the start and recompute every fingerprint. Hashes alone cannot stop a complete rewrite.
+
+The real key of a blockchain is that **many independent nodes follow the same rules and jointly decide which history to accept**. Those rules are the consensus mechanism, and different networks use different ones.
+
+## Proof of stake on Ethereum
+
+Ethereum currently uses **proof of stake** (PoS). Roughly:
+
+- people who want to propose and validate blocks (validators) must **stake** ETH as a deposit;
+- the protocol selects a validator to propose each block, and other validators check that the block follows the rules and **attest** to it;
+- rule-breaking can be penalised, for example by losing part of the stake.
+
+So it is **not** simply "every computer votes on who is right". Voting weight and eligibility come from stake and protocol rules, every node independently checks that transactions and blocks are valid, and honest nodes reject invalid blocks.
+
+<Callout type="note" title="Key idea">
+
+Hashes help **detect** changes; consensus rules and distributed validation decide **which state is accepted**. You need both.
+
+</Callout>
+
+## What you will see in the labs
+
+Every lab transaction in this book lists its **block number**. For example, the D-01 allowance revocation landed in block **12117312**, and the book's snapshot was taken at block **12117419**. Higher numbers came later. Open any block on Sepolia Etherscan and you will see its hash and its "Parent Hash": the chain in this chapter's figure.
