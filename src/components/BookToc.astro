@@ -1,0 +1,36 @@
+---
+// Book contents, generated from the chapter files (see src/data/chapters.ts).
+import type { Lang } from '../data/book'
+import { getBook } from '../data/chapters'
+import { href } from '../data/site'
+interface Props { lang: Lang; current?: string; idPrefix: string }
+const { lang, current, idPrefix } = Astro.props
+const book = await getBook()
+const soon = lang === 'zh' ? '即将推出' : 'Coming soon'
+const draft = lang === 'zh' ? '草稿' : 'Draft'
+const multiPhase = new Set(book.parts.map((p) => p.phase.id)).size > 1
+---
+<nav class="book-toc" aria-labelledby={`${idPrefix}-title`}>
+  <p class="toc-title" id={`${idPrefix}-title`}>{lang === 'zh' ? '全书目录' : 'Book contents'}</p>
+  {book.parts.map((p, i) => (
+    <div class="part" data-phase={p.phase.id}>
+      <p class="part-title" id={`${idPrefix}-part-${i}`}>
+        {multiPhase && (i === 0 || book.parts[i - 1].phase.id !== p.phase.id) && <span class="phase-tag">{p.phase[lang]}</span>}
+        <span>{p[lang]}</span>
+      </p>
+      <ol aria-labelledby={`${idPrefix}-part-${i}`}>
+        {p.chapters.map((c) => (
+          <li>
+            {c.status === 'upcoming' ? (
+              <span class="toc-upcoming">{c.nav[lang]} <span class="badge">{soon}</span></span>
+            ) : (
+              <a href={href(`${lang}/chapters/${c.slug}/`)} aria-current={c.slug === current ? 'page' : undefined}>
+                {c.nav[lang]}{c.status === 'draft' && <span class="badge">{draft}</span>}
+              </a>
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
+  ))}
+</nav>

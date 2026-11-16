@@ -1,0 +1,13 @@
+---
+interface Props { type?: 'note' | 'warn' | 'danger'; title: string }
+const { type = 'note', title } = Astro.props
+const icons = {
+  note: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-6h2Zm0-8h-2V7h2Z"/>',
+  warn: '<path d="M1 21h22L12 2Zm12-3h-2v-2h2Zm0-4h-2v-4h2Z"/>',
+  danger: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-2h2Zm0-4h-2V7h2Z"/>'
+}
+---
+<aside class={`callout ${type}`} aria-label={title}>
+  <p class="callout-title"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" set:html={icons[type]} /><span>{title}</span></p>
+  <slot />
+</aside>

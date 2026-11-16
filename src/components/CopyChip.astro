@@ -1,0 +1,11 @@
+---
+interface Props { value: string; kind: 'address' | 'tx'; short?: boolean }
+const { value, kind, short = false } = Astro.props
+const lang = Astro.url.pathname.includes('/en/') ? 'en' : 'zh'
+const href = `https://sepolia.etherscan.io/${kind === 'tx' ? 'tx' : 'address'}/${value}`
+const shown = short ? `${value.slice(0, 8)}…${value.slice(-6)}` : value
+const t = lang === 'zh'
+  ? { copy: '复制', what: kind === 'tx' ? '交易哈希' : '地址', view: kind === 'tx' ? '在 Sepolia Etherscan 查看交易' : '在 Sepolia Etherscan 查看地址', newtab: '（新窗口打开）' }
+  : { copy: 'Copy', what: kind === 'tx' ? 'transaction hash' : 'address', view: kind === 'tx' ? 'View transaction on Sepolia Etherscan' : 'View address on Sepolia Etherscan', newtab: ' (opens in a new tab)' }
+---
+<span class="chip"><a href={href} target="_blank" rel="noopener noreferrer" title={`${t.view}: ${value}`}><span class="visually-hidden">{t.view}{t.newtab}: </span><span aria-hidden={short ? 'true' : undefined}>{shown}</span>{short && <span class="visually-hidden">{value}</span>}</a><button type="button" class="copy-btn" data-copy={value} data-done={lang === 'zh' ? '已复制' : 'Copied'} aria-label={`${t.copy} ${t.what} ${value}`}>{t.copy}</button></span>

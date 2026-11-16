@@ -1,0 +1,7 @@
+---
+// A Sepolia address: monospace link to Etherscan + accessible copy button.
+import CopyChip from './CopyChip.astro'
+interface Props { a: string; short?: boolean; lang?: 'zh' | 'en' }
+const { a, short = false } = Astro.props
+---
+<CopyChip value={a} kind="address" short={short} />
