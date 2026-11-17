@@ -39,6 +39,8 @@ jobs:
         run: node scripts/check-facts.mjs
       - name: Decode OG images (assets/og/*.png.b64), content check (zh + en pairs) and build
         run: npm run build
+      - name: Check built links, assets and language URLs
+        run: npm run check:build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
