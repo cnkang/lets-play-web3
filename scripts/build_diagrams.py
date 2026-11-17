@@ -96,7 +96,7 @@ def blocks(lang):
                              "哈希让改动「容易被发现」；哪一条历史被接受，还要靠共识规则（以太坊用权益证明 PoS）。"], 18, gap=1.6, fill=C["amber"])
     else:
         b += lines(64, 432, ["Change one character in block N−1 → H(N−1) changes → block N no longer matches.",
-                             "Hashes make edits easy to spot; consensus decides which history is accepted (PoS on Ethereum)."], 18, gap=1.6, fill=C["amber"])
+                             "Hashes make edits easy to spot; consensus (PoS on Ethereum) decides which history counts."], 18, gap=1.6, fill=C["amber"])
     svg("blocks", lang,
         "区块、哈希与链" if zh else "Blocks, hashes and the chain",
         "三个区块从左到右排列。每个区块保存前一块的指纹、交易列表和本块指纹；箭头把前一块的指纹连到下一块。底部说明：改动旧区块会让后面的指纹对不上，但接受哪条历史由共识决定。" if zh else
@@ -110,20 +110,21 @@ def wallet_flow(lang):
     b = heading("一笔交易从签名到「看得见」" if zh else "A transaction from signing to \"visible\"")
     steps = [
         (("钱包", ["私钥只留在本地", "用它生成签名"]) if zh else ("Wallet", ["Private key stays", "local; makes the", "signature"]), C["brandSoft"], C["brand"]),
-        (("已签名交易", ["to、数据、nonce、", "gas 参数 + 签名"]) if zh else ("Signed tx", ["to, data, nonce,", "gas fields", "+ signature"]), C["paper2"], C["rule"]),
+        (("已签名交易", ["to、数据、", "nonce、gas 参数", "+ 签名"]) if zh else ("Signed tx", ["to, data, nonce,", "gas fields", "+ signature"]), C["paper2"], C["rule"]),
         (("RPC 节点", ["校验签名与 nonce", "放进待处理队列", "（内存池）"]) if zh else ("RPC node", ["checks signature", "and nonce; holds", "it in the mempool"]), C["paper2"], C["rule"]),
         (("验证者出块", ["把交易打包进", "某个区块"]) if zh else ("Validator", ["includes the tx", "in a block"]), C["tealSoft"], C["teal"]),
         (("区块浏览器", ["Network · Status", "From / To · Logs", "Block · Hash"]) if zh else ("Explorer", ["Network · Status", "From / To · Logs", "Block · Hash"]), C["paper2"], C["rule"]),
     ]
     x = 40
     for i, ((title, ls), fill, stroke) in enumerate(steps):
-        b += box(x, 130, 160, 200, fill, stroke, 14, 2 if stroke != C["rule"] else 1.5)
-        b += t(x + 80, 128 - 14, str(i + 1), 18, 700, C["ink3"], "middle")
-        b += t(x + 80, 170, title, 20, 700, C["ink"], "middle")
-        b += lines(x + 80, 212, ls, 16, gap=1.45, fill=C["ink2"], anchor="middle")
+        # 5 × 156 px boxes, 25 px gaps: the row spans 40–920 like the notes below
+        b += box(x, 130, 156, 200, fill, stroke, 14, 2 if stroke != C["rule"] else 1.5)
+        b += t(x + 78, 128 - 14, str(i + 1), 18, 700, C["ink3"], "middle")
+        b += t(x + 78, 170, title, 20, 700, C["ink"], "middle")
+        b += lines(x + 78, 212, ls, 16, gap=1.45, fill=C["ink2"], anchor="middle")
         if i < 4:
-            b += arrow(x + 162, 230, x + 188, 230)
-        x += 190
+            b += arrow(x + 158, 230, x + 179, 230)
+        x += 181
     b += box(40, 362, 430, 148, C["amberSoft"], C["amberLine"], 14)
     b += box(490, 362, 430, 148, C["redSoft"], C["red"], 14)
     if zh:
@@ -179,8 +180,8 @@ def counter(lang):
 # ---------------------------------------------------------------- 4 approve
 def approve(lang):
     zh = lang == "zh"
-    b = heading("授权 ≠ 付款：MBox-Burn 上 allowance(A, B) 的一生" if zh else "Approval ≠ payment: the life of allowance(A, B) on MBox-Burn",
-                "A = 持有人，B = 被授权者（spender）。数字均来自实验记录" if zh else "A = holder, B = spender. All numbers come from the lab notebook")
+    b = heading("授权 ≠ 付款：MBox-Burn 上 allowance(A, B) 的一生" if zh else "Approval ≠ payment: the life of allowance(A, B)",
+                "A = 持有人，B = 被授权者（spender）。数字均来自实验记录" if zh else "On MBox-Burn. A = holder, B = spender. All numbers come from the lab notebook")
     steps = [
         (["approve", "(B, 500)"], "A", "500", ["余额不变"] if zh else ["No balance", "change"]),
         (["burnFrom", "(A, 100)"], "B", "400", ["A −100", "供应 −100"] if zh else ["A −100", "supply −100"]),
@@ -191,15 +192,15 @@ def approve(lang):
     x = 40
     for i, (op, signer, allow, eff) in enumerate(steps):
         is_revoke = i == 4
-        b += box(x, 118, 168, 250, C["tealSoft"] if is_revoke else (C["brandSoft"] if i == 0 else C["paper2"]),
+        b += box(x, 118, 160, 250, C["tealSoft"] if is_revoke else (C["brandSoft"] if i == 0 else C["paper2"]),
                  C["teal"] if is_revoke else (C["brand"] if i == 0 else C["rule"]), 14, 2 if i in (0, 4) else 1.5)
-        b += t(x + 84, 150, ("签名者 " if zh else "Signed by ") + signer, 15, 600, C["ink3"], "middle")
-        b += lines(x + 84, 178, op, 15, gap=1.3, weight=700, fill=C["ink"], anchor="middle", mono=True)
-        b += t(x + 84, 236, "allowance", 14, 600, C["ink3"], "middle", mono=True)
-        b += t(x + 84, 282, allow, 42, 700, C["teal"] if is_revoke else C["brand"], "middle")
-        b += lines(x + 84, 320, eff, 15, gap=1.35, fill=C["ink2"], anchor="middle")
+        b += t(x + 80, 150, ("签名者 " if zh else "Signed by ") + signer, 15, 600, C["ink3"], "middle")
+        b += lines(x + 80, 178, op, 15, gap=1.3, weight=700, fill=C["ink"], anchor="middle", mono=True)
+        b += t(x + 80, 236, "allowance", 14, 600, C["ink3"], "middle", mono=True)
+        b += t(x + 80, 282, allow, 42, 700, C["teal"] if is_revoke else C["brand"], "middle")
+        b += lines(x + 80, 320, eff, 15, gap=1.35, fill=C["ink2"], anchor="middle")
         if i < 4:
-            b += arrow(x + 170, 243, x + 186, 243)
+            b += arrow(x + 161, 243, x + 179, 243)
         x += 180
     b += box(40, 392, 880, 118, C["amberSoft"], C["amberLine"], 14)
     if zh:
@@ -208,7 +209,7 @@ def approve(lang):
                              "撤销交易：D-01，区块 12117312。"], 16.5, gap=1.6, fill=C["amber"])
     else:
         b += lines(64, 426, ["approve only sets the most B may move; balances change only when B calls burnFrom / transferFrom.",
-                             "A new approve overwrites (it does not add). When done: approve(spender, 0), then wait until it is mined.",
+                             "A new approve replaces the old amount. To revoke: approve(spender, 0), then wait until mined.",
                              "Revocation: D-01, block 12117312."], 16.5, gap=1.6, fill=C["amber"])
     svg("approve", lang,
         "授权、代扣与撤销" if zh else "Approve, transferFrom and revoke",
@@ -220,27 +221,29 @@ def approve(lang):
 # ---------------------------------------------------------------- 5 proxy
 def proxy(lang):
     zh = lang == "zh"
-    b = heading("代理 + 实现 + ProxyAdmin：门牌不变，后台可换" if zh else "Proxy + implementation + ProxyAdmin: same door, new back office")
+    # English copy is longer: the title gets a subtitle line and the note wraps to two lines.
+    b = heading("代理 + 实现 + ProxyAdmin：门牌不变，后台可换" if zh else "Proxy + implementation + ProxyAdmin",
+                None if zh else "Same front door (address), swappable back office (code)")
     # user
-    b += box(40, 120, 170, 96, C["paper2"], C["rule"], 14)
-    b += t(125, 160, "用户 / 钱包" if zh else "User / wallet", 19, 700, anchor="middle")
-    b += t(125, 190, "只认代理地址" if zh else "uses the proxy", 15, fill=C["ink3"], anchor="middle")
-    b += arrow(212, 168, 268, 168)
+    b += box(40, 120, 150, 96, C["paper2"], C["rule"], 14)
+    b += t(115, 160, "用户 / 钱包" if zh else "User / wallet", 18, 700, anchor="middle")
+    b += t(115, 190, "只认代理地址" if zh else "uses the proxy", 15, fill=C["ink3"], anchor="middle")
+    b += arrow(192, 168, 226, 168)
     # proxy
-    b += box(270, 110, 280, 190, C["brandSoft"], C["brand"], 16, 2.5)
-    b += t(290, 146, "UBOX 代理（地址不变）" if zh else "UBOX proxy (fixed address)", 19, 700, C["brand"])
-    b += t(290, 176, "0xc3F20D54…98db04", 16, 600, C["ink"], mono=True)
-    b += lines(290, 212, ["存储：余额、授权、名称、scale" if zh else "Storage: balances, allowances,", "" if zh else "name, scale", ], 15.5, fill=C["ink2"])
-    b += lines(290, 262, ["ERC-1967 实现槽 → 当前实现" if zh else "ERC-1967 slot → current impl."], 15.5, fill=C["ink2"])
+    b += box(230, 110, 300, 190, C["brandSoft"], C["brand"], 16, 2.5)
+    b += t(250, 146, "UBOX 代理（地址不变）" if zh else "UBOX proxy (fixed address)", 19 if zh else 17, 700, C["brand"])
+    b += t(250, 176, "0xc3F20D54…98db04", 16, 600, C["ink"], mono=True)
+    b += lines(250, 212, ["存储：余额、授权、名称、scale"] if zh else ["Storage: balances,", "allowances, name, scale"], 15.5, fill=C["ink2"])
+    b += lines(250, 246 if zh else 266, ["ERC-1967 实现槽 → 当前实现" if zh else "ERC-1967 slot → current code"], 15.5, fill=C["ink2"])
     # delegatecall
-    b += arrow(552, 205, 656, 205, C["teal"], 2.5, head="a-teal")
-    b += t(603, 194, "delegatecall", 12.5, 700, C["teal"], "middle", mono=True)
+    b += arrow(532, 205, 656, 205, C["teal"], 2.5, head="a-teal")
+    b += t(594, 192, "delegatecall", 13, 700, C["teal"], "middle", mono=True)
     # implementations
     impls = [
         ("V1", "0xdaBaDC03…7300a", "代码仍在，已不被指向" if zh else "code remains, not used", C["greySoft"], C["grey"], None),
         ("V2", "0x0711Ef7C…E779F", "代码仍在，已不被指向" if zh else "code remains, not used", C["greySoft"], C["grey"], None),
         ("V3", "0x16E3D2f2…fad28", "当前实现（快照时）" if zh else "current (at snapshot)", C["tealSoft"], C["teal"], None),
-        ("V4", "—", "仅本地 / fork 模拟，未上链" if zh else "local / fork sim only, not on-chain", C["paper"], C["grey"], "6 5"),
+        ("V4", "—", "仅本地 / fork 模拟，未上链" if zh else "local tests only, not on-chain", C["paper"], C["grey"], "6 5"),
     ]
     y = 104
     for name, addr, note, fill, stroke, dash in impls:
@@ -250,15 +253,19 @@ def proxy(lang):
         b += t(676, y + 54, note, 14.5, 500, C["ink2"])
         y += 78
     # proxyadmin
-    b += box(270, 336, 280, 104, C["paper2"], C["ink2"], 14, 2)
-    b += t(290, 370, "ProxyAdmin", 19, 700)
-    b += t(290, 398, "0x6DEAe6C7…0BBEE9", 15, 600, mono=True)
-    b += t(290, 424, "owner = 账户 A" if zh else "owner = account A", 15.5, fill=C["ink2"])
-    b += arrow(420, 334, 420, 304, C["ink2"], 2.4)
-    b += t(432, 324, "upgradeAndCall", 13.5, 600, C["ink2"], mono=True)
-    b += box(40, 460, 880, 58, C["amberSoft"], C["amberLine"], 12)
-    b += t(60, 495, "每次升级都是公开交易，发出 Upgraded 事件；管理员能换规则，这是权力也是风险。" if zh else
-           "Every upgrade is a public tx with an Upgraded event. The admin can change the rules: power and risk.", 16.5, 600, C["amber"])
+    b += box(230, 336, 300, 104, C["paper2"], C["ink2"], 14, 2)
+    b += t(250, 370, "ProxyAdmin", 19, 700)
+    b += t(250, 398, "0x6DEAe6C7…0BBEE9", 15, 600, mono=True)
+    b += t(250, 424, "owner = 账户 A" if zh else "owner = account A", 15.5, fill=C["ink2"])
+    b += arrow(380, 334, 380, 304, C["ink2"], 2.4)
+    b += t(392, 324, "upgradeAndCall", 13.5, 600, C["ink2"], mono=True)
+    if zh:
+        b += box(40, 460, 880, 58, C["amberSoft"], C["amberLine"], 12)
+        b += t(60, 495, "每次升级都是公开交易，发出 Upgraded 事件；管理员能换规则，这是权力也是风险。", 16.5, 600, C["amber"])
+    else:
+        b += box(40, 452, 880, 74, C["amberSoft"], C["amberLine"], 12)
+        b += lines(60, 482, ["Every upgrade is a public transaction that emits an Upgraded event.",
+                             "Whoever controls the admin can change the rules: that is power, and risk."], 16, gap=1.4, weight=600, fill=C["amber"])
     svg("proxy", lang,
         "代理、实现合约与 ProxyAdmin" if zh else "Proxy, implementation and ProxyAdmin",
         "用户调用固定的 UBOX 代理地址 0xc3F20D5488784D922aC3428a54125715fA98db04，代理保存余额等存储，并通过 delegatecall 执行当前实现 V3；V1、V2 的代码仍在但已不被指向；V4 只在本地。ProxyAdmin 的 owner 是账户 A，可以调用 upgradeAndCall 更换实现。" if zh else
@@ -274,22 +281,22 @@ def redenom(lang):
     b += box(40, 112, 360, 200, C["paper2"], C["rule"], 14)
     b += t(60, 146, "代理存储（原始值，旧单位）" if zh else "Proxy storage (raw, old units)", 18, 700)
     for i, (k, v) in enumerate([("A", "999,900 × 10¹⁸"), ("B", "100 × 10¹⁸"), ("supply", "1,000,000 × 10¹⁸")]):
-        b += t(60, 186 + i * 30, k, 17, 600, C["ink2"], mono=True)
-        b += t(380, 186 + i * 30, v, 17, 400, C["ink2"], "end", mono=True)
+        b += t(60, 190 + i * 36, k, 17, 600, C["ink2"], mono=True)
+        b += t(380, 190 + i * 36, v, 17, 400, C["ink2"], "end", mono=True)
     b += arrow(402, 212, 548, 212, C["teal"], 2.6, head="a-teal")
     b += t(475, 198, "÷ scale 10000", 16, 700, C["teal"], "middle", mono=True)
     b += box(550, 112, 370, 200, C["tealSoft"], C["teal"], 14, 2)
     b += t(570, 146, "通过代理读取（新单位）" if zh else "Read via proxy (new units)", 18, 700, C["teal"])
     for i, (k, v) in enumerate([("balanceOf(A)", "99.99"), ("balanceOf(B)", "0.01"), ("totalSupply", "100")]):
-        b += t(570, 186 + i * 30, k, 17, 600, C["ink"], mono=True)
-        b += t(900, 186 + i * 30, v, 17, 700, C["teal"], "end", mono=True)
-    b += t(570, 290, "decimals() = 18（未改）" if zh else "decimals() = 18 (unchanged)", 15.5, 600, C["ink2"])
+        b += t(570, 190 + i * 36, k, 17, 600, C["ink"], mono=True)
+        b += t(900, 190 + i * 36, v, 17, 700, C["teal"], "end", mono=True)
+    b += t(570, 292, "decimals() = 18（未改）" if zh else "decimals() = 18 (unchanged)", 15.5, 600, C["ink2"])
     b += box(40, 336, 880, 176, C["redSoft"], C["red"], 14, 2)
-    b += t(62, 370, "历史日志不会被改写" if zh else "Old logs are never rewritten", 19, 700, C["red"])
-    b += lines(62, 404, ["成功批次留下的 Transfer(A → B, 100e18) 是旧单位。" if zh else "The successful batch left Transfer(A → B, 100e18) in old units.",
+    b += t(62, 378, "历史日志不会被改写" if zh else "Old logs are never rewritten", 19, 700, C["red"])
+    b += lines(62, 418, ["成功批次留下的 Transfer(A → B, 100e18) 是旧单位。" if zh else "The successful batch left Transfer(A → B, 100e18) in old units.",
                          "若把它当成新单位来读：会以为 B 收到 100，实际 B 现在是 0.01 —— 大了 10,000 倍。" if zh else "Read as new units it says B got 100, but B now holds 0.01: 10,000× too large.",
-                         "升级交易只发出 Upgraded 与 Redenominated(10000)，没有 Transfer（没有铸币或转账）。" if zh else "The upgrade emitted Upgraded and Redenominated(10000), and no Transfer (nothing minted or moved)."],
-                    16.5, gap=1.65, fill=C["red"])
+                         "升级交易只发出 Upgraded 与 Redenominated(10000)，没有 Transfer（没有铸币或转账）。" if zh else "The upgrade emitted Upgraded and Redenominated(10000); no Transfer: nothing minted or moved."],
+                    16.5, gap=1.75, fill=C["red"])
     svg("redenomination", lang,
         "UBOX V3 面额重标与历史事件" if zh else "UBOX V3 redenomination and historical events",
         "左边是代理存储中的原始值（旧单位）：A 999,900e18、B 100e18、总供应 1,000,000e18；除以 scale 10000 后，右边读出 A 99.99、B 0.01、总供应 100，decimals 仍为 18。下方警告：历史 Transfer 日志仍是旧单位，若按新单位读会大 10,000 倍。" if zh else

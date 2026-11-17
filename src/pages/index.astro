@@ -1,9 +1,16 @@
 ---
-// Root: send visitors to the default (Chinese) edition. A real page with a
-// visible link (not a JS-only redirect), canonical pointing at /zh/.
+// Root: a language-neutral entry. With JS it picks an edition:
+//   1. an explicit choice saved by the language switcher (localStorage 'lang'),
+//   2. otherwise the first zh*/en* tag in navigator.languages,
+//   3. otherwise English (readers whose browser is neither zh nor en).
+// Without JS (and for crawlers that don't run it) a <noscript> meta refresh
+// sends visitors to the default Chinese edition, and the page keeps visible links
+// to both. Language pages themselves never auto-redirect.
 import '../styles/global.css'
 import { href, absolute } from '../data/site'
-const target = href('zh/')
+const zh = href('zh/')
+const en = href('en/')
+const routes = JSON.stringify({ zh, en })
 ---
 <!doctype html>
 <html lang="zh-CN" dir="ltr">
@@ -16,13 +23,37 @@ const target = href('zh/')
     <link rel="alternate" hreflang="zh-CN" href={absolute('zh/')} />
     <link rel="alternate" hreflang="en" href={absolute('en/')} />
     <link rel="alternate" hreflang="x-default" href={absolute('zh/')} />
-    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <script is:inline define:vars={{ routes }}>
+      (function () {
+        var r = JSON.parse(routes), pick = null
+        try { var s = localStorage.getItem('lang'); if (s === 'zh' || s === 'en') pick = s } catch (e) {}
+        if (!pick) {
+          var l = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''])
+          for (var i = 0; i < l.length && !pick; i++) {
+            var t = String(l[i]).toLowerCase()
+            if (t === 'zh' || t.indexOf('zh-') === 0) pick = 'zh'
+            else if (t === 'en' || t.indexOf('en-') === 0) pick = 'en'
+          }
+        }
+        location.replace(r[pick || 'en'] + location.search + location.hash)
+      })()
+    </script>
+    <noscript><meta http-equiv="refresh" content={`0; url=${zh}`} /></noscript>
     <link rel="icon" type="image/svg+xml" href={href('favicon.svg')} />
   </head>
   <body>
     <main id="main" class="shell">
       <h1>一起玩 Web3 · <span lang="en">Let’s Play Web3</span></h1>
-      <p><a href={target}>进入中文版</a> · <a href={href('en/')} lang="en" hreflang="en">Read in English</a></p>
+      <p>
+        <a href={zh} hreflang="zh-CN" data-lang-choice="zh">进入中文版</a> ·
+        <a href={en} lang="en" hreflang="en" data-lang-choice="en">Read in English</a>
+      </p>
     </main>
+    <script is:inline>
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('[data-lang-choice]')
+        if (a) try { localStorage.setItem('lang', a.getAttribute('data-lang-choice')) } catch (err) {}
+      })
+    </script>
   </body>
 </html>

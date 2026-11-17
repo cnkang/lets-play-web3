@@ -827,7 +827,13 @@ main {
 .figure figcaption strong {
   color: var(--ink);
 }
+/* MDX wraps the caption text in <p>: keep it on the same line as「图 5｜」/ "Figure 5 ·" */
+.figure figcaption > strong + p {
+  display: inline;
+  margin: 0;
+}
 .figure .fig-actions {
+  display: block;
   margin-top: var(--s-2);
   font-size: 0.85rem;
 }
@@ -1726,9 +1732,11 @@ h1, h2, h3, .brand-text, .btn, .card h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /* The negative end margin pulls following punctuation (「, . ）」) 2px closer, so the
+     18px dot doesn't leave a visible gap after it; the target itself stays 24×24. */
   inline-size: 24px;
   block-size: 24px;
-  margin: -6px 0 -6px 1px;
+  margin: -6px -2px -6px 0;
   padding: 0;
   border: 0;
   background: none;
@@ -1765,6 +1773,12 @@ h1, h2, h3, .brand-text, .btn, .card h3 {
   outline: 3px solid var(--focus);
   outline-offset: 1px;
   border-radius: 999px;
+}
+/* CJK glyphs sit higher in the line box than Latin x-height: lift the dot to the
+   ideograph centre so「区块链 ?」reads as one line (measured ≈2.5px low before). */
+:lang(zh) .term-btn {
+  top: -2px;
+  margin-inline-end: 0; /* no word space in Chinese: keep the gap after the dot equal to the gap before */
 }
 /* Bigger hit area for touch (aim: 44×44) without moving any text */
 @media (pointer: coarse) {
@@ -1984,3 +1998,48 @@ body {
 }
 /* Long hashes/addresses keep breaking anywhere (overflow-wrap: anywhere on .chip a and code);
    only short inline code (≤22 chars, marked .nw at build time) is kept on one line. */
+
+/* ---- Language hint (shown only when the browser prefers the other edition) */
+.lang-hint[hidden] { display: none; }
+.lang-hint {
+  background: var(--brand-soft);
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+}
+.lang-hint-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  padding: var(--s-2) max(var(--s-4), env(safe-area-inset-right)) var(--s-2) max(var(--s-4), env(safe-area-inset-left));
+  font-size: 0.95rem;
+}
+.lang-hint-inner p { margin: 0; }
+.lang-hint-go {
+  font-weight: 650;
+  color: var(--brand-strong);
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+.lang-hint-close {
+  margin-left: auto;
+  min-width: 32px;
+  min-height: 32px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--rule-strong);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lang-hint-close:hover { background: var(--paper-2); }
+@media (pointer: coarse) {
+  .lang-hint-close { min-width: 44px; min-height: 44px; }
+  .lang-hint-go { min-height: 44px; }
+}
