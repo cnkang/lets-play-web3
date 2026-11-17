@@ -81,7 +81,9 @@ const axeSummary = {}
 for (const theme of ['light', 'dark']) for (const width of [1280, 375]) for (const path of ['/zh/chapters/06-gas-nonce-explorer/', '/en/chapters/09-lab-mbox-erc20/', '/zh/']) {
   const p = await browser.newPage()
   await p.setViewport({ width, height: 900 })
-  await p.evaluateOnNewDocument((t) => localStorage.setItem('theme', t), theme)
+  // Saved language = page language, so the language hint (tested in lang-check.mjs) stays hidden
+  // and a popover-induced scroll can't tuck it under the sticky header.
+  await p.evaluateOnNewDocument((t, l) => { localStorage.setItem('theme', t); localStorage.setItem('lang', l) }, theme, path.slice(1, 3))
   await p.goto(B + path, { waitUntil: 'networkidle0' })
   await p.evaluate(() => { document.querySelectorAll('.term-pop')[2].showPopover() })
   await sleep(300)
