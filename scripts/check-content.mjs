@@ -5,6 +5,10 @@
 //  - part / order / status are identical across the pair, part exists in parts.json
 //  - status is one of published | upcoming | draft
 // The same rules are enforced again inside the Astro build (src/data/chapters.ts).
+//  - glossary (src/content/glossary.json): every term has zh + en { term, def },
+//    an optional `chapter` that exists; every <Term id="…"> used in chapters,
+//    pages and components exists; a term id is marked at most once per MDX file;
+//    <Term> is never inside a heading, link text or code fence
 // ALLOW_UNPAIRED=1 turns a missing translation into a warning.
 import { readFileSync, readdirSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
@@ -62,9 +66,66 @@ for (const slug of [...slugs].sort()) {
     orders.set(key, slug)
   }
 }
+// ---- Glossary terms (<Term id="…">) ----
+const glossaryPath = join(root, 'src/content/glossary.json')
+let glossary = {}
+try {
+  glossary = JSON.parse(readFileSync(glossaryPath, 'utf8'))
+} catch (e) {
+  errors.push(`src/content/glossary.json: cannot parse (${e.message})`)
+}
+for (const [id, e] of Object.entries(glossary)) {
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id)) errors.push(`glossary "${id}": ids are lowercase letters, digits and hyphens`)
+  for (const l of langs) {
+    if (!e[l] || typeof e[l].term !== 'string' || !e[l].term.trim() || typeof e[l].def !== 'string' || !e[l].def.trim())
+      errors.push(`glossary "${id}": missing ${l}.term or ${l}.def (every term needs both languages)`)
+  }
+  if (e.chapter !== undefined && !slugs.has(e.chapter)) errors.push(`glossary "${id}": chapter "${e.chapter}" does not exist in src/content/chapters`)
+}
+function walkFiles(d, ext, out = []) {
+  if (!existsSync(d)) return out
+  for (const name of readdirSync(d, { withFileTypes: true })) {
+    const p = join(d, name.name)
+    if (name.isDirectory()) walkFiles(p, ext, out)
+    else if (ext.some((x) => name.name.endsWith(x))) out.push(p)
+  }
+  return out
+}
+const termFiles = [...walkFiles(join(root, 'src/content'), ['.mdx']), ...walkFiles(join(root, 'src/components'), ['.astro']), ...walkFiles(join(root, 'src/pages'), ['.astro']), ...walkFiles(join(root, 'templates'), ['.mdx'])]
+let termUses = 0
+const usedIds = new Set()
+for (const f of termFiles) {
+  const rel = f.slice(root.length)
+  // Blank out MDX / JS comments (keeping line numbers) so examples in comments are ignored.
+  const src = readFileSync(f, 'utf8').replace(/\{\/\*[\s\S]*?\*\/\}|\/\*[\s\S]*?\*\/|^\s*\/\/.*$/gm, (c) => c.replace(/[^\n]/g, ' '))
+  const seen = new Set()
+  let inFence = false
+  src.split(/\r?\n/).forEach((line, i) => {
+    if (/^\s*(```|~~~)/.test(line)) { inFence = !inFence; return }
+    const re = /<Term\s+id=["']([^"']+)["'][^>]*>([\s\S]*?)<\/Term>/g
+    let m
+    while ((m = re.exec(line))) {
+      termUses++
+      const id = m[1]
+      usedIds.add(id)
+      const where = `${rel}:${i + 1}`
+      if (!glossary[id]) errors.push(`${where}: <Term id="${id}"> is not in src/content/glossary.json`)
+      if (inFence) errors.push(`${where}: <Term> inside a code block`)
+      if (/^\s*#{1,6}\s/.test(line)) errors.push(`${where}: <Term> inside a heading (headings feed the contents list)`)
+      const before = line.slice(0, m.index)
+      if (/\[[^\]]*$/.test(before) && /^[^\[]*\]\(/.test(line.slice(m.index + m[0].length))) errors.push(`${where}: <Term> inside link text`)
+      if (/<a\s[^>]*>(?![\s\S]*<\/a>)/.test(before)) errors.push(`${where}: <Term> inside a link`)
+      if (f.endsWith('.mdx')) {
+        if (seen.has(id)) errors.push(`${where}: <Term id="${id}"> appears more than once in this file; mark only the first occurrence`)
+        seen.add(id)
+      }
+    }
+  })
+}
+const unused = Object.keys(glossary).filter((id) => !usedIds.has(id))
 for (const w of warnings) console.warn(`⚠ ${w}`)
 if (errors.length) {
   console.error(`✖ content check failed (${errors.length}):\n- ${errors.join('\n- ')}`)
   process.exit(1)
 }
-console.log(`content: ${slugs.size} chapters × ${langs.length} languages OK`)
+console.log(`content: ${slugs.size} chapters × ${langs.length} languages OK; glossary: ${Object.keys(glossary).length} terms, ${termUses} <Term> uses${unused.length ? ` (listed in Appendix C only: ${unused.join(', ')})` : ''}`)
