@@ -11,7 +11,7 @@ status: published
 
 <Callout type="note" title="Never touched a blockchain before?">
 
-No problem. When you meet an unfamiliar word, press the small <strong>?</strong> next to it for a plain-language explanation (keyboard: Tab to the ?, then Enter or Space; Esc closes it). Appendix C lists every term in one place.
+No problem. When you meet an unfamiliar word, press the small <strong>?</strong> next to it. A short explanation in plain language opens. On a keyboard, press Tab to reach the ?. Press Enter or Space to open it. Press Esc to close it. Appendix C lists every term in one place.
 
 </Callout>
 
@@ -19,12 +19,12 @@ No problem. When you meet an unfamiliar word, press the small <strong>?</strong>
 
 ## Start by looking, or read in order
 
-You do not need to connect a wallet, claim test coins or create an account to read. To see a real action first, try the [read-only exercise in Chapter 8](../08-lab-counter/#inspect-a-transaction): open an existing transaction and check its status, token transfers and event. Then return to the reading path below. Learning to inspect a record is a useful first hands-on step.
+Reading needs no wallet, test coins or account. To see a real action first, try the [read-only exercise in Chapter 8](../08-lab-counter/#inspect-a-transaction). Open an existing transaction. Check its status, token transfers and event. Then return to the reading path below. Learning to inspect a record is a useful first step.
 
 ## Four kinds of content
 
-1. **Principles and everyday analogies** explain <Term id="blockchain">blockchains</Term> and <Term id="smart-contract">smart contracts</Term>, using shared records and vending machines as examples. An analogy helps explain an idea; it is neither a definition nor an experimental result.
-2. **On-chain results** come from deployments, <Term id="transaction">transactions</Term> and upgrades on <Term id="ethereum">Ethereum</Term>’s Sepolia testnet on 11–12 November 2026 (Singapore time). Look up addresses, <Term id="tx-hash">transaction hashes</Term> (the IDs used to find transactions) and <Term id="block-number">block numbers</Term> on Sepolia <Term id="etherscan">Etherscan</Term>. Read balances at the recorded block; today’s values do not replace the historical snapshot.
+1. **Principles and everyday analogies** explain <Term id="blockchain">blockchains</Term> and <Term id="smart-contract">smart contracts</Term>, using shared records and vending machines as examples. An analogy helps explain an idea. It is not a definition. It is not an experimental result.
+2. **On-chain results** come from deployments, <Term id="transaction">transactions</Term> and upgrades on <Term id="ethereum">Ethereum</Term>’s Sepolia testnet on 11–12 November 2026 (Singapore time). Look up addresses, <Term id="tx-hash">transaction hashes</Term> (the IDs used to find transactions) and <Term id="block-number">block numbers</Term> on Sepolia <Term id="etherscan">Etherscan</Term>. Read balances at the recorded block. Today’s values do not replace the historical snapshot.
 3. **Local tests and simulations** supply test counts, assertions and the UBOX V4 simulation. These are local records, not explorer transactions. V4 was never deployed on-chain. Chapter 15 explains the review’s results and limits.
 4. **Future plans** describe work still to do. Phase-0 basics, experiments and review are complete. Phase-1 means the next DeFi work, which has not started. A plan is not a completed experiment.
 
@@ -37,7 +37,7 @@ You do not need to connect a wallet, claim test coins or create an account to re
 | Read first | What you get | Chapters |
 | --- | --- | --- |
 | What blockchains are actually good for | Shared ledger vs ordinary database | 2–4 |
-| Wallets, transactions, contracts | Who signs, who executes, who pays; how to confirm something really landed | 5–8 |
+| Wallets, transactions, contracts | Who signs, who executes, who pays. How to confirm something really landed | 5–8 |
 | Tokens and allowances | ERC-20, approval is not payment, burning, atomicity | 9–12 |
 | Upgradeable contracts | Proxies, upgrades and redenomination: benefits and costs | 13–14 |
 | Evidence and wrap-up | What tests, source matching and reviews each prove | 15 and appendices |
@@ -45,7 +45,7 @@ You do not need to connect a wallet, claim test coins or create an account to re
 
 </T>
 
-Each chapter can be read on its own, but reading in order works best because later experiments use earlier ideas. The experiments are not tucked away in a separate "lab log": each one lives in the chapter it illustrates. The Counter contract follows the chapter on smart contracts, and the allowance revocation follows "Approval is not payment".
+Each chapter can be read on its own. Reading in order works best because later experiments use earlier ideas. The experiments are not collected in a separate "lab log". Each one lives in the chapter it illustrates. The Counter contract follows the chapter on smart contracts. The allowance revocation follows "Approval is not payment".
 
 ## Rules for the Phase-0 labs
 
@@ -53,7 +53,7 @@ The whole lab followed a few rules. The rules are themselves habits worth learni
 
 - **The budget was strictly $0.** No crypto was bought, no mainnet funds were used, and no real wallet seed phrase or private key was imported.
 - **Only the Ethereum Sepolia testnet** was used, together with free, open-source, widely used tools (solc, <Term id="viem">viem</Term>, the <Term id="openzeppelin">OpenZeppelin</Term> contracts library, <Term id="foundry">Foundry</Term>).
-- **Every on-chain transaction was <Term id="simulate">simulated</Term> first (a free rehearsal) and <Term id="broadcast">broadcast</Term> (actually sent to the network) only after explicit confirmation.** Signing in, <Term id="signature">signing</Term>, approving and broadcasting all required confirmation first; if safety could not be confirmed, work stopped.
+- **Every on-chain transaction was <Term id="simulate">simulated</Term> first. Simulation is a free rehearsal. We <Term id="broadcast">broadcast</Term> a transaction only after explicit confirmation.** Broadcasting sends it to the network. Logging in, <Term id="signature">signing</Term>, approving and broadcasting each required confirmation first. If we could not confirm safety, we stopped the work.
 - Every experiment recorded the network, what was done, the transaction hash or contract address, the actual cost, what was learned and the next step.
 - Test-account private keys lived only in a local, Git-ignored, permission-restricted folder. They were never printed or written into any public record. This book contains no private keys, seed phrases or <Term id="api-key">API keys</Term>.
 

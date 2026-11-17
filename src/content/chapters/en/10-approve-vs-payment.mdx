@@ -11,7 +11,7 @@ status: published
 
 ## Why do wallets keep asking you to "approve" rather than "pay"?
 
-Many <Term id="dex-amm">decentralised exchanges</Term> and services first ask the holder to **approve** a <Term id="smart-contract">smart contract</Term> to use up to some amount of a token (`approve`), and only later, when you act, does that contract call `transferFrom`.
+Many <Term id="dex-amm">decentralised exchanges</Term> and services use two steps. First, the holder **approves** a <Term id="smart-contract">smart contract</Term> to use up to a set amount of a token. This is `approve`. Later, when you act, that contract calls `transferFrom`.
 
 - **`approve` is not a payment**: it only writes into the token contract "B may move up to this much of A's tokens". **Balances do not change at all.**
 - What actually moves balances is a later `transferFrom` (move) or `burnFrom` (<Term id="burn">destroy</Term>) sent by the spender.
@@ -21,14 +21,14 @@ So although an approval is not "money already gone", a long-lived approval is a 
 
 “Balances do not change” refers to this token’s balances. Sending an approval transaction still costs a network fee. Looking up the allowance is read-only and needs no signature or fee.
 
-<Figure name="approve" n="4" alt="Five steps: A calls approve(B,500), allowance 500, balances unchanged; B calls burnFrom(A,100), allowance 400; B calls transferFrom moving 100 from A to B, allowance 300; B calls transferFrom moving 200 from A to A, allowance 100; A calls approve(B,0), allowance 0.">
-The real history of allowance(A, B) on MBox-Burn in the lab. Approving and spending are different transactions; revoking takes another approve(B, 0), effective only once it is mined.
+<Figure name="approve" n="4" alt="Five steps: A calls approve(B,500), allowance 500, balances unchanged. B calls burnFrom(A,100), allowance 400. B calls transferFrom moving 100 from A to B, allowance 300. B calls transferFrom moving 200 from A to A, allowance 100. A calls approve(B,0), allowance 0.">
+The real history of allowance(A, B) on MBox-Burn in the lab. Approving and spending are different transactions. Revoking takes another `approve(B, 0)`. It takes effect only once it is mined.
 </Figure>
 
 ## An allowance is an overwritable "remaining amount"
 
 - After part of it is used, the rest **stays valid**: in the lab B burned 100 and 400 remained.
-- A new `approve` **overwrites; it does not add**. If the allowance is 100 and you `approve(B, 500)`, the result is 500, not 600.
+- A new `approve` **overwrites the allowance. It does not add to it.** If the allowance is 100 and you `approve(B, 500)`, the result is 500, not 600.
 - To clear it, send `approve(B, 0)`.
 
 ## Three risks and one habit
@@ -37,7 +37,7 @@ The real history of allowance(A, B) on MBox-Burn in the lab. Approving and spend
 2. **Approving the wrong address**: a familiar name does not make an address trustworthy (remember Chapter 9: names are not unique).
 3. **Forgotten approvals**: after you stop using a service, the allowance may still be usable.
 
-**One habit**: at the end of every experiment, check `allowance`; when it is no longer needed, send `approve(spender, 0)` to revoke it.
+**One habit**: at the end of every experiment, check `allowance`. When you no longer need it, send `approve(spender, 0)` to revoke it.
 
 <Callout type="warn" title="Revoking has a time window too">
 
@@ -47,8 +47,8 @@ A revocation <Term id="transaction">transaction</Term> must be sent by the **hol
 
 ## Everyday analogy
 
-You let a food-delivery platform deduct up to 100 loyalty points in total. Nothing is deducted yet. Each use reduces the remaining allowance; **it does not reset every month**. When you stop using the service, setting the limit to 0 withdraws permission rather than handing anyone 100 points.
+You let a food-delivery platform deduct up to 100 loyalty points in total. Nothing is deducted yet. Each use reduces the remaining allowance. **It does not reset every month.** When you stop using the service, set the limit to 0. That withdraws permission. It does not hand anyone 100 points.
 
-The lab initially left an allowance of 100, which D-01 later revoked. The next chapter links that successful transaction: look for an `Approval` event with value 0 and no token transfer. The early leftover amount is not the snapshot state.
+The lab initially left an allowance of 100. D-01 later revoked it. The next chapter links that successful transaction. Look for an `Approval` event with value 0. Confirm that no token transfer occurred. The early leftover amount is not the snapshot state.
 
 The next chapter is this whole process as a real experiment on Sepolia.

@@ -105,6 +105,17 @@ updated: "2026-12-01"               # 可选：内容更新日期，会显示在
 - 链接文字要说清去哪里，不要写「点这里」。
 - 写给「会用电脑、会上网，但没碰过区块链」的读者：第一次出现的专有名词要么在句子里顺手解释（例如「测试网，也就是专门用来练习的区块链」），要么加 `<Term>`。
 
+### 正文编辑规范（建议）
+
+英文正文用短句、主动语态。写操作步骤时用祈使句，把条件和警告放在对应动作之前。每个步骤句只写一个动作（不超过 20 个英文单词），每个说明句只讲一件事（不超过 25 个英文单词）。授权（approve 这个动作）要区别于额度（allowance，剩余可动用的数量），签名要区别于广播，本地测试要区别于链上结果。术语统一按 `src/content/glossary.json` 来写；中文版要用自然的中文重写，不要逐字照搬英文句子结构。
+
+这些是编辑习惯，不是发布门槛。不要只凭单词数或词表就宣称符合 ASD-STE100。改正文时跳过代码、地址、哈希、链接和引文。如果写检查脚本，它只能是提示性的，绝不能卡住构建或发布。
+
+示例（改前 → 改后）：
+
+- 改前："Balances do not change; the allowance is only a standing permission, so check it before you approve again and revoke it when you no longer need it."
+- 改后："Approving does not change any balance. The allowance is only a standing permission. Check the allowance before you approve again. Revoke it when you no longer need it."
+
 ### 术语「?」小窗（`<Term>`）
 
 全书的术语解释只写在**一个文件**里：`src/content/glossary.json`。章节里的 `<Term>`、附录 C 的完整术语表都从这里读，所以改一处，全书同步。

@@ -11,13 +11,13 @@ status: published
 
 ## What Phase-0 was
 
-This documentation review used the original lab repository supplied by the project owner. [Public notebook excerpts](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/phase-0-notebook-excerpts.md) retain source line ranges and a file checksum. The outcomes in §10.2–10.6 come after the early plans. Test results below are from that original review; they were not rerun for this documentation edit. Local records and on-chain transactions are identified separately.
+This documentation review used the original lab repository supplied by the project owner. [Public notebook excerpts](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/phase-0-notebook-excerpts.md) retain source line ranges and a file checksum. The outcomes in §10.2–10.6 come after the early plans. Test results below are from that original review. They were not rerun for this documentation edit. Local records and on-chain transactions are identified separately.
 
-Phase-0 names the completed basics, experiments and review stage, not an issue priority. This chapter covers the **technical review and wrap-up**: read-only on-chain checks, source and <Term id="storage-layout">storage-layout</Term> review, <Term id="foundry">Foundry</Term> tests, preparation for public <Term id="verification">source verification</Term>, and decisions D-01 to D-05. It was the project’s own review, **not a certificate from a professional third-party <Term id="audit">audit</Term>**.
+Phase-0 names the completed basics, experiments and review stage, not an issue priority. This chapter covers the **technical review and wrap-up**. It includes read-only on-chain checks, source and <Term id="storage-layout">storage-layout</Term> review, <Term id="foundry">Foundry</Term> tests, preparation for public <Term id="verification">source verification</Term>, and decisions D-01 to D-05. It was the project’s own review, **not a certificate from a professional third-party <Term id="audit">audit</Term>**.
 
 ## Conclusion: PASS WITH FINDINGS
 
-The review groups findings into five severity levels: Critical, High, Medium, Low and Info (informational). PASS WITH FINDINGS means the review passed with findings: the recorded defects and limits still matter. It does not mean there are no vulnerabilities.
+The review groups findings into five severity levels: Critical, High, Medium, Low and Info (informational). PASS WITH FINDINGS means the review passed with findings. The recorded defects and limits still matter. It does not mean there are no vulnerabilities.
 
 <T label="Phase-0 findings by severity">
 
@@ -25,17 +25,17 @@ The review groups findings into five severity levels: Critical, High, Medium, Lo
 | --- | ---: | --- |
 | Critical | 0 | — |
 | High | 0 | — |
-| Medium | 1 | F-V3-001: `type(uint256).max` approval overflows; no infinite allowance |
-| Low | 3 | F-V3-002 dust truncation (not triggered on-chain now); F-V3-003 visible sum can drift if dust is injected; F-ALLOW-001 leftover MBox-Burn allowance (revoked by D-01) |
-| Info | 6 | Event units (historical logs are in old units); centralised upgrade power; unused `onlyOwner`; V1/V2 source cannot be reproduced exactly from current files; npm audit (tooling); public RPC has no archive |
+| Medium | 1 | F-V3-001: `type(uint256).max` approval overflows. No infinite allowance |
+| Low | 3 | F-V3-002 dust truncation (not triggered on-chain now). F-V3-003 visible sum can drift if dust is injected. F-ALLOW-001 leftover MBox-Burn allowance (revoked by D-01) |
+| Info | 6 | Event units (historical logs are in old units). Centralised upgrade power. Unused `onlyOwner`. V1/V2 source cannot be reproduced exactly from current files. Tooling: npm audit. Public RPC has no archive |
 
 </T>
 
-No Critical or High issue was found that could let current test assets be stolen, <Term id="mint">minted</Term> or taken out of control.
+The review found no Critical or High issue that could let current test assets be stolen. None could let them be <Term id="mint">minted</Term> or taken out of control.
 
 ## Test layers: each answers a different question
 
-<Figure name="test-layers" n="7" alt="Three layers: unit tests 49/49 pass; fuzz 9 tests × 1000 runs pass; invariant 256 runs × 100 calls = 25,600 calls with 4 invariants passing. Side note: beyond tests, check on-chain evidence and source matching. Bottom: all green does not mean no bugs; 1 Medium, 3 Low, 6 Info remain.">
+<Figure name="test-layers" n="7" alt="Three layers: unit tests 49/49 pass. Fuzz: 9 tests times 1000 runs pass. Invariant: 256 runs times 100 calls = 25,600 calls, with 4 invariants passing. Side note: beyond tests, check on-chain evidence and source matching. Bottom: all green does not mean no bugs. 1 Medium, 3 Low, 6 Info remain.">
 Phase-0 used several layers of tests, and every layer has limits and blind spots.
 </Figure>
 
@@ -49,12 +49,12 @@ Phase-0 used several layers of tests, and every layer has limits and blind spots
 
 </T>
 
-The tests used Foundry 1.9.0 with addresses generated by the test framework only, **not** the local <Term id="private-key">private keys</Term>, and no production contract logic was changed to make tests pass.
+The tests used Foundry 1.9.0. The test framework generated the addresses. It did **not** use the local <Term id="private-key">private keys</Term>. No production contract logic was changed to make tests pass.
 
 ### Two instructive side stories
 
-- **Fuzzing failed twice along the way**: the cause was the assertion order in the **test oracle** (the test code that computes the expected result). The test was fixed; **the contracts were not changed**. A failing test does not always mean a buggy contract; the test itself can be wrong.
-- **16 unexpected Handler reverts**: in the invariant run (the Handler is helper code in the test that fires off random calls for you), `batchTransferFrom` was called 3,166 times and 16 of those calls (about 0.5%) <Term id="revert">reverted</Term> in a way the Handler did not expect. The whole Handler call rolled back and the invariants still held. Phase-0 treated this as **residue in the test scaffolding (an oracle edge case)**, not a contract bug; the careful next step is a minimal reproduction to confirm it is an expected constraint.
+- **Fuzzing failed twice along the way**. The cause was the assertion order in the **test oracle**. The test oracle is the test code that computes the expected result. The test was fixed. **The contracts were not changed.** A failing test does not always mean a buggy contract. The test itself can be wrong.
+- **16 unexpected Handler reverts**: in the invariant run, `batchTransferFrom` was called 3,166 times. The Handler is helper code in the test that fires random calls for you. Of those calls, 16 (about 0.5%) <Term id="revert">reverted</Term> in a way the Handler did not expect. The whole Handler call rolled back. The invariants still held. Phase-0 treated this as **residue in the test scaffolding (an oracle edge case)**, not a contract bug. The careful next step is a minimal reproduction. It would confirm that the reverts are an expected constraint.
 
 <Callout type="warn" title="49/49 passing ≠ no vulnerabilities">
 
@@ -64,11 +64,11 @@ All unit tests passed and the review still recorded 1 Medium, 3 Low and 6 Info f
 
 ## Source matching: Sourcify and Etherscan
 
-What lives on-chain is <Term id="bytecode">bytecode</Term>, not source code. **Source verification** recompiles the source you submit with the same compiler settings; if the bytecode matches what is on-chain, the source is published and marked verified. (Appendix B explains how to get an Etherscan <Term id="api-key">API key</Term>.)
+What lives on-chain is <Term id="bytecode">bytecode</Term>, not source code. **Source verification** recompiles the source you submit with the same compiler settings. If the bytecode matches what is on-chain, the source is published and marked verified. (Appendix B explains how to get an Etherscan <Term id="api-key">API key</Term>.)
 
 ### Sourcify: all 8 addresses matched
 
-<Term id="sourcify">Sourcify</Term> has two common results: **exact_match** (everything matches, including metadata, the descriptive data the compiler appends to the bytecode) and **match** (the bytecode matches but the metadata does not entirely). Of the 8 addresses, **5 are exact_match and 3 are match**, so you cannot call them all "exact".
+<Term id="sourcify">Sourcify</Term> has two common results. **exact_match** means everything matches, including metadata. Metadata is the descriptive data the compiler appends to the bytecode. **match** means the bytecode matches but the metadata does not entirely. Of the 8 addresses, **5 are exact_match and 3 are match**. Do not call them all "exact".
 
 <T label="Sourcify results">
 
@@ -85,11 +85,11 @@ What lives on-chain is <Term id="bytecode">bytecode</Term>, not source code. **S
 
 </T>
 
-Why only "match" for V1 and V2? Chapter 14 changed V1's source for V3, and at the time the workspace **had no Git history**, so the deployed version could not be retrieved. Phase-0 rebuilt the historical source so that the main bytecode matches the chain, but the metadata (which includes a hash of the source) does not. The rebuilt source is kept as a separate historical snapshot and did not overwrite the current files.
+Why only "match" for V1 and V2? Chapter 14 changed V1's source for V3. At that time the workspace **had no Git history**. The deployed version could not be retrieved. Phase-0 rebuilt the historical source. The main bytecode now matches the chain. The metadata does not. Metadata includes a hash of the source. The rebuilt source is kept as a separate historical snapshot. It did not overwrite the current files.
 
 ### Etherscan: submitted, still queued at the snapshot
 
-All 8 contracts were submitted through the <Term id="etherscan">Etherscan</Term> API V2 (`chainid=11155111`) and each received a submission ID (GUID). But as of **2026-11-12 15:39 Singapore time**, the status check still returned `Pending in queue` and `getsourcecode` still showed them as unverified. **It must not be described as verified.** Linking the proxy (`verifyproxycontract`) returned success and recognised V3 as the implementation, but noted "implementation saved (unverified - without ABI)": the implementation address was recorded, but there is no verified <Term id="abi">ABI</Term> (the contract's interface description) yet.
+All 8 contracts were submitted through the <Term id="etherscan">Etherscan</Term> API V2 (`chainid=11155111`). Each received a submission ID (GUID). But as of **2026-11-12 15:39 Singapore time**, the status check still returned `Pending in queue`. `getsourcecode` still showed them as unverified. **It must not be described as verified.** Linking the proxy (`verifyproxycontract`) returned success. It recognised V3 as the implementation. It also noted "implementation saved (unverified - without ABI)". The implementation address was recorded. There is no verified <Term id="abi">ABI</Term> (the contract's interface description) yet.
 
 Receiving a GUID means "queued", not "passed".
 
@@ -98,16 +98,16 @@ Receiving a GUID means "queued", not "passed".
 Decision D-04 designed a UBOX V4 locally to fix F-V3-001 and the dust issues:
 
 - <Term id="storage">Storage</Term>-compatible: `_scale` stays in slot 58 and the new `_v4Initialized` is appended in **slot 59**, without reordering old slots.
-- `initializeV4()` runs only once and does not mint again; the <Term id="implementation">implementation</Term> locks initialisation in its constructor.
+- `initializeV4()` runs only once and does not mint again. The <Term id="implementation">implementation</Term> locks initialisation in its constructor.
 - `type(uint256).max` becomes an infinite-allowance sentinel: stored without scaling and never decremented when used.
 - New `dustOf` and `sweepDust` move invisible dust to another address without changing total supply.
-- Tests: unit **10/10** pass; fuzz **3/3 × 1000** (seed `0x5030`) pass; a <Term id="fork">fork simulation</Term> against the latest Sepolia state passed (deploy about 2,777,602 gas, upgrade about 72,181 gas; after the upgrade supply 100, A 99.99, B 0.01, zero dust).
+- Tests: unit **10/10** pass. Fuzz **3/3 × 1000** (seed `0x5030`) pass. A <Term id="fork">fork simulation</Term> against the latest Sepolia state passed (deploy about 2,777,602 gas, upgrade about 72,181 gas). After the upgrade, supply was 100, A 99.99, B 0.01, with zero dust.
 
 **V4 was not deployed, <Term id="signature">signed</Term> or <Term id="broadcast">broadcast</Term>.** A fork simulation produces no real transaction and no transaction hash. At the snapshot the UBOX proxy still pointed to V3.
 
 <Callout type="warn" title="Fixing one problem can add a new power">
 
-`sweepDust` lets the holder, **and also the token <Term id="owner">owner</Term>**, move an account's invisible dust. The first is like a customer tidying up their own small change; the second is like a shop admin moving a customer's change into another account. It is convenient for maintenance, but raises a governance question: **should** the admin have this power at all? Being able to do something in code does not mean the business should allow it.
+`sweepDust` lets the holder, **and also the token <Term id="owner">owner</Term>**, move an account's invisible dust. The first is like a customer tidying up their own small change. The second is like a shop admin moving a customer's change into another account. It is convenient for maintenance. It also raises a governance question: **should** the admin have this power at all? Being able to do something in code does not mean the business should allow it.
 
 </Callout>
 
@@ -120,25 +120,25 @@ D-05 describes the lab contract repository’s local archive at that time, not t
 | Decision | What | Outcome |
 | --- | --- | --- |
 | D-01 | Revoke the leftover MBox-Burn allowance | **Done on-chain** (block 12117312, Chapter 11) |
-| D-02 | Submit source verification to Etherscan | 8 submitted; still queued at the snapshot, **not confirmed** |
+| D-02 | Submit source verification to Etherscan | 8 submitted. Still queued at the snapshot, **not confirmed** |
 | D-03 | Verify V1/V2 with rebuilt historical source | Sourcify **match**, not exact |
-| D-04 | UBOX V4 | **Local only**: development, tests and fork simulation; not on-chain |
-| D-05 | Local Git archive | Local repository created (root commit `516dcf6`); **no remote, nothing pushed** |
+| D-04 | UBOX V4 | **Local only**: development, tests and fork simulation. Not on-chain |
+| D-05 | Local Git archive | Local repository created (root commit `516dcf6`). **No remote, nothing pushed** |
 
 </T>
 
 ## A repeatable chain of evidence
 
-1. Find the address and its deployment/upgrade transactions; confirm the network is Sepolia (<Term id="chainid">chainId</Term> 11155111).
-2. Find the matching compiler settings, source files and metadata; understand the difference between exact match and match.
-3. Read the proxy's current implementation address; do not mistake a historical implementation for the current one.
+1. Find the address and its deployment/upgrade transactions. Confirm the network is Sepolia (<Term id="chainid">chainId</Term> 11155111).
+2. Find the matching compiler settings, source files and metadata. Understand the difference between exact match and match.
+3. Read the proxy's current implementation address. Do not mistake a historical implementation for the current one.
 4. For any state change you want to prove, check transactions, <Term id="event">events</Term> and storage reads around the relevant block.
 5. Record the source, time, block height, commands, results and **anything uncertain**.
 
-It is like checking an app upgrade: look not only at the installer version, but at what is really running in production, its configuration and the migrated user data.
+It is like checking an app upgrade. Look at the installer version. Also look at what really runs in production, its configuration and the migrated user data.
 
 ## Limits of Phase-0
 
-- The public <Term id="rpc">RPC</Term> has no <Term id="archive-node">archive</Term> data, so pre-upgrade blocks could not be forked; Phase-0 rebuilt the upgrade path locally instead and said so plainly (it did not report an unperformed fork as passing).
-- The static analyser Slither (a tool that scans source code for common problems without running it) was not run (not installed; optional).
+- The public <Term id="rpc">RPC</Term> has no <Term id="archive-node">archive</Term> data. Pre-upgrade blocks could not be forked. Phase-0 rebuilt the upgrade path locally instead. It said so plainly. It did not report an unperformed fork as passing.
+- The static analyser Slither (a tool that scans source code for common problems without running it) was not run (not installed, optional).
 - The next round only needs to track D-02's final result and reproduce the 16 Handler reverts, rather than extending Phase-0 forever.
