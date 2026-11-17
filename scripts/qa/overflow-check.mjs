@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core'
-const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', args: ['--no-sandbox'] })
 for (const u of process.argv.slice(2)) {
   const page = await browser.newPage()
   await page.setViewport({ width: Number(process.env.W || 375), height: 800 })

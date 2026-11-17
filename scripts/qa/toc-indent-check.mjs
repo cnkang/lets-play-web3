@@ -6,7 +6,7 @@
 import puppeteer from 'puppeteer-core'
 const B = process.env.BASE_URL ?? 'http://localhost:4399'
 const SHOTS = process.env.SHOTS, PREFIX = process.env.PREFIX ?? 'after'
-const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', args: ['--no-sandbox'] })
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 let fails = 0, checks = 0
 const ok = (c, m) => { checks++; if (!c) { fails++; console.log('✗ ' + m) } }

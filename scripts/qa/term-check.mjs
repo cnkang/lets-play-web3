@@ -7,7 +7,7 @@ const axeSrc = readFileSync('node_modules/axe-core/axe.min.js', 'utf8')
 const B = 'http://localhost:4399'
 const PAGES = ['/zh/chapters/06-gas-nonce-explorer/', '/en/chapters/13-upgradeable-ubox/', '/zh/']
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
-const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', args: ['--no-sandbox'] })
 const res = {}
 const state = (p) => p.evaluate(() => {
   const a = document.activeElement

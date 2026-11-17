@@ -15,6 +15,7 @@ W=1024 node focus-not-obscured.mjs /zh/chapters/16-appendix-addresses-txs/  # WC
 node keyboard-check.mjs                # ← → paging + every no-fire case, ? dialog, / search, off switch, skip link, menu trap + Esc, popover Esc, quiz, every Tab stop visible & not under the header (7 pages × light/dark × 1280/390), target sizes; exit 1 on failure
 node toc-indent-check.mjs              # numbered labels (book contents in sidebar / mobile menu / home, prev-next pager): wrapped titles hang under their first line, number column aligned, MBox-Burn not split; zh+en × 1280/1024/390/320 × light/dark; SHOTS=dir PREFIX=after for screenshots; exit 1 on failure
 node term-check.mjs                    # glossary「?」popovers: keyboard, Esc, outside click, 320px sheet, no-JS, axe with a popover open
+node regression-check.mjs              # ch8 TOC (both editions, 1280/390, no-JS, anchor), search query race + clear + isolation, copy rapid-click + retry; CHROME env required on macOS
 node orphan-check.mjs                  # orphan last lines (≤3 CJK chars / one short word) on every page at 1280/1024/768/390/320
 node orphan-check.mjs --no-pretty      # same, simulating browsers without text-wrap: pretty (Safari/Firefox)
 node diagram-overflow-check.mjs        # every diagram <text> inside its box / the viewBox, no text-text or text-arrow overlap; default + wide-font stress pass (exit 1 on issues)
@@ -22,7 +23,7 @@ node lang-check.mjs                    # root redirect by saved choice / navigat
 node render-og.mjs /path/to/lets-play-web3   # re-render public/og/{zh,en}.png from the SVG sources
 ```
 
-Most scripts expect Google Chrome at `/usr/bin/google-chrome`; `lang-check.mjs`, `keyboard-check.mjs`, `term-check.mjs` and `toc-indent-check.mjs` also accept `CHROME=/path/to/chrome`. On macOS use `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome` (or adapt the executable path in a scratch copy). Keep scratch dependencies and screenshots outside this repository.
+Every QA script reads `CHROME` for the browser executable and falls back to `/usr/bin/google-chrome`. On macOS set `CHROME='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'` (or another installed Chrome path) before running them; scratch dependencies and screenshots stay outside this repository.
 
 The dependency-free `npm run check:build` runs against `dist/` without a browser. Use the same `SITE_URL` and `BASE` as the build; it checks local links/fragments, assets, canonical/hreflang URLs, JSON-LD, sitemap, robots and llms links. It does not replace browser interaction or accessibility checks.
 
