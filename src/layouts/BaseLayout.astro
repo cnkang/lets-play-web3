@@ -1,4 +1,5 @@
 ---
+import Nw from '../components/Nw.astro'
 import '../styles/global.css'
 import { ui, type Lang } from '../data/book'
 import { href, absolute, htmlLang, ogLocale, authorFor, REPO_URL } from '../data/site'
@@ -77,6 +78,7 @@ const a11yHref = href(`${lang}/accessibility/`)
     <script is:inline>
       // Apply saved / system theme before paint (no flash). Light is the default.
       (function () {
+        document.documentElement.classList.add('js')
         try {
           var s = localStorage.getItem('theme')
           var dark = s ? s === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -151,9 +153,9 @@ const a11yHref = href(`${lang}/accessibility/`)
 
     <footer class="site-footer">
       <div class="footer-inner">
-        <p>{t.footer}</p>
-        <p>{t.snapshot}</p>
-        <p>{lang === 'zh' ? `整理：${author}（个人学习项目）· 页面发布于 2026-11-13` : `Compiled by ${author} (a personal study project) · Pages published 2026-11-13`}</p>
+        <p><Nw text={t.footer} /></p>
+        <p><Nw text={t.snapshot} /></p>
+        <p><Nw text={lang === 'zh' ? `整理：${author}（个人学习项目）· 页面发布于 2026-11-13` : `Compiled by ${author} (a personal study project) · Pages published 2026-11-13`} /></p>
         <ul class="footer-links" aria-label={lang === 'zh' ? '页脚链接' : 'Footer links'}>
           <li><a href={a11yHref} aria-current={navKey === 'a11y' ? 'page' : undefined}>{lang === 'zh' ? '无障碍声明与问题反馈' : 'Accessibility statement & feedback'}</a></li>
           {REPO_URL && <li><a href={`${REPO_URL}/issues`}>{lang === 'zh' ? '报告问题（GitHub Issues）' : 'Report a problem (GitHub Issues)'}</a></li>}
@@ -217,6 +219,65 @@ const a11yHref = href(`${lang}/accessibility/`)
         }
       })
       window.matchMedia('(min-width: 1024px)').addEventListener('change', (m) => { if (m.matches && panel && !panel.hidden) closeMenu(false) })
+
+      // ---- Glossary popovers (<Term>): native popover does open / Esc / light dismiss
+      // without JS; here we add aria-expanded, placement, close-on-focus-leave and a
+      // fallback for browsers without the popover API. See BUILD-NOTES.md.
+      const native = typeof HTMLElement !== 'undefined' && 'popover' in HTMLElement.prototype
+      const wide = window.matchMedia('(min-width: 40rem)')
+      let openPop: HTMLElement | null = null
+      const btnFor = (pop: HTMLElement) => pop.closest('.term')?.querySelector<HTMLButtonElement>('.term-btn') ?? null
+      function place(pop: HTMLElement) {
+        const b = btnFor(pop)
+        if (!b) return
+        if (!wide.matches) {
+          // Bottom sheet on narrow screens: keep the「?」button visible above it (2.4.11).
+          pop.removeAttribute('data-placed'); pop.style.top = ''; pop.style.left = ''
+          requestAnimationFrame(() => {
+            const r = b.getBoundingClientRect(), sheetTop = window.innerHeight - pop.offsetHeight
+            if (r.bottom > sheetTop - 8) window.scrollBy({ top: r.bottom - sheetTop + 16, behavior: 'instant' as ScrollBehavior })
+            else if (r.top < 72) window.scrollBy({ top: r.top - 88, behavior: 'instant' as ScrollBehavior })
+          })
+          return
+        }
+        pop.setAttribute('data-placed', '')
+        const r = b.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight, m = 12
+        let left = Math.min(Math.max(m, r.left + r.width / 2 - w / 2), window.innerWidth - w - m)
+        let top = r.bottom + 8
+        if (top + h > window.innerHeight - m && r.top - 8 - h > m) top = r.top - 8 - h
+        pop.style.left = `${Math.round(left)}px`
+        pop.style.top = `${Math.round(Math.max(m, top))}px`
+      }
+      function setOpen(pop: HTMLElement, open: boolean) {
+        btnFor(pop)?.setAttribute('aria-expanded', String(open))
+        if (open) { openPop = pop; place(pop) } else if (openPop === pop) openPop = null
+      }
+      document.querySelectorAll<HTMLElement>('.term').forEach((term) => {
+        const b = term.querySelector<HTMLButtonElement>('.term-btn')
+        const pop = term.querySelector<HTMLElement>('.term-pop')
+        if (!b || !pop) return
+        b.setAttribute('aria-expanded', 'false')
+        if (native) {
+          pop.addEventListener('toggle', (e) => setOpen(pop, (e as ToggleEvent).newState === 'open'))
+        } else {
+          // Fallback: class-based disclosure (CSS hides .term-pop unless .is-open).
+          const show = (v: boolean) => { if (v && openPop && openPop !== pop) { openPop.classList.remove('is-open'); setOpen(openPop, false) } pop.classList.toggle('is-open', v); setOpen(pop, v) }
+          b.addEventListener('click', () => show(!pop.classList.contains('is-open')))
+          term.querySelector('.term-close')?.addEventListener('click', () => { show(false); b.focus() })
+          term.addEventListener('keydown', (e) => { if (e.key === 'Escape' && pop.classList.contains('is-open')) { show(false); b.focus() } })
+          document.addEventListener('click', (e) => { if (pop.classList.contains('is-open') && !term.contains(e.target as Node)) show(false) })
+        }
+        // Close when keyboard focus moves somewhere else on the page (not when the window blurs).
+        term.addEventListener('focusout', (e) => {
+          const to = (e as FocusEvent).relatedTarget as Node | null
+          if (!to || term.contains(to)) return
+          if (native) { try { pop.hidePopover() } catch {} } else if (pop.classList.contains('is-open')) { pop.classList.remove('is-open'); setOpen(pop, false) }
+        })
+      })
+      let raf = 0
+      const reflow = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (openPop && wide.matches) place(openPop) }) }
+      window.addEventListener('scroll', reflow, { passive: true })
+      window.addEventListener('resize', () => { if (openPop) place(openPop) })
 
       // ---- Copy buttons for addresses / hashes (status announced politely)
       const live = document.createElement('div')

@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config'
 import mdx from '@astrojs/mdx'
+import { satteri } from '@astrojs/markdown-satteri'
+import { satteriNoOrphans } from './src/lib/rehype-no-orphans.mjs'
 
 // Hosting is controlled by two PUBLIC env vars (see .env.example):
 //   SITE_URL  absolute origin used for canonical / hreflang / sitemap / OG / JSON-LD
@@ -26,6 +28,8 @@ export default defineConfig({
   build: { format: 'directory' },
   integrations: [mdx()],
   markdown: {
+    // Glue the last few characters of each text block so no 1–3 character orphan line appears
+    processor: satteri({ hastPlugins: [satteriNoOrphans] }),
     shikiConfig: { themes: { light: 'github-light-high-contrast', dark: 'github-dark-high-contrast' }, defaultColor: 'light' }
   }
 })
