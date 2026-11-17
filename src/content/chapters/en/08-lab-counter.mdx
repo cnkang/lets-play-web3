@@ -15,11 +15,11 @@ Open the first `increment` transaction, which added one to the counter:
 
 <Tx h="0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73" />
 
-This completed experiment appears in the table below, at Sepolia block **12110964**. You only need a browser: no wallet connection, faucet or account. Check three things:
+This completed experiment appears in the table below, at Sepolia block **12110964**. You only need a browser. You need no wallet connection, faucet or account. Check three things:
 
-1. **Status** should be **Success**: the call completed successfully.
-2. **Tokens Transferred**: this call made no token transfer. Increasing a counter is not a payment, though the sender still paid a network fee.
-3. **Logs** record the `Incremented` event. If the explorer can decode it, `newCount` is **1**. Decoding needs the interface description; if fields are unavailable, compare the code and record below rather than guessing.
+1. **Status** shows **Success**. The call completed.
+2. **Tokens Transferred** shows no token transfer for this call. Increasing a counter is not a payment. The sender still paid a network fee.
+3. **Logs** record the `Incremented` event. If the explorer can decode the log, `newCount` is **1**. If you cannot see the field, do not guess. Decoding needs the interface description. Compare the code and the record below instead.
 
 This describes that one call, not the counter today. The historical snapshot’s `count()` of 2 comes after the later calls.
 
@@ -33,7 +33,7 @@ curl -sS https://ethereum-sepolia-rpc.publicnode.com \
   --data '{"jsonrpc":"2.0","id":1,"method":"eth_getTransactionReceipt","params":["0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73"]}'
 ```
 
-Look at `result.status` (`0x1` means success), `blockNumber` and `logs`. RPC block numbers are hexadecimal; the explorer displays decimal. If the result is `null` or the service returns an error, check the network or try later. A failed lookup does not mean a failed transaction.
+Look at `result.status` (`0x1` means success), `blockNumber` and `logs`. RPC block numbers are hexadecimal. The explorer displays decimal. If the result is `null` or the service returns an error, check the network. You can also try later. A failed lookup does not mean a failed transaction.
 
 ## What the contract does
 
@@ -62,7 +62,7 @@ contract Counter {
 }
 ```
 
-Anyone may call `increment` (add one and emit the `Incremented` <Term id="event">event</Term>); only the <Term id="deploy">deployer</Term>, `owner`, may call `reset` (set to zero). It was <Term id="compile">compiled</Term> with solc 0.8.34.
+Anyone may call `increment`. It adds one and emits the `Incremented` <Term id="event">event</Term>. Only the <Term id="deploy">deployer</Term>, `owner`, may call `reset`. That sets the count to zero. It was <Term id="compile">compiled</Term> with solc 0.8.34.
 
 ## On-chain result
 
@@ -72,8 +72,8 @@ Contract <Term id="address">address</Term> (computed in advance from account A's
 
 Read-only check at the snapshot: **`count()` = 2**, **`owner()` = account A**.
 
-<Figure name="counter" n="3" alt="Five circles show count: 0 after deploy, 1 after increment, 0 after reset, 1 after an increment with a 1 wei tip, 2 after an increment with a 2 wei tip. Notes: reads are free; reset does not erase history and only the owner may call it.">
-Each Counter step is a mined transaction; reading <code>count()</code> needs no transaction.
+<Figure name="counter" n="3" alt="Five circles show count: 0 after deploy, 1 after increment, 0 after reset, 1 after an increment with a 1 wei tip, 2 after an increment with a 2 wei tip. Reads are free. Reset does not erase history. Only the owner may call it.">
+Each Counter step is a mined transaction. Reading <code>count()</code> needs no transaction.
 </Figure>
 
 <T label="The five Counter transactions">
@@ -88,19 +88,19 @@ Each Counter step is a mined transaction; reading <code>count()</code> needs no 
 
 </T>
 
-All five succeeded. Use the links or the Copy buttons for full hashes; Appendix A lists every transaction in full.
+All five succeeded. Use the links or the Copy buttons for full hashes. Appendix A lists every transaction in full.
 
 ## What the numbers teach
 
 - **The chain keeps the books for you**: `count`, `owner` and the event logs all live on-chain. Changing state means paying <Term id="gas">gas</Term> yourself.
 - **Deploying costs far more than calling**: deployment used 1,652,641 gas, reset only 23,626. Most of the cost is writing the contract's code into chain state, not the few lines of arithmetic.
-- **The same function can cost different gas**: the increment from 0 to 1 used 127,229 gas, from 1 to 2 only 29,309. Writing a <Term id="storage">storage slot</Term> from zero to non-zero is expensive; changing an already non-zero value is much cheaper.
+- **The same function can cost different gas**: the increment from 0 to 1 used 127,229 gas, from 1 to 2 only 29,309. Writing a <Term id="storage">storage slot</Term> from zero to non-zero is expensive. Changing an already non-zero value is much cheaper.
 - **Confirmed <Term id="transaction">transactions</Term> cannot be undone**: reset sets the number back to zero but cannot erase the earlier increment transactions or events. The history is still there.
 - **This contract cannot gain features**: to add batch operations or upgradeability you must choose an <Term id="upgradeable">upgradeable</Term> pattern at deployment time, which leads straight to UBOX (Chapter 13).
 
 ## Everyday equivalent
 
-Picture a public counter outside a shop that every partner merchant can check: each call changes the count by one. If the count tracks raffle entries or completed public tasks, an on-chain counter reduces disputes about one side changing the number. But it cannot prove that a real person ever stood at the counter.
+Picture a public counter outside a shop. Every partner merchant can check it. Each call changes the count by one. If the count tracks raffle entries or completed public tasks, an on-chain counter reduces disputes. It stops one side from changing the number alone. But it cannot prove that a real person ever stood at the counter.
 
 <Callout type="note" title="Reflection question">
 

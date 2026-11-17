@@ -55,6 +55,17 @@ Phases live in `src/content/phases.json`; parts in `src/content/parts.json`. A p
 - Give every figure useful `alt` text and a caption that explains the takeaway and key numbers.
 - Keep navigation labels like `11 · Title`, `11　标题`, `Appendix A · Title` or `附录 A　标题` so the number column aligns.
 
+### Editing prose (advisory)
+
+Write English prose in short, active sentences. Use the imperative for steps. Put a condition or a warning before the action it applies to. Keep one action in each procedural sentence (20 words or fewer) and one idea in each descriptive sentence (25 words or fewer). Keep approval (the action) separate from allowance (the remaining amount), signing separate from broadcasting, and local tests separate from on-chain results. Use the terms in `src/content/glossary.json` consistently. Rewrite the Chinese edition in natural Chinese, not as a word-for-word copy.
+
+These are editing habits, not a release gate. Never claim ASD-STE100 compliance from word counts or word lists alone. Skip code, addresses, hashes, links and quoted text when you revise prose. A style script, if you use one, is advisory only: it must never block a build or a release.
+
+Example (before → after):
+
+- Before: "Balances do not change; the allowance is only a standing permission, so check it before you approve again and revoke it when you no longer need it."
+- After: "Approving does not change any balance. The allowance is only a standing permission. Check the allowance before you approve again. Revoke it when you no longer need it."
+
 Components are available in MDX without imports:
 
 | Component | Use |

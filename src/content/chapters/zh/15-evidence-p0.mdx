@@ -11,13 +11,13 @@ status: published
 
 ## Phase-0 是什么
 
-本轮文档核对使用了项目所有者提供的原始实验仓库。[公开的实验记录节选](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/phase-0-notebook-excerpts.md)保留原文行号和源文件校验值：第 10.2–10.6 节的决策结果晚于早期计划。本章的测试结果来自原复核，没有在本轮重新执行；本地记录与链上交易分别说明。
+本轮文档核对使用了项目所有者提供的原始实验仓库。[公开的实验记录节选](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/phase-0-notebook-excerpts.md)保留原文行号和源文件校验值，第 10.2–10.6 节的决策结果晚于早期计划。本章的测试结果来自原复核，本轮没有重新执行。本地记录与链上交易分别说明。
 
-Phase-0 指基础实验与复核阶段，不是缺陷优先级。本章讲其中的**技术复核与收尾**：链上只读核对、源码与<Term id="storage-layout">存储布局</Term>审查、<Term id="foundry">Foundry</Term> 测试、<Term id="verification">源码公开验证</Term>的准备，最后列出决策 D-01 到 D-05。它是项目自己做的复核，<strong>不是第三方专业<Term id="audit">审计</Term>证书</strong>。
+Phase-0 指基础实验与复核阶段，不是缺陷优先级。本章讲其中的**技术复核与收尾**，包括链上只读核对、源码与<Term id="storage-layout">存储布局</Term>审查、<Term id="foundry">Foundry</Term> 测试、<Term id="verification">源码公开验证</Term>的准备，最后列出决策 D-01 到 D-05。这是项目自己做的复核，<strong>不是第三方专业<Term id="audit">审计</Term>证书</strong>。
 
 ## 结论：PASS WITH FINDINGS
 
-复核把发现按严重程度分为五级：Critical（严重）、High（高）、Medium（中）、Low（低）和 Info（信息项）。PASS WITH FINDINGS 的意思是「通过，但有发现」：记录的缺陷与限制仍需理解和处理，不能读成「没有漏洞」。
+复核把发现按严重程度分为五级：Critical（严重）、High（高）、Medium（中）、Low（低）和 Info（信息项）。PASS WITH FINDINGS 的意思是「通过，但有发现」。记录的缺陷与限制仍需理解和处理，不能读成「没有漏洞」。
 
 <T label="Phase-0 发现按严重程度汇总">
 
@@ -49,12 +49,12 @@ Phase-0 用了多层测试，但每一层都有边界和盲区。
 
 </T>
 
-测试使用 Foundry 1.9.0，账户只用测试框架生成的地址，**没有**使用本地<Term id="private-key">私钥</Term>；没有为了让测试变绿去修改生产合约逻辑。
+测试使用 Foundry 1.9.0，地址只由测试框架生成，**没有**使用本地<Term id="private-key">私钥</Term>，也没有为了让测试变绿而修改生产合约逻辑。
 
 ### 两个值得讲的小插曲
 
-- **Fuzz 曾失败两次**：原因是**测试预言机**（测试里计算「期望结果」的代码）的断言顺序有问题。修好的是测试，**合约没有改**。这说明：测试失败不一定是合约有 bug，也可能是测试本身写错了。
-- **16 次 Handler 意外回退**：Invariant 测试中（Handler 是测试里替你随机发起各种调用的辅助代码），`batchTransferFrom` 被调用 3,166 次，其中 16 次（约 0.5%）出现了 Handler 没有预料到的<Term id="revert">回退</Term>。整笔 Handler 调用回滚，不变量仍然成立。Phase-0 把它判断为**测试脚手架（预言机边界）的残留**，而不是合约漏洞；更稳妥的做法是以后做一个最小复现，确认它属于预期约束。
+- **Fuzz 曾失败两次**，原因是**测试预言机**（测试里计算「期望结果」的代码）的断言顺序有问题。修好的是测试，**合约没有改**。这说明测试失败不一定是合约有 bug，也可能是测试本身写错了。
+- **16 次 Handler 意外回退**：Invariant 测试中，Handler 是替你随机发起各种调用的辅助代码。`batchTransferFrom` 被调用 3,166 次，其中 16 次（约 0.5%）出现了 Handler 没有预料到的<Term id="revert">回退</Term>。整笔 Handler 调用回滚，不变量仍然成立。Phase-0 把它判断为**测试脚手架（预言机边界）的残留**，不是合约漏洞。更稳妥的做法是以后做一个最小复现，确认它属于预期约束。
 
 <Callout type="warn" title="49/49 通过 ≠ 没有漏洞">
 
@@ -64,11 +64,11 @@ Phase-0 用了多层测试，但每一层都有边界和盲区。
 
 ## 源码匹配：Sourcify 与 Etherscan
 
-部署到链上的是<Term id="bytecode">字节码</Term>，不是源码。**源码验证**就是用同样的编译参数重新编译你提交的源码，如果得到的字节码与链上一致，就公开源码并标记已验证。（怎样申请 Etherscan <Term id="api-key">API 密钥</Term>，见附录 B。）
+部署到链上的是<Term id="bytecode">字节码</Term>，不是源码。**源码验证**是用同样的编译参数重新编译你提交的源码。如果得到的字节码与链上一致，就公开源码并标记已验证。（怎样申请 Etherscan <Term id="api-key">API 密钥</Term>，见附录 B。）
 
 ### Sourcify：8 个地址全部匹配
 
-<Term id="sourcify">Sourcify</Term> 有两种常见结果：**exact_match**（完全匹配，连元数据——编译器附在字节码末尾的说明信息——都一致）和 **match**（字节码匹配，但元数据不完全一致）。8 个地址里 **5 个 exact_match、3 个 match**，不能统称「全部完全匹配」。
+<Term id="sourcify">Sourcify</Term> 有两种常见结果。**exact_match** 指完全匹配，连元数据都一致；元数据是编译器附在字节码末尾的说明信息。**match** 指字节码匹配，但元数据不完全一致。8 个地址里 **5 个 exact_match、3 个 match**，不能统称「全部完全匹配」。
 
 <T label="Sourcify 匹配结果">
 
@@ -85,7 +85,7 @@ Phase-0 用了多层测试，但每一层都有边界和盲区。
 
 </T>
 
-为什么 V1、V2 只能 match？因为第 14 章为了 V3 改过 V1 的源码，而当时工作区**还没有 Git 历史**，无法取回部署时的那一份。Phase-0 重建了历史源码，使字节码主体与链上一致，但元数据（含源码哈希）对不上。重建的源码作为单独的历史快照保存，没有覆盖当前源码。
+为什么 V1、V2 只能 match？第 14 章为了 V3 改过 V1 的源码，而当时工作区**还没有 Git 历史**，取不回部署时的那一份。Phase-0 重建了历史源码，使字节码主体与链上一致，但元数据（含源码哈希）对不上。重建的源码作为单独的历史快照保存，没有覆盖当前源码。
 
 ### Etherscan：已提交，快照时仍在排队
 
@@ -107,7 +107,7 @@ Phase-0 用了多层测试，但每一层都有边界和盲区。
 
 <Callout type="warn" title="修了一个问题，可能多了一个权力">
 
-`sweepDust` 允许持有人本人，<strong>也允许代币 <Term id="owner">owner</Term></strong>，把某个账户的不可见粉尘转走。前者像用户处理自己的找零；后者像商家管理员能把顾客的零头调到别的账户。这带来维护便利，也引出治理问题：管理员**应不应该**有这个权力？代码能做到，不代表业务上应该允许。
+`sweepDust` 允许持有人本人，<strong>也允许代币 <Term id="owner">owner</Term></strong>，把某个账户的不可见粉尘转走。前者像用户处理自己的找零，后者像商家管理员把顾客的零头调到别的账户。这带来维护便利，也引出治理问题：管理员**应不应该**有这个权力？代码能做到，不代表业务上应该允许。
 
 </Callout>
 
@@ -135,10 +135,10 @@ D-05 说的是实验合约仓库当时的本地归档，不是这个公开指南
 4. 对需要证明的状态变化，在目标区块附近核对交易、<Term id="event">事件</Term>和存储读取。
 5. 记录来源、时间、区块高度、命令、结果和**不确定的地方**。
 
-这一步就像检查 App 升级：不只看安装包的版本，还要核对线上真正运行的版本、配置，以及迁移后的用户数据。
+这一步就像检查 App 升级。不只看安装包版本，还要核对线上真正运行的版本、配置和迁移后的用户数据。
 
 ## Phase-0 的边界
 
-- 公共 <Term id="rpc">RPC</Term> 没有 <Term id="archive-node">archive</Term> 数据，所以无法对升级前的历史区块做 fork；Phase-0 改为在本地重建升级路径，并如实注明（没有把没做的 fork 写成通过）。
+- 公共 <Term id="rpc">RPC</Term> 没有 <Term id="archive-node">archive</Term> 数据，无法对升级前的历史区块做 fork。Phase-0 改为在本地重建升级路径，并如实注明：没有把没做的 fork 写成通过。
 - 静态分析工具（不运行代码、直接扫描源码找常见问题的工具）Slither 没有运行（未安装，属于可选项）。
 - 下一轮只需追踪 D-02 的最终结果，并复现那 16 次 Handler 回退，不必无限延长 Phase-0。

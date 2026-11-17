@@ -15,11 +15,11 @@ status: published
 
 <Tx h="0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73" />
 
-这是本章表格中的已完成实验，位于 Sepolia 区块 **12110964**。只需浏览网页，不用连接钱包、领币或注册账号。先看三项：
+这是本章表格中的已完成实验，位于 Sepolia 区块 **12110964**。只需浏览网页，不用连接钱包、领测试币或注册账号。先看三项：
 
-1. **Status** 应为 **Success**：说明这次调用执行成功。
-2. **Tokens Transferred**：这次操作没有代币转账。计数加一不等于付款，但发送者仍付了网络手续费。
-3. **Logs**（事件日志）记录 `Incremented`；若页面能解码，`newCount` 为 **1**。解码需要接口说明；看不到字段时不要猜，先对照下方代码和记录。
+1. **Status** 显示 **Success**，说明这次调用执行成功。
+2. **Tokens Transferred** 显示这次没有代币转账。计数加一不等于付款，但发送者仍付了网络手续费。
+3. **Logs**（事件日志）记录 `Incremented`。若页面能解码，`newCount` 为 **1**。看不到字段时不要猜。解码需要接口说明，先对照下方代码和记录。
 
 这说的是那一次调用，不是今天的计数。全书历史快照中的 `count()` 为 2，来自后面的操作。
 
@@ -33,7 +33,7 @@ curl -sS https://ethereum-sepolia-rpc.publicnode.com \
   --data '{"jsonrpc":"2.0","id":1,"method":"eth_getTransactionReceipt","params":["0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73"]}'
 ```
 
-看返回的 `result.status`（`0x1` 表示成功）、`blockNumber` 和 `logs`。RPC 返回的区块号是十六进制；浏览器显示十进制。若返回 `null` 或服务报错，先检查网络或稍后重试，不要把「没查到」当作「交易失败」。
+看返回的 `result.status`（`0x1` 表示成功）、`blockNumber` 和 `logs`。RPC 返回的区块号是十六进制，浏览器显示十进制。若返回 `null` 或服务报错，先检查网络，也可以稍后重试。不要把「没查到」当作「交易失败」。
 
 ## 合约做了什么
 
@@ -62,7 +62,7 @@ contract Counter {
 }
 ```
 
-任何人都能 `increment`（加一并发出 `Incremented` <Term id="event">事件</Term>），只有<Term id="deploy">部署</Term>者 `owner` 能 `reset`（清零）。实际用 solc 0.8.34 <Term id="compile">编译</Term>。
+任何人都能调用 `increment`，加一并发出 `Incremented` <Term id="event">事件</Term>。只有<Term id="deploy">部署</Term>者 `owner` 能调用 `reset`，把计数清零。实际用 solc 0.8.34 <Term id="compile">编译</Term>。
 
 ## 链上结果
 
@@ -73,7 +73,7 @@ contract Counter {
 快照时只读核对：**`count()` = 2**，**`owner()` = 账户 A**。
 
 <Figure name="counter" n="3" alt="五个圆圈表示 count 的值：部署后 0，increment 后 1，reset 后 0，1 wei 小费 increment 后 1，2 wei 小费 increment 后 2。下方说明读操作免费、reset 不抹掉历史且只有 owner 能调用。">
-Counter 每一步都是一笔已上链的交易；读取 <code>count()</code> 不需要交易。
+Counter 每一步都是一笔已上链的交易，读取 <code>count()</code> 不需要交易。
 </Figure>
 
 <T label="Counter 的五笔交易">
@@ -88,7 +88,7 @@ Counter 每一步都是一笔已上链的交易；读取 <code>count()</code> �
 
 </T>
 
-五笔都成功。完整哈希可以点开链接或用「复制」按钮获取；附录 A 有全部交易的完整列表。
+五笔都成功。完整哈希可以点开链接或用「复制」按钮获取，附录 A 也有全部交易的完整列表。
 
 ## 从数字里能学到什么
 
@@ -100,7 +100,7 @@ Counter 每一步都是一笔已上链的交易；读取 <code>count()</code> �
 
 ## 生活对应
 
-把它想成一家店门口「所有合作商户都能核对」的公共计数器：调用一次，计数变化一次。如果计数涉及活动抽奖总次数、公开任务完成次数，链上计数能减少「单方改数」的争议。但它证明不了柜台前真的来过一个人。
+把它想成一家店门口「所有合作商户都能核对」的公共计数器，调用一次，计数变化一次。如果计数涉及活动抽奖总次数或公开任务完成次数，链上计数能减少争议，避免单方改数。但它证明不了柜台前真的来过一个人。
 
 <Callout type="note" title="复盘问题">
 
