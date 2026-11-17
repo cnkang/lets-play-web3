@@ -11,14 +11,14 @@ status: published
 
 ## A vending machine
 
-A vending machine hands out the item when it receives the right payment and its conditions are met; otherwise it gives the money back. A smart contract likewise turns rules into a program that is deployed on-chain and executed the same way by every node.
+A vending machine hands out the item when it receives the right payment and its conditions are met; otherwise it gives the money back. A <Term id="smart-contract">smart contract</Term> likewise turns rules into a program that is <Term id="deploy">deployed</Term> on-chain and executed the same way by every <Term id="node">node</Term>.
 
-While executing a transaction, the **Ethereum Virtual Machine (EVM)** reads state, checks conditions, updates state, or **rolls back** when a check fails. It does not go online to read today's weather, and it cannot tell whether goods were really shipped: that is the oracle problem from Chapter 4.
+While executing a transaction, the **Ethereum Virtual Machine (EVM)** reads state, checks conditions, updates state, or **rolls back** when a check fails. It does not go online to read today's weather, and it cannot tell whether goods were really shipped: that is the <Term id="oracle">oracle</Term> problem from Chapter 4.
 
 ## Reads and writes
 
-- **Reading** (for example, asking the Counter for its current number) is usually an `eth_call` through RPC, executed locally on a node: **no signature, no gas, no change to on-chain state**.
-- **Writing** (for example, calling `increment`) requires signing and sending a transaction; state changes only after it is mined, and it costs gas.
+- **Reading** (for example, asking the Counter for its current number) is usually an `eth_call` through <Term id="rpc">RPC</Term>, executed locally on a node: **no signature, no <Term id="gas">gas</Term>, no change to on-chain state**.
+- **Writing** (for example, calling `increment`) requires <Term id="signature">signing</Term> and sending a <Term id="transaction">transaction</Term>; state changes only after it is mined, and it costs gas.
 - **When a check fails**, such as a `require` in the code, the transaction **reverts**: none of the state changes from that execution are kept, but the gas has already been spent.
 
 <T label="What to look at when a contract is called">
@@ -27,21 +27,21 @@ While executing a transaction, the **Ethereum Virtual Machine (EVM)** reads stat
 | --- | --- |
 | Transaction succeeded | The EVM execution did not revert |
 | Counter value increased | A value in the contract's storage changed |
-| Event log (if the contract emits one) | Lets interfaces and indexers follow along; it **does not replace** reading state directly |
+| <Term id="event">Event log</Term> (if the contract emits one) | Lets interfaces and indexers follow along; it **does not replace** reading state directly |
 | Gas paid | Keeping one shared state has an execution cost |
 
 </T>
 
 ## Simulate first, then broadcast
 
-Every on-chain transaction in this book was first simulated with viem using `eth_call` and `estimateGas`, and where needed `eth_simulateV1` or `stateOverride`. **Simulation does not change the chain**: it uses no nonce and spends no ETH. Only a transaction that is actually broadcast after confirmation changes on-chain state.
+Every on-chain transaction in this book was first <Term id="simulate">simulated</Term> with <Term id="viem">viem</Term> using `eth_call` and `estimateGas`, and where needed `eth_simulateV1` or `stateOverride`. **Simulation does not change the chain**: it uses no <Term id="nonce">nonce</Term> and spends no <Term id="eth">ETH</Term>. Only a transaction that is actually <Term id="broadcast">broadcast</Term> after confirmation changes on-chain state.
 
 ## Frozen once deployed
 
 Once an ordinary contract is deployed, its code is **fixed at that address**. It cannot be patched or extended later. To change the logic there are only two routes:
 
 1. deploy a new contract and get everyone to agree to use the new address; or
-2. use an upgradeable pattern such as a proxy, **decided at deployment time** (Chapter 13).
+2. use an upgradeable pattern such as a <Term id="proxy">proxy</Term>, **decided at deployment time** (Chapter 13).
 
 <Callout type="note" title="Key idea">
 

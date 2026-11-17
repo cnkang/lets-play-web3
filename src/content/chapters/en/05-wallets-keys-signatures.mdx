@@ -7,15 +7,15 @@ order: 50
 status: published
 ---
 
-<p class="lead">A wallet mainly holds the power to sign, not a drawer inside some app where tokens sit.</p>
+<p class="lead">A <Term id="wallet">wallet</Term> mainly holds the power to sign, not a drawer inside some app where tokens sit.</p>
 
 ## Your tokens are not actually "in" the wallet
 
-When you pay by bank card, the bank checks your identity and account permissions. On networks like Ethereum, an ordinary account uses a **private key** to produce a **digital signature**, and the network checks the signature to confirm the transaction was authorised.
+When you pay by bank card, the bank checks your identity and account permissions. On networks like <Term id="ethereum">Ethereum</Term>, an ordinary account uses a **<Term id="private-key">private key</Term>** to produce a **<Term id="signature">digital signature</Term>**, and the network checks the signature to confirm the <Term id="transaction">transaction</Term> was authorised.
 
 - An **address** is like a public account number. It is safe to share.
 - A **private key** is like a master permission that can never be reset: whoever holds it can sign anything in that address's name.
-- Your token balance is actually recorded **in a contract on-chain** (for example, a balance table inside an ERC-20 contract). The wallet just reads it for you and signs on your behalf when you agree.
+- Your token balance is actually recorded **in a contract on-chain** (for example, a balance table inside an <Term id="erc20">ERC-20</Term> contract). The wallet just reads it for you and signs on your behalf when you agree.
 
 <Figure name="wallet-flow" n="2" alt="Five steps: the wallet signs with a local private key; the signed transaction; an RPC node checks it and holds it in the mempool; a validator includes it in a block; the explorer shows network, status, from, to, logs, block and hash.">
 A signed transaction is broadcast, checked by nodes, included in a block by a validator, and then observed in a block explorer. The private key never leaves the wallet.
@@ -25,8 +25,8 @@ A signed transaction is broadcast, checked by nodes, included in a block by a va
 
 - **Connecting a wallet** tells a website one of your addresses. On its own it does not move any tokens.
 - **Signing a message** may be a harmless log-in statement, or it may grant a risky permission. **Read it before you sign.**
-- **Sending a transaction** changes on-chain state and usually costs a gas fee.
-- **Exporting a seed phrase or private key** means anyone who obtains it may control everything at that address. Legitimate sites almost never need you to do this.
+- **Sending a transaction** changes on-chain state and usually costs a <Term id="gas">gas</Term> fee.
+- **Exporting a <Term id="seed-phrase">seed phrase</Term> or private key** means anyone who obtains it may control everything at that address. Legitimate sites almost never need you to do this.
 
 ## Seed phrases, private keys and API keys
 
@@ -43,21 +43,21 @@ All of these may have "key" in their name, but the risks differ completely:
 
 </T>
 
-Appendix B explains how to obtain and store an API key.
+Appendix B explains how to obtain and store an <Term id="api-key">API key</Term>.
 
 ## How the labs handled this
 
-- Accounts A and B were both **freshly generated locally** as disposable test accounts. No real wallet seed phrase was ever imported, and neither was ever used on mainnet.
+- Accounts A and B were both **freshly generated locally** as disposable test accounts. No real wallet seed phrase was ever imported, and neither was ever used on <Term id="mainnet">mainnet</Term>.
 - The private keys lived only in a local, Git-ignored folder (folder permission 700, file permission 600). They were never printed and never written into public records or this book.
 - Broadcast scripts checked that the account's ETH balance was **no more than 0.1 ETH**, as a guard against accidentally using a key that might hold mainnet funds.
 
 The public addresses of the two test accounts (addresses only, not keys):
 
-- Account A (deployer, owner of UBOX): <Addr a="0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC" />
-- Account B (the approved spender): <Addr a="0x1dB261d3d5BE16E1A81582E8786A6FAB82Fe218c" />
+- Account A (deployer, <Term id="owner">owner</Term> of UBOX): <Addr a="0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC" />
+- Account B (the approved <Term id="spender">spender</Term>): <Addr a="0x1dB261d3d5BE16E1A81582E8786A6FAB82Fe218c" />
 
 <Callout type="danger" title="Least-cost principle">
 
-For experiments, use a wallet that is **completely separate** from your everyday funds, and work only on the Sepolia testnet. **Never** import a real wallet's seed phrase or private key into any lab, website, chat or code repository.
+For experiments, use a wallet that is **completely separate** from your everyday funds, and work only on the Sepolia <Term id="testnet">testnet</Term>. **Never** import a real wallet's seed phrase or private key into any lab, website, chat or code repository.
 
 </Callout>

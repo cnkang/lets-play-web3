@@ -7,11 +7,11 @@ order: 80
 status: published
 ---
 
-<p class="lead">Start by reading one on-chain state change, rather than equating smart contracts with finance from day one.</p>
+<p class="lead">Start by reading one on-chain state change, rather than equating <Term id="smart-contract">smart contracts</Term> with finance from day one.</p>
 
 ## What the contract does
 
-Counter is a teaching contract only a dozen lines long:
+Counter is a teaching contract written in <Term id="solidity">Solidity</Term>, only a dozen lines long:
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -36,11 +36,11 @@ contract Counter {
 }
 ```
 
-Anyone may call `increment` (add one and emit `Incremented`); only the deployer, `owner`, may call `reset` (set to zero). It was compiled with solc 0.8.34.
+Anyone may call `increment` (add one and emit the `Incremented` <Term id="event">event</Term>); only the <Term id="deploy">deployer</Term>, `owner`, may call `reset` (set to zero). It was <Term id="compile">compiled</Term> with solc 0.8.34.
 
 ## On-chain result
 
-Contract address (computed in advance from account A's nonce 0, and matching exactly after deployment):
+Contract <Term id="address">address</Term> (computed in advance from account A's <Term id="nonce">nonce</Term> 0, and matching exactly after deployment):
 
 <Addr a="0xAf6f88Cf8bf6e9211CD11B375AECBa37d61CD00f" />
 
@@ -66,11 +66,11 @@ All five succeeded. Use the links or the Copy buttons for full hashes; Appendix 
 
 ## What the numbers teach
 
-- **The chain keeps the books for you**: `count`, `owner` and the event logs all live on-chain. Changing state means paying gas yourself.
+- **The chain keeps the books for you**: `count`, `owner` and the event logs all live on-chain. Changing state means paying <Term id="gas">gas</Term> yourself.
 - **Deploying costs far more than calling**: deployment used 1,652,641 gas, reset only 23,626. Most of the cost is writing the contract's code into chain state, not the few lines of arithmetic.
-- **The same function can cost different gas**: the increment from 0 to 1 used 127,229 gas, from 1 to 2 only 29,309. Writing a storage slot from zero to non-zero is expensive; changing an already non-zero value is much cheaper.
-- **Confirmed transactions cannot be undone**: reset sets the number back to zero but cannot erase the earlier increment transactions or events. The history is still there.
-- **This contract cannot gain features**: to add batch operations or upgradeability you must choose an upgradeable pattern at deployment time, which leads straight to UBOX (Chapter 13).
+- **The same function can cost different gas**: the increment from 0 to 1 used 127,229 gas, from 1 to 2 only 29,309. Writing a <Term id="storage">storage slot</Term> from zero to non-zero is expensive; changing an already non-zero value is much cheaper.
+- **Confirmed <Term id="transaction">transactions</Term> cannot be undone**: reset sets the number back to zero but cannot erase the earlier increment transactions or events. The history is still there.
+- **This contract cannot gain features**: to add batch operations or upgradeability you must choose an <Term id="upgradeable">upgradeable</Term> pattern at deployment time, which leads straight to UBOX (Chapter 13).
 
 ## Everyday equivalent
 

@@ -11,24 +11,24 @@ status: published
 
 ## Where the starting funds came from
 
-At the start of the lab, account A received **0.05 SepETH** (testnet ETH) at **2026-11-11 15:58:24 Singapore time**, in block **12110419**:
+At the start of the lab, account A received **0.05 <Term id="sepeth">SepETH</Term>** (testnet ETH) at **2026-11-11 15:58:24 Singapore time**, in <Term id="block">block</Term> **12110419**:
 
-- Funding transaction: <Tx h="0xc8b5c548e4e42c69c9f0b9cd8a9a8c4381d7cb2a1e0823b1ef22f539d344d92b" />
-- Sending address: <Addr a="0x52f1984Cd3e46e1214dB222D3Ff63712E7aCEedD" />
+- Funding <Term id="transaction">transaction</Term>: <Tx h="0xc8b5c548e4e42c69c9f0b9cd8a9a8c4381d7cb2a1e0823b1ef22f539d344d92b" />
+- Sending <Term id="address">address</Term>: <Addr a="0x52f1984Cd3e46e1214dB222D3Ff63712E7aCEedD" />
 
-A service that hands out free test coins is called a **faucet**. The sending address has **no official name tag** in the explorer, so this book only states the address and amount you can verify and does not guess which brand it belongs to. Test coins have no market value; the lab spent no real money.
+A service that hands out free test coins is called a **faucet**. The sending address has **no official name tag** in the <Term id="block-explorer">explorer</Term>, so this book only states the address and amount you can verify and does not guess which brand it belongs to. Test coins have no market value; the lab spent no real money.
 
 ## Gas: the metering fee for execution
 
-**Gas** is the unit that measures the work the EVM does. Think of posting a parcel: the price depends not only on whether you send it, but on handling cost and how busy things are.
+**Gas** is the unit that measures the work the <Term id="evm">EVM</Term> does. Think of posting a parcel: the price depends not only on whether you send it, but on handling cost and how busy things are.
 
-Under the EIP-1559 fee market:
+Under the <Term id="eip-1559">EIP-1559</Term> fee market:
 
 - fee paid = `gasUsed × effective gas price`
 - effective gas price ≈ `base fee + tip`
-- **`gasUsed × base fee` is burned** (removed from circulation, credited to nobody); **`gasUsed × tip` goes to the validator** that includes the block.
+- **`gasUsed × base fee` is burned** (removed from circulation, credited to nobody); **`gasUsed × tip` goes to the <Term id="validator">validator</Term>** that includes the block.
 
-Which part is larger depends on the base fee and tip at the time; there is no fixed ratio. Check it against the five real Counter transactions from the lab (all values in wei):
+Which part is larger depends on the <Term id="base-fee">base fee</Term> and <Term id="tip">tip</Term> at the time; there is no fixed ratio. Check it against the five real Counter transactions from the lab (all values in <Term id="wei">wei</Term>):
 
 <T label="Fee split of the Counter transactions (wei)">
 
@@ -46,13 +46,13 @@ Sepolia was quiet then: the base fee was only around 20 wei while the default ti
 
 <Callout type="warn" title="Failed transactions cost money too">
 
-A failed transaction is still a transaction: it uses a nonce, consumes gas and appears in the explorer; only its state changes are rolled back. Chapter 12 has a deliberately failing transaction that used 51,719 gas. However high you set the gas limit, the unused part is not charged: you pay only `gasUsed × effective gas price`.
+A failed transaction is still a transaction: it uses a nonce, consumes gas and appears in the explorer; only its state changes are <Term id="revert">rolled back</Term>. Chapter 12 has a deliberately failing transaction that used 51,719 gas. However high you set the <Term id="gas-limit">gas limit</Term>, the unused part is not charged: you pay only `gasUsed × effective gas price`.
 
 </Callout>
 
 ## Nonce: the account's transaction counter
 
-For an ordinary externally owned account, the **nonce** is the sequence number of the account's transactions. It starts at 0 and goes up by one for every transaction that gets mined; it orders transactions and prevents the same one from being replayed.
+For an ordinary <Term id="eoa">externally owned account</Term>, the **nonce** is the sequence number of the account's transactions. It starts at 0 and goes up by one for every transaction that gets mined; it orders transactions and prevents the same one from being replayed.
 
 At the snapshot, **account A's nonce was 20**. That means A had sent 20 mined transactions using nonces 0 through 19, and its next transaction would use nonce 20. It is **not** "a balance of 20", and not "20 successful calls" (nonce 15 was a deliberately failing transaction that still used up a nonce). Account B's nonce was 3 (nonces 0, 1 and 2 used).
 
@@ -61,9 +61,9 @@ At the snapshot, **account A's nonce was 20**. That means A had sent 20 mined tr
 The lower the tip, the more likely a transaction waits at the back of the queue when the network is busy. The lab practised this on purpose:
 
 - **Nonce 3**: an increment with a tip of only **1 wei**. The chain was not busy, so it was still mined: <Tx h="0xd61e57686959b7c4c9d774a6aa35b0fb9dac72e8317055146da4676a9e4e4b31" short /> (block 12111091).
-- **Nonce 4**: the replacement script `replace-stuck.mjs` was designed to first send a 1 wei tip transaction at nonce 4 that would be hard to mine and watch it; if it was still waiting in the pending queue (the mempool), it would send a replacement with **the same nonce and a higher tip (2 wei)**. The transaction mined at nonce 4 matches that script exactly (gas limit 140,000, tip 2 wei): <Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short /> (block 12111181).
+- **Nonce 4**: the replacement script `replace-stuck.mjs` was designed to first send a 1 wei tip transaction at nonce 4 that would be hard to mine and watch it; if it was still waiting in the pending queue (the <Term id="mempool">mempool</Term>), it would send a replacement with **the same nonce and a higher tip (2 wei)**. The transaction mined at nonce 4 matches that script exactly (gas limit 140,000, tip 2 wei): <Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short /> (block 12111181).
 
-**Only the transaction that was finally mined is visible on-chain.** A replaced transaction never enters any block and leaves no successful receipt. That is why this book **never treats the hash of an unmined transaction as fact**: a hash shown by your wallet or script only says "sent", not "landed".
+**Only the transaction that was finally mined is visible on-chain.** A replaced transaction never enters any block and leaves no successful receipt. That is why this book **never treats the hash of an unmined transaction as fact**: a <Term id="tx-hash">hash</Term> shown by your wallet or script only says "sent", not "landed".
 
 <Callout type="note" title="Why can the same nonce replace a transaction?">
 
@@ -75,10 +75,10 @@ Only one transaction per account per nonce can ever be mined. Nodes usually acce
 
 (See Figure 2 in Chapter 5 for the whole flow.)
 
-1. **Network**: make sure it is Sepolia (the address bar reads `sepolia.etherscan.io`). Do not confuse testnet and mainnet.
+1. **Network**: make sure it is Sepolia (the address bar reads `sepolia.etherscan.io`). Do not confuse <Term id="testnet">testnet</Term> and <Term id="mainnet">mainnet</Term>.
 2. **Status**: success or failure. A failed transaction may still have consumed gas.
 3. **From / To**: who sent it and which account or contract it went to.
-4. **Method / Logs**: which function was called and which events were emitted. An event is not always the final state of an asset (Chapters 11–12 show an event with a net change of zero).
+4. **Method / Logs**: which function was called and which <Term id="event">events</Term> were emitted. An event is not always the final state of an asset (Chapters 11–12 show an event with a net change of zero).
 5. **Block / Transaction Hash**: the block that contains it and its unique identifier.
 
 Judge the on-chain result by **status, events and balance changes together**, never just because a program or bot says "success".
