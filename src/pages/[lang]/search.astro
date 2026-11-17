@@ -8,6 +8,7 @@ export function getStaticPaths() {
 const { lang } = Astro.params as { lang: Lang }
 const zh = lang === 'zh'
 const title = zh ? '搜索全书' : 'Search the book'
+const contentsHref = href(`${lang}/#contents-title`)
 ---
 <BaseLayout lang={lang} title={title} description={zh ? '在「一起玩 Web3」中文版中全文搜索章节、地址与术语。' : 'Full-text search across the English edition of Let’s Play Web3: chapters, addresses and terms.'} path="search/" navKey="search" noindex>
   <div class="shell">
@@ -19,18 +20,34 @@ const title = zh ? '搜索全书' : 'Search the book'
         <input id="q" name="q" type="search" autocomplete="off" enterkeyhint="search" />
       </form>
       <p id="search-status" role="status" aria-live="polite" class="snapshot" style="margin-top:1rem"></p>
+      <p class="search-fallback"><a href={contentsHref}>{zh ? '返回目录，浏览全部章节' : 'Go back to the contents and browse all chapters'}</a></p>
       <ol id="search-results" class="search-results" aria-label={zh ? '搜索结果' : 'Search results'}></ol>
       <noscript><p>{zh ? '搜索需要 JavaScript。请改用目录浏览。' : 'Search needs JavaScript. Please use the contents instead.'}</p></noscript>
     </div>
   </div>
-  <script define:vars={{ pf: href('pagefind/pagefind.js'), zh }}>
+  <script define:vars={{ pf: href('pagefind/pagefind.js'), zh, lang }}>
     const msg = zh
-      ? { idle: '输入关键词后按回车，或稍等片刻自动显示结果。', none: '没有找到结果。', n: (k) => `找到 ${k} 条结果。`, unavailable: '搜索索引只在 npm run build 之后可用（开发模式下没有索引）。请使用目录浏览。' }
-      : { idle: 'Type a keyword and press Enter, or wait a moment for results.', none: 'No results found.', n: (k) => `${k} result${k === 1 ? '' : 's'} found.`, unavailable: 'The search index only exists after npm run build (not in dev mode). Please use the contents.' }
+      ? {
+          idle: '输入关键词后按回车，或稍等片刻自动显示结果。',
+          loading: '正在搜索…',
+          none: '没有找到结果。',
+          n: (shown, total) => (shown < total ? `显示前 ${shown} 条，共 ${total} 条结果。` : `找到 ${total} 条结果。`),
+          unavailable: '搜索索引只在 npm run build 之后可用（开发模式下没有索引）。请用上面的目录链接浏览。',
+          failed: '搜索暂时失败，请稍后重试，或用上面的目录链接浏览。'
+        }
+      : {
+          idle: 'Type a keyword and press Enter, or wait a moment for results.',
+          loading: 'Searching…',
+          none: 'No results found.',
+          n: (shown, total) => (shown < total ? `Showing ${shown} of ${total} results.` : `${total} result${total === 1 ? '' : 's'} found.`),
+          unavailable: 'The search index only exists after npm run build (not in dev mode). Use the contents link above.',
+          failed: 'Search failed. Try again later, or use the contents link above.'
+        }
     const form = document.getElementById('search-form')
     const input = document.getElementById('q')
     const status = document.getElementById('search-status')
     const list = document.getElementById('search-results')
+    const langSegment = `/${zh ? 'zh' : 'en'}/`
     status.textContent = msg.idle
     let pagefind
     async function load() {
@@ -38,32 +55,53 @@ const title = zh ? '搜索全书' : 'Search the book'
       try { pagefind = await import(/* @vite-ignore */ pf); await pagefind.init?.() } catch { pagefind = null }
       return pagefind
     }
+    // Only the results of the newest query may render. Every input invalidates
+    // work already in flight, so an older, slower search cannot come back later.
+    let generation = 0
     let timer
+    const sameEdition = (url) => {
+      try { return new URL(url, location.href).pathname.includes(langSegment) } catch { return true }
+    }
     async function run() {
       const q = input.value.trim()
+      const mine = ++generation
       const url = new URL(location.href)
       if (q) url.searchParams.set('q', q); else url.searchParams.delete('q')
       history.replaceState(null, '', url)
-      list.innerHTML = ''
+      list.replaceChildren()
       if (!q) { status.textContent = msg.idle; return }
-      const p = await load()
-      if (!p) { status.textContent = msg.unavailable; return }
-      const r = await p.search(q)
-      const data = await Promise.all(r.results.slice(0, 20).map((x) => x.data()))
-      status.textContent = data.length ? msg.n(data.length) : msg.none
-      for (const d of data) {
-        const li = document.createElement('li')
-        const a = document.createElement('a')
-        a.href = d.url
-        a.textContent = d.meta?.title || d.url
-        const p2 = document.createElement('p')
-        p2.innerHTML = d.excerpt
-        li.append(a, p2)
-        list.append(li)
+      status.textContent = msg.loading
+      try {
+        const p = await load()
+        if (mine !== generation) return
+        if (!p) { status.textContent = msg.unavailable; return }
+        const r = await p.search(q)
+        if (mine !== generation) return
+        // Pagefind indexes both editions; show only this language's pages.
+        const hits = (r.results ?? []).filter((x) => sameEdition(x.url))
+        list.setAttribute('aria-label', zh ? `“${q}”的搜索结果` : `Search results for “${q}”`)
+        const total = hits.length
+        const data = await Promise.all(hits.slice(0, 20).map((x) => x.data()))
+        if (mine !== generation) return
+        status.textContent = data.length ? msg.n(data.length, total) : msg.none
+        for (const d of data) {
+          const li = document.createElement('li')
+          const a = document.createElement('a')
+          a.href = d.url
+          a.textContent = d.meta?.title || d.url
+          const p2 = document.createElement('p')
+          // Pagefind excerpts come from this build's own static pages and include
+          // its <mark> highlighting; the search query is never inserted as HTML.
+          p2.innerHTML = d.excerpt
+          li.append(a, p2)
+          list.append(li)
+        }
+      } catch {
+        if (mine === generation) { list.replaceChildren(); status.textContent = msg.failed }
       }
     }
-    form.addEventListener('submit', (e) => { e.preventDefault(); run() })
-    input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(run, 300) })
+    form.addEventListener('submit', (e) => { e.preventDefault(); clearTimeout(timer); run() })
+    input.addEventListener('input', () => { generation++; clearTimeout(timer); timer = setTimeout(run, 300) })
     const initial = new URL(location.href).searchParams.get('q')
     if (initial) { input.value = initial; run() }
     if (location.hash === '#q') input.focus() // arrived via the「/」shortcut

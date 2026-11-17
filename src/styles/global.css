@@ -515,8 +515,66 @@ main {
     display: none;
   }
 }
+/* On-page chapter TOC. A native <details> is collapsed by default on narrow
+   screens and works without JavaScript. At >=1280px CSS shows the list as a
+   sticky rail, so no script is needed to open it there. */
 .onpage {
   display: none;
+}
+@media (max-width: 1023px) {
+  .onpage {
+    display: block;
+    order: -1; /* put the chapter TOC above the article in the single-column grid */
+    margin: 0 0 var(--s-5);
+    padding: 0 var(--s-3);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    font-size: 0.92rem;
+  }
+  .onpage > summary {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 650;
+    color: var(--ink-2);
+  }
+  .onpage > summary::-webkit-details-marker {
+    display: none;
+  }
+  .onpage > summary::after {
+    content: "+";
+    margin-inline-start: auto;
+    font-size: 1.1rem;
+    color: var(--ink-3);
+  }
+  .onpage[open] > summary::after {
+    content: "\2212"; /* minus sign */
+  }
+  .onpage > .onpage-nav {
+    padding: 0 0 var(--s-3);
+  }
+}
+.onpage ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 1px solid var(--rule);
+}
+.onpage a {
+  display: block;
+  padding: 0.35rem 0 0.35rem var(--s-3);
+  color: var(--ink-2);
+  text-decoration: none;
+  line-height: 1.4;
+}
+.onpage a:hover {
+  color: var(--brand);
+}
+.onpage .depth-3 a {
+  padding-left: var(--s-5);
+  font-size: 0.84rem;
 }
 @media (min-width: 1280px) {
   .onpage {
@@ -528,32 +586,27 @@ main {
     overflow-y: auto;
     font-size: 0.88rem;
   }
-  .onpage h2 {
+  /* Chrome hides a closed <details> through ::details-content, so both the
+     pseudo-element and the child need overriding at wide widths. */
+  .onpage::details-content {
+    content-visibility: visible;
+  }
+  .onpage > .onpage-nav {
+    display: block;
+    content-visibility: visible;
+  }
+  .onpage > summary {
+    display: block;
+    cursor: default;
+    list-style: none;
     font-size: 0.8rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--ink-3);
     margin: 0 0 var(--s-2);
   }
-  .onpage ol {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    border-left: 1px solid var(--rule);
-  }
-  .onpage a {
-    display: block;
-    padding: 0.3rem 0 0.3rem var(--s-3);
-    color: var(--ink-2);
-    text-decoration: none;
-    line-height: 1.4;
-  }
-  .onpage a:hover {
-    color: var(--brand);
-  }
-  .onpage .depth-3 a {
-    padding-left: var(--s-5);
-    font-size: 0.84rem;
+  .onpage > summary::after {
+    display: none;
   }
 }
 
@@ -713,6 +766,22 @@ main {
 }
 .code-copy:hover {
   text-decoration: underline;
+}
+/* Transient copy feedback keeps the original button label in place. The live
+   region carries the accessible announcement, so the mark is decorative. */
+.copy-btn.is-copied::after {
+  content: " \2713";
+  color: var(--teal);
+}
+.copy-btn.is-failed::after {
+  content: " \26A0";
+  color: var(--amber-ink);
+}
+.search-fallback {
+  margin: 0.5rem 0 0;
+}
+.search-fallback a {
+  color: var(--brand);
 }
 
 /* Tables: scroll inside a labelled region on small screens */

@@ -40,7 +40,14 @@ const author = authorLd(lang)
 const byline = authorFor(lang)
 const title = entry.data.title
 const path = `chapters/${slug}/`
-const toc = headings.filter((h) => h.depth === 2 || h.depth === 3)
+const headingList = headings.filter((h) => h.depth === 2 || h.depth === 3)
+// The first section of Chapter 8 is a raw <h2 id> in the MDX, which Astro's
+// heading extraction does not list. Add it explicitly so the on-page TOC shows
+// the published anchor before the nested terminal subsection in both editions.
+const extraToc = slug === '08-lab-counter' && !headingList.some((h) => h.slug === 'inspect-a-transaction')
+  ? [{ depth: 2, slug: 'inspect-a-transaction', text: lang === 'zh' ? '先看一笔交易：不用钱包的练习' : 'Inspect a transaction without a wallet' }]
+  : []
+const toc = [...extraToc, ...headingList]
 
 const jsonLd: object[] = [
   {
@@ -116,12 +123,14 @@ const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz,
       </p>
     </article>
     {toc.length > 1 && (
-      <nav class="onpage" aria-labelledby="onpage-title">
-        <h2 id="onpage-title">{t.onThisPage}</h2>
-        <ol>
-          {toc.map((h) => <li class={`depth-${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}
-        </ol>
-      </nav>
+      <details class="onpage" id="onpage">
+        <summary id="onpage-title">{t.onThisPage}</summary>
+        <nav class="onpage-nav" aria-labelledby="onpage-title">
+          <ol>
+            {toc.map((h) => <li class={`depth-${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}
+          </ol>
+        </nav>
+      </details>
     )}
   </div>
 </BaseLayout>
