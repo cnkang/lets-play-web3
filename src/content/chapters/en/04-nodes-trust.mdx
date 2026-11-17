@@ -11,15 +11,15 @@ status: published
 
 ## What a node is
 
-A **node** is a computer running blockchain software that stores or validates on-chain data. With an ordinary web request you usually have to trust whatever the server returns; with a blockchain, different nodes can each check that transactions follow the same rules. Nodes differ in their roles and in how much data they keep: some keep the full history (archive nodes), others only recent state.
+A **node** is a computer running <Term id="blockchain">blockchain</Term> software that stores or validates on-chain data. With an ordinary web request you usually have to trust whatever the server returns; with a blockchain, different nodes can each check that transactions follow the same rules. Nodes differ in their roles and in how much data they keep: some keep the full history (<Term id="archive-node">archive nodes</Term>), others only recent state.
 
-The labs in this book used a **free public RPC node**:
+The labs in this book used a **free public <Term id="rpc">RPC</Term> node**:
 
 ```text
 https://ethereum-sepolia-rpc.publicnode.com
 ```
 
-It needs no API key. The trade-offs are limited speed and reliability and **no archive data**: asking for the state at an old block may fail. That is why the P0 review rebuilt the upgrade path locally instead of paying for an archive node (see Chapter 15).
+It needs no <Term id="api-key">API key</Term>. The trade-offs are limited speed and reliability and **no archive data**: asking for the state at an old block may fail. That is why the P0 review rebuilt the upgrade path locally instead of paying for an archive node (see Chapter 15).
 
 ## Everyday analogy: a shared mall checkout
 
@@ -29,18 +29,18 @@ But that does not prove the customer **really** bought anything. Facts that happ
 
 ## Four things a blockchain does not solve on its own
 
-1. **Real-world truth** (the oracle problem): a false report made before data goes on-chain is still recorded faithfully.
+1. **Real-world truth** (the <Term id="oracle">oracle</Term> problem): a false report made before data goes on-chain is still recorded faithfully.
 2. **Privacy**: addresses and interactions on a public chain can usually be traced by anyone.
-3. **Lost keys**: losing a private key is not like forgetting a website password. There is no "reset password" button.
+3. **Lost keys**: losing a <Term id="private-key">private key</Term> is not like forgetting a website password. There is no "reset password" button.
 4. **Buggy contracts**: code can be executed in public, and it can also execute **the wrong logic** in public.
 
 <Callout type="warn" title="The key distinction">
 
-"Hard to tamper with unilaterally" does not mean "always true", "always safe" or "never changeable". In Chapter 13 you will see that the admin of an upgradeable contract can legitimately change the rules behind the same address.
+"Hard to tamper with unilaterally" does not mean "always true", "always safe" or "never changeable". In Chapter 13 you will see that the admin of an <Term id="upgradeable">upgradeable contract</Term> can legitimately change the rules behind the same address.
 
 </Callout>
 
 ## Where this shows up in the labs
 
-- Chapter 9: 1,000 MBox were sent to an address that has **no private key**, so they can never be moved: an extreme case of a lost key.
+- Chapter 9: 1,000 MBox were sent to an <Term id="address">address</Term> that has **no private key**, so they can never be moved: an extreme case of a lost key.
 - Chapters 14–15: the P0 review still found a Medium-severity issue. Putting code on-chain does not make design flaws disappear.

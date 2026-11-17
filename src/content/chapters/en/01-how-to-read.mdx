@@ -9,14 +9,20 @@ status: published
 
 <p class="lead">First understand why you might need it, then how it works, and finally check it against real testnet experiments. This book keeps all three on one line.</p>
 
+<Callout type="note" title="Never touched a blockchain before?">
+
+No problem. When you meet an unfamiliar word, press the small <strong>?</strong> next to it for a plain-language explanation (keyboard: Tab to the ?, then Enter or Space; Esc closes it). Appendix C lists every term in one place.
+
+</Callout>
+
 <SafetyNotice lang="en" />
 
 ## Two sources of information
 
 The content comes from two places. Please keep them apart as you read:
 
-1. **General knowledge and everyday analogies**: blockchain basics added to explain ideas, such as "a hash is like a content fingerprint" or "a contract is like a vending machine". Analogies help understanding, but an analogy is not a definition.
-2. **Real Sepolia experiments**: from the afternoon of 11 November to the afternoon of 12 November 2026 (Singapore time), contracts were deployed, transactions sent and upgrades performed on the Ethereum Sepolia testnet (chainId 11155111), then reviewed in "Phase 0" (P0). Every concrete contract address, transaction hash, block number, balance and test result in this book comes from that lab notebook and its review reports, and each one links to Sepolia Etherscan so you can check it yourself.
+1. **General knowledge and everyday analogies**: <Term id="blockchain">blockchain</Term> basics added to explain ideas, such as "a hash is like a content fingerprint" or "a contract is like a vending machine". Analogies help understanding, but an analogy is not a definition.
+2. **Real Sepolia experiments**: from the afternoon of 11 November to the afternoon of 12 November 2026 (Singapore time), <Term id="smart-contract">smart contracts</Term> were deployed (that is, small programs were published on the chain), <Term id="transaction">transactions</Term> sent and upgrades performed on the <Term id="ethereum">Ethereum</Term> Sepolia testnet (chainId 11155111), then reviewed in "Phase 0" (P0, the first review round). Every concrete contract address, <Term id="tx-hash">transaction hash</Term>, <Term id="block-number">block number</Term>, balance and test result in this book comes from that lab notebook and its review reports, and each one links to Sepolia <Term id="etherscan">Etherscan</Term> (a public website for looking up on-chain records) so you can check it yourself.
 
 <Snapshot lang="en" />
 
@@ -42,18 +48,18 @@ Each chapter can be read on its own, but reading in order works best because lat
 The whole lab followed a few rules. The rules are themselves habits worth learning:
 
 - **The budget was strictly $0.** No crypto was bought, no mainnet funds were used, and no real wallet seed phrase or private key was imported.
-- **Only the Ethereum Sepolia testnet** was used, together with free, open-source, widely used tools (solc, viem, the OpenZeppelin contracts library, Foundry).
-- **Every on-chain transaction was simulated first and broadcast only after explicit confirmation.** Signing in, signing, approving and broadcasting all required confirmation first; if safety could not be confirmed, work stopped.
+- **Only the Ethereum Sepolia testnet** was used, together with free, open-source, widely used tools (solc, <Term id="viem">viem</Term>, the <Term id="openzeppelin">OpenZeppelin</Term> contracts library, <Term id="foundry">Foundry</Term>).
+- **Every on-chain transaction was <Term id="simulate">simulated</Term> first (a free rehearsal) and <Term id="broadcast">broadcast</Term> (actually sent to the network) only after explicit confirmation.** Signing in, <Term id="signature">signing</Term>, approving and broadcasting all required confirmation first; if safety could not be confirmed, work stopped.
 - Every experiment recorded the network, what was done, the transaction hash or contract address, the actual cost, what was learned and the next step.
-- Test-account private keys lived only in a local, Git-ignored, permission-restricted folder. They were never printed or written into any public record. This book contains no private keys, seed phrases or API keys.
+- Test-account private keys lived only in a local, Git-ignored, permission-restricted folder. They were never printed or written into any public record. This book contains no private keys, seed phrases or <Term id="api-key">API keys</Term>.
 
 ## After reading, you should be able to answer
 
 - Why do a group of merchants sometimes need a shared ledger, and sometimes not at all?
-- Looking at one transaction in a block explorer, can you tell "the transaction succeeded" from "a balance changed" from "only an approval was granted"?
-- How do holding tokens, approving tokens and upgrading a contract differ as kinds of power?
+- Looking at one transaction in a <Term id="block-explorer">block explorer</Term>, can you tell "the transaction succeeded" from "a balance changed" from "only an approval was granted"?
+- How do holding <Term id="token">tokens</Term>, approving tokens and upgrading a contract differ as kinds of power?
 - Why can neither a transfer to the wrong address nor any confirmed transaction be undone?
-- Why can a review still have findings when all 49 unit tests pass?
+- Why can a review still have findings when all 49 <Term id="unit-test">unit tests</Term> pass?
 - Why does "passed in a local simulation" not mean "live on-chain"?
 
 <Callout type="warn" title="Reminder">
