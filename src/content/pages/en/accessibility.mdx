@@ -13,7 +13,9 @@ This site targets **WCAG 2.2 Level AA** (Web Content Accessibility Guidelines 2.
 
 - Every page has a "Skip to content" link, the first thing to receive focus when you press Tab, and uses header, navigation, main and footer landmarks.
 - Everything works with a keyboard alone, with a clearly visible focus outline; the sticky header never hides the focused element.
-- The mobile contents menu closes with Esc, keeps focus inside while open, and returns focus to its button when closed.
+- The mobile contents menu closes with Esc, keeps focus inside while open, and returns focus to its button when closed. Glossary “?” popups close with Esc and return focus to the “?” button.
+- Keyboard shortcuts: on chapter pages, ← / → open the previous / next chapter; / opens search; ? lists the shortcuts. They do nothing while you type, select text, hold Ctrl / Alt / ⌘ / Shift, have a popup or the menu open, or while focus is in a table, code block or diagram that scrolls sideways (the arrows then scroll it).
+- Single-key shortcuts can be turned off (WCAG 2.1.4): open “Keyboard shortcuts” in the footer (or “All shortcuts & on/off” at the end of a chapter) and untick “Use single-key shortcuts”. The setting is saved in this browser only; Tab navigation and all links keep working.
 - The current chapter and section are marked with `aria-current`; the page language is set in the `lang` attribute, and the language switch announces the target language and opens the same page in that language.
 - Body text has at least 4.5:1 contrast and interface parts at least 3:1. Light mode is the default; dark mode meets the same contrast and remembers your choice.
 - Click and tap targets are at least 44×44 pixels; nothing needs hovering or dragging.
@@ -24,7 +26,7 @@ This site targets **WCAG 2.2 Level AA** (Web Content Accessibility Guidelines 2.
 ## How we tested
 
 - Automated checks with axe-core on the home page, a chapter, the appendix, the self-check page and the 404 page, in both languages and in light and dark modes.
-- A manual keyboard pass: Tab / Shift+Tab order, visible focus, focus not hidden by the header, and Esc plus focus wrapping in the mobile menu.
+- A keyboard pass (scripted and by hand): Tab / Shift+Tab order, visible focus, focus not hidden by the header, Esc plus focus wrapping in the mobile menu, and the shortcuts staying quiet in every case where they should not fire.
 - Layout checks at 320, 375, 768, 1024 and 1440 pixels wide.
 
 Automated tools only catch some problems, so we do not claim full conformance.
