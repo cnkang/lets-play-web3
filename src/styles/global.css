@@ -120,6 +120,12 @@ html {
   scroll-padding-top: calc(var(--header-h) + 1.25rem + env(safe-area-inset-top));
   scroll-behavior: smooth;
 }
+/* Keyboard users: Tab / skip-link / arrow-paging scrolls jump at once instead of gliding,
+   so fast Tab presses never leave the focused element below the fold mid-animation.
+   Mouse clicks on in-page links (no :focus-visible) keep the smooth scroll. */
+html:has(:focus-visible) {
+  scroll-behavior: auto;
+}
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -2042,4 +2048,132 @@ body {
 @media (pointer: coarse) {
   .lang-hint-close { min-width: 44px; min-height: 44px; }
   .lang-hint-go { min-height: 44px; }
+}
+
+/* ---- Keyboard shortcuts: hint under the pager, help dialog, link-style buttons */
+[data-js-only][hidden] { display: none; }
+.link-btn {
+  font: inherit;
+  color: var(--brand-strong);
+  background: none;
+  border: 0;
+  padding: 0;
+  min-height: 24px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+.link-btn:hover { color: var(--brand-strong); text-decoration-thickness: 2px; }
+/* Footer: same look, size and alignment as the footer links next to it */
+.site-footer .link-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--s-2);
+  border-radius: 8px;
+  color: var(--brand);
+}
+.kbd-hint kbd { font-size: 1em; }
+@media (pointer: coarse) { .link-btn { min-height: 44px; } }
+.kbd-hint {
+  margin: var(--s-3) 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-3);
+  text-align: center;
+}
+html[data-kbd='off'] .kbd-on,
+html:not([data-kbd='off']) .kbd-off { display: none; }
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0.05em 0.4em;
+  border: 1px solid var(--rule-strong);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--ink);
+  font: 600 0.85em/1.4 var(--font-mono, ui-monospace, monospace);
+  text-align: center;
+}
+.kbd-help {
+  width: min(92vw, 520px);
+  max-height: min(88vh, 640px);
+  padding: var(--s-5);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-lg, 18px);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-lg);
+}
+.kbd-help:modal { overscroll-behavior: contain; }
+.kbd-help::backdrop {
+  background: rgba(16, 12, 40, 0.55);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+.kbd-help-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-3);
+}
+.kbd-help-head h2 { margin: 0; font-size: 1.25rem; }
+.kbd-help-head form { margin: 0; }
+.kbd-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.kbd-table th, .kbd-table td { text-align: left; vertical-align: top; padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--rule); }
+.kbd-table th { font-size: 0.85rem; color: var(--ink-3); font-weight: 600; }
+.kbd-table td:first-child { white-space: nowrap; }
+.kbd-help-note { font-size: 0.88rem; color: var(--ink-2); margin: var(--s-3) 0 0; }
+.kbd-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: var(--s-4);
+  min-height: 44px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.kbd-toggle input { inline-size: 1.25rem; block-size: 1.25rem; accent-color: var(--brand); margin: 0; }
+
+/* ---------- Numbered labels: hanging indent (BookToc + pager, see NumLabel.astro) ----------
+   Number column (≥ 2ch, numbers right-aligned so 9 and 10 end at the same place) + a title
+   column that wraps under itself, not under the number. Same in zh and en; appendix labels
+   ("附录 A", "Appendix A") simply make their own number column wider. */
+.num-item,
+.book-toc a.num-item,
+.book-toc .toc-upcoming.num-item,
+.pager .ttl.num-item {
+  display: grid;
+  grid-template-columns: minmax(2ch, max-content) minmax(0, 1fr);
+  column-gap: 0.5em;
+  align-items: baseline;
+  align-content: center;
+}
+.num-item > .num {
+  text-align: end;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.num-item > .num-text:only-child { grid-column: 1 / -1; }
+.num-item > .num-word {
+  grid-column: 2;
+  text-align: start;
+  font-size: 0.8em;
+  font-weight: 650;
+  color: var(--ink-3);
+}
+.num-item > .num-word + .num-text { grid-column: 2; }
+.num-text { min-width: 0; overflow-wrap: anywhere; }
+/* zh label with a hyphenated token (NumLabel adds .keep): break at spaces and punctuation only
+   (「MBox-Burn 销｜毁」→「MBox-Burn｜销毁…」); overflow-wrap: anywhere still breaks a run that would not fit. */
+.num-text.keep { word-break: keep-all; }
+.nw-hy { white-space: nowrap; }
+/* Pager: a single label, so no shared number column; "Next" pushes a short label to the right,
+   a wrapped one fills the card and still hangs under its first line. */
+.pager .ttl.num-item { grid-template-columns: max-content minmax(0, 1fr); }
+@media (min-width: 640px) {
+  .pager .next .ttl.num-item { justify-content: end; grid-template-columns: max-content minmax(0, max-content); }
+  .pager .next .num-text { text-align: start; }
 }

@@ -3,6 +3,7 @@
 import type { Lang } from '../data/book'
 import { getBook } from '../data/chapters'
 import { href } from '../data/site'
+import NumLabel from './NumLabel.astro'
 interface Props { lang: Lang; current?: string; idPrefix: string }
 const { lang, current, idPrefix } = Astro.props
 const book = await getBook()
@@ -22,10 +23,10 @@ const multiPhase = new Set(book.parts.map((p) => p.phase.id)).size > 1
         {p.chapters.map((c) => (
           <li>
             {c.status === 'upcoming' ? (
-              <span class="toc-upcoming">{c.nav[lang]} <span class="badge">{soon}</span></span>
+              <span class="toc-upcoming num-item"><NumLabel label={c.nav[lang]}> <span class="badge">{soon}</span></NumLabel></span>
             ) : (
-              <a href={href(`${lang}/chapters/${c.slug}/`)} aria-current={c.slug === current ? 'page' : undefined}>
-                {c.nav[lang]}{c.status === 'draft' && <span class="badge">{draft}</span>}
+              <a class="num-item" href={href(`${lang}/chapters/${c.slug}/`)} aria-current={c.slug === current ? 'page' : undefined}>
+                <NumLabel label={c.nav[lang]}>{c.status === 'draft' && <span class="badge">{draft}</span>}</NumLabel>
               </a>
             )}
           </li>

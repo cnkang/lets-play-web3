@@ -1,0 +1,18 @@
+---
+/*
+ * A numbered label ("11　实验：MBox-Burn 销毁与撤销授权", "Appendix A · Addresses…") split into
+ * a number column and a title column, so a wrapped title hangs under its own first line, not
+ * under the number. The plain space between the two spans keeps the accessible name "11 实验…".
+ * Word labels ("附录 A", "Appendix A") sit on a small line above the title, in the title column,
+ * so appendix titles line up with chapter titles. Hyphenated Latin tokens (MBox-Burn, ERC-20, self-check) are kept on one line.
+ * The wrapping element needs class="num-item" (styles in global.css, check: scripts/qa/toc-indent-check.mjs).
+ */
+import { splitNumLabel } from '../data/chapters'
+interface Props { label: string }
+const { num, text } = splitNumLabel(Astro.props.label)
+const parts = text.split(/([A-Za-z0-9]+(?:-[A-Za-z0-9]+)+)/)
+// zh label with a hyphenated token: break only at spaces/punctuation, so「实验：MBox-Burn｜销毁与撤销授权」,
+// not「MBox-Burn 销｜毁」. Other zh labels keep normal CJK breaking (lets text-wrap: balance work).
+const keep = parts.length > 1 && /[\u3400-\u9fff]/.test(text)
+---
+{num && <><span class={/^\d+$/.test(num) ? 'num' : 'num num-word'}>{num}</span> </>}<span class={keep ? 'num-text keep' : 'num-text'}>{parts.map((s, i) => (i % 2 ? <span class="nw-hy">{s}</span> : s))}<slot /></span>
