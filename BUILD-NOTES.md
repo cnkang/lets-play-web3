@@ -47,6 +47,36 @@ BASE=/lets-play-web3/ SITE_URL=https://example.github.io npm run build
 - Templates: `templates/chapter.{zh,en}.mdx`; scaffold with `npm run new:chapter`. Chinese guide: `CONTRIBUTING.md` (adding chapters, parts/phases, statuses, components, appending experiments to Appendix A, diagrams, pre-commit checklist).
 - `scripts/gen_appendix.py` now writes the new frontmatter, documents how to append experiments, and stops with a list of missing block numbers / English labels instead of a bare assert (output verified byte-identical to the committed appendix).
 
+## Glossary popovers for beginners (2026-11-17)
+
+Goal: a reader who can use a computer but has never touched a blockchain can read every chapter. Two layers:
+
+1. **In-line plain words** for the hardest sentences (safety notice, home hero, Chapter 1, testnet in Chapter 2, overflow/sentinel in 14, severity levels / metadata / Handler / Slither in 15, calldata in 13). A beginner gets the gist without opening anything. No fact, number, hash or address changed.
+2. **`<Term id="…">word</Term>`** marks the first use of a jargon term per page; it renders the word plus a small「?」button that opens a plain-language explanation.
+
+**Single source**: `src/content/glossary.json` — 90 terms, each `{ chapter?, zh: { term, def }, en: { term, def } }`. `src/components/Term.astro` reads it; `src/components/Glossary.astro` renders the full list in Appendix C (chapter 18, "完整术语表 / Full glossary", `id="g-<term>"` anchors). `scripts/check-content.mjs` (run by `npm run build`) fails if a term lacks a language, a `chapter` slug does not exist, a used id is unknown, an id is marked twice in one MDX file, or a `<Term>` sits in a heading, link text or code fence. `Term.astro` also throws at build time for an unknown id.
+
+**Usage**: 512 `<Term>` uses across the chapters (zh + en; every chapter except Appendix C, which carries the full list instead) plus 18 in `SafetyNotice` (shown on the home page and in Chapter 1); zh and en mark the same ids per chapter except Chapter 14 (zh "无限授权" → `approve`, en "infinite allowance" → `allowance`). Appendix A's marks are emitted by `scripts/gen_appendix.py` (the generator was updated, then re-run; only the `<Term>` lines changed).
+
+**Mechanism — native HTML popover, progressively enhanced**
+
+```html
+<span class="term"><span class="term-text">Sepolia</span>&#8288;<button class="term-btn" popovertarget="term-sepolia-1" aria-controls="term-sepolia-1" aria-label="什么是Sepolia？">?</button><span id="term-sepolia-1" popover="auto" class="term-pop" tabindex="-1" data-pagefind-ignore>…title, × close (popovertargetaction="hide"), explanation, optional chapter link…</span></span>
+```
+
+- **No JS needed** for open (click / tap / Enter / Space), close on **Esc**, close on **outside click** (light dismiss), and only one open at a time (`popover="auto"`). Verified with JavaScript disabled in Chrome.
+- The popover is the button's **next DOM sibling**, so reading order and Tab order go「?」→ × → chapter link → rest of the page. No focus trap, focus does not jump.
+- **BaseLayout script adds**: `aria-expanded` kept in sync via the `toggle` event (without JS, Chrome/Safari expose the expanded state of popover invokers natively); placement next to the button on screens ≥ 40rem (flips above if there is no room, clamped 12px inside the viewport, follows scroll); **close when keyboard focus moves elsewhere** (`focusout` with a `relatedTarget` outside the term — window blur is ignored); on narrow screens the page scrolls so the「?」button stays visible above the sheet (2.4.11).
+- **Layout**: ≥ 40rem a 24rem card (`--card`, `--rule-strong` border, `--radius-lg`, shadow); < 40rem a full-width **bottom sheet** (max 60vh, safe-area padding). Without JS the card is centred in the viewport.
+- **Old browsers without the popover API**: with JS, a class-based fallback (`.is-open`, same keys and outside click); without JS, `@supports not selector(:popover-open)` shows the explanation inline as a small tinted note, so it is never unreachable.
+- **Target size**: the button box is 24×24 CSS px (2.5.8) with negative block margins so the line box does not grow; the visible dot is 18px; `(pointer: coarse)` adds a transparent `::before` that extends the hit area to 44×44. Close button 36×36.
+- **Focus** uses the global `--focus` ring (3px, magenta light / pink dark). **Contrast** (computed): popover title 9.8:1 light / 10.8:1 dark, body 11.0 / 11.3, link 7.4 / 7.7, "?" glyph on its tint 8.1 / 8.5, dot border vs page 6.8 / 8.0 (6.6 on the amber safety box), popover border 3.9 / 4.6. `forced-colors` keeps borders visible.
+- **Motion**: 160ms fade/slide via `@starting-style`; off under `prefers-reduced-motion` (plus the global reduced-motion rule).
+- **Search**: the「?」button and popover carry `data-pagefind-ignore`, so explanations do not pollute every page's search result; the full glossary in Appendix C is indexed (searching a term lands there). `llms-full.txt` strips the tag and keeps the word.
+- Accessible names: zh「什么是X？」, en "What is “X”?"; close button「关闭「X」的解释」/ "Close the explanation of “X”".
+
+**QA (2026-11-17, Chrome 156 headless)**: `scripts/qa/axe-check.mjs` 96 runs → 0 violations, 0 incomplete contrast; `scripts/qa/term-check.mjs` → keyboard (Tab to「?」, Enter/Space open + `aria-expanded=true`, Tab into × and link, Tab out closes, Esc closes and keeps focus on「?」), outside click closes, min target 24px, popover inside the viewport at 1280, bottom sheet inside 320/390 px with the button visible and no horizontal scroll, no-JS open/Esc works, axe with a popover **open** in light/dark × 1280/375 → 0 violations (contrast "incomplete" items there are axe's `bgOverlap` on top-layer text; ratios computed above).
+
 ## How SITE_URL and BASE work
 
 - `astro.config.mjs` reads `SITE_URL` → Astro `site` and `BASE` → Astro `base` (normalised to `/x/` or `/`), after loading an optional local `.env` (git-ignored). Defaults: `http://localhost:4321` and `/`.
@@ -72,6 +102,16 @@ BASE=/lets-play-web3/ SITE_URL=https://example.github.io npm run build
 | Visible attribution, publish date and snapshot on every chapter; FAQ in real HTML (`<details>`); no ratings; "not affiliated" footer | layout / chapter page |
 | Root `/` → `/zh/` (meta refresh 0 + visible links + canonical) | `src/pages/index.astro` |
 | Minimal JS: one small inline module (theme, menu, copy) + Pagefind only on the search page; fonts are self-hosted variable fonts with `unicode-range` subsets and `font-display: swap` | |
+
+## No orphan last lines (2026-11-17)
+
+Goal: no line that holds only 1–3 CJK characters or a single short word at the end of a text block.
+
+- **CSS** (`global.css`, end): `text-wrap: pretty` on running text (p, li, td/th, dd, captions, callouts, popover body, cards, safety notice, footer); `text-wrap: balance` on headings, card titles, callout titles, sidebar/TOC/nav links, pager titles, part titles, glossary links. `html:lang(zh) { line-break: strict }` keeps CJK closing punctuation off the start of a line.
+- **Build-time fallback** for browsers where `pretty` is missing or weaker (Safari/Firefox): `src/lib/rehype-no-orphans.mjs`, registered as a Sätteri hast plugin in `astro.config.mjs` (Astro 7's default Markdown/MDX processor, so Markdown rendering is unchanged). For each leaf block it wraps the tail (last 4 CJK chars + trailing punctuation, or the last two Latin words, max 18 chars) in `<span class="nw">` (`white-space: nowrap`). It splits `<strong>/<em>` when needed, moves a short link / inline code / `<Term>` whole, never splits a link. A span adds no characters, so copy-paste, Pagefind and screen readers get the original text (no U+00A0 / U+2060). Also: table columns whose cells are all short get `c-short` (one line); short inline code (≤22 chars) is `nw`; longer code with spaces glues its last words; long URL link text gets `<wbr>` after `/`.
+- **Templates**: `src/components/Nw.astro` applies the same rule to plain strings (home cards, footer, quiz, glossary list, accessibility page); safety notice and snapshot have hand-placed `<span class="nw">`; chapter meta line glues「区块 12117419」.
+- **`<Term>`**: the last 1–2 CJK chars or last 1–2 words of the term sit in `.term-nw` together with the「?」button, so the button never starts a line alone; `.term-pop { white-space: normal }` keeps the popover text wrapping.
+- **QA**: `scripts/qa/orphan-check.mjs` measures the last line of every leaf text block with `Range.getClientRects()` on all 44 zh/en pages at 1280/1024/768/390/320. Before → after (Chrome): 423/383/215/506/588 → 0/0/0/2/6; with `pretty` disabled (`--no-pretty`, the Safari/Firefox case): 0/0/0/2/7. The few left are narrow-phone cases that cannot be avoided without breaking words (a two-word English h1, a word after a 20-digit number or a long code span, text after a hash chip).
 
 ## Chapters (zh / en) — same slug in both languages (order/part now come from each file's frontmatter)
 
@@ -199,11 +239,11 @@ Tools: axe-core 4.14.0 via puppeteer-core in Google Chrome 156 (headless), tags 
 │   └── og/{zh,en}.svg sources (PNG decoded from assets/og/*.png.b64)
 ├── scripts/
 │   ├── build_diagrams.py   gen_appendix.py   check-facts.mjs   check-content.mjs   new-chapter.mjs
-│   └── qa/ (axe-check, overflow-check, focus-not-obscured, keyboard-check, render-og, README)
+│   └── qa/ (axe-check, overflow-check, focus-not-obscured, keyboard-check, term-check, render-og, README)
 └── src/
-    ├── components/ Addr Tx CopyChip Figure Callout Lab T SafetyNotice Snapshot BookToc Quiz (.astro)
+    ├── components/ Addr Tx CopyChip Figure Callout Lab T Term Glossary SafetyNotice Snapshot BookToc Quiz (.astro)
     ├── content.config.ts
-    ├── content/parts.json  content/phases.json
+    ├── content/parts.json  content/phases.json  content/glossary.json (term explanations, zh + en)
     ├── content/chapters/{zh,en}/01…19-*.mdx
     ├── content/pages/{zh,en}/accessibility.mdx
     ├── data/ book.ts (UI strings) chapters.ts (getBook) site.ts quiz.ts llms.ts

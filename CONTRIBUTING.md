@@ -90,6 +90,8 @@ updated: "2026-12-01"               # 可选：内容更新日期，会显示在
 | `<Figure>` | 示意图 + 图注 + 替代文字 | `<Figure name="approve" n="4" alt="图里画了什么">图注</Figure>`，图片放在 `public/diagrams/{zh,en}/<name>.svg` |
 | `<T>` | 宽表格：手机上可在表格内横向滑动，键盘可聚焦 | `<T label="表格用途">`（空一行）Markdown 表格（空一行）`</T>` |
 | `<SafetyNotice>` / `<Snapshot>` | 安全须知 / 链上快照说明 | `<SafetyNotice lang="zh" />` |
+| `<Term>` | 术语：文字后面带一个「?」按钮，点开是一段大白话解释（见下文） | `<Term id="gas">手续费（gas）</Term>` |
+| `<Glossary>` | 自动生成的完整术语表（附录 C 在用） | `<Glossary lang="zh" />` |
 
 组件里的文字会按页面语言自动切换（「实验 / Lab」「复制 / Copy」等）。
 
@@ -99,6 +101,54 @@ updated: "2026-12-01"               # 可选：内容更新日期，会显示在
 - 图片必须写 `alt`（给读屏软件）；图注里重复关键数字。
 - 标题层级从 `##` 开始（`#` 由页面自动生成），不要跳级。
 - 链接文字要说清去哪里，不要写「点这里」。
+- 写给「会用电脑、会上网，但没碰过区块链」的读者：第一次出现的专有名词要么在句子里顺手解释（例如「测试网，也就是专门用来练习的区块链」），要么加 `<Term>`。
+
+### 术语「?」小窗（`<Term>`）
+
+全书的术语解释只写在**一个文件**里：`src/content/glossary.json`。章节里的 `<Term>`、附录 C 的完整术语表都从这里读，所以改一处，全书同步。
+
+**1. 加一个新术语**：在 `glossary.json` 里加一项（键就是术语 id，只用小写字母、数字和连字符）：
+
+```json
+"slippage": {
+  "chapter": "20-p1-dex-amm",
+  "zh": { "term": "滑点", "def": "下单时看到的价格和最终成交价之间的差。就像排队买菜，轮到你时菜价可能已经变了。" },
+  "en": { "term": "slippage", "def": "The gap between the price you saw and the price you finally got, like a market stall changing its price while you queue." }
+}
+```
+
+- `zh` 和 `en` **都必须有**，每种语言都要有 `term`（小窗标题）和 `def`（解释）。
+- `def` 写 1–3 句大白话，能用生活类比就用；只写通用知识，不要放具体地址、哈希或实验数字。
+- `chapter` 可选：填详细讲这个概念的章节 slug，小窗底部会出现「详细讲解：第 X 章」链接（在那一章本身里不显示）。
+
+**2. 在正文里用**：把第一次出现的那个词包起来，显示的文字可以和 `term` 不同（比如带复数或加括号）：
+
+```mdx
+后面的实验都在 <Term id="sepolia">Sepolia</Term> 测试网上做。
+Every fee is paid in <Term id="eth">ETH</Term>.
+```
+
+规则（`npm run check:content` 会自动检查）：
+
+- 用到的 id 必须在 `glossary.json` 里；每个术语都要中英两种语言。
+- **每个文件里同一个 id 只标一次**——只标这一页第一次出现的地方，别处照常写字。
+- 不要放进标题（`##`）、链接文字、代码块或 `` `代码` `` 里；表格单元格里可以用，但优先标在正文段落里。
+- 中英两份章节尽量标同一批术语。
+- 不要一句话里堆三四个「?」：能在句子里用几个字解释清楚的，就直接写在句子里。
+
+**3. 自查**：`npm run dev` 打开页面，点「?」看小窗；键盘按 Tab 移到「?」，Enter / 空格打开，Esc 关闭。
+
+小窗用的是浏览器原生的 popover：不开 JavaScript 也能点开、按 Esc 或点空白处关闭；小窗里的文字不会进站内搜索（`data-pagefind-ignore`），完整解释在附录 C 可以被搜到。技术细节见 `BUILD-NOTES.md`「Glossary popovers」。
+
+### 折行：不要让最后一行只剩一两个字
+
+网站会自动避免「最后一行只剩 1–3 个字（或一个英文单词）」的难看折行，写作时**不用手动加空格或换行**：
+
+- 正文、列表、表格、标题会在构建时自动处理（`src/lib/rehype-no-orphans.mjs`）：把段落最后约 4 个汉字（或最后两个英文单词）包进 `<span class="nw">` 不让它们分开；表格里每格都很短的列（≤ 约 11 个汉字，例如「自动履约的数字凭证」）会保持一行。复制、搜索、读屏软件看到的文字不变。
+- `.astro` 模板里的长句用 `<Nw text={...} />` 组件；短标题、按钮、目录靠 CSS `text-wrap: balance` 自动平衡。
+- 「?」按钮总是和术语最后一两个字黏在一起，不会单独跑到下一行开头。
+- 长链接会在「/」后断行；长哈希 / 地址照常可以在任意位置断开，不会撑出页面。
+- 检查：`scripts/qa/orphan-check.mjs`（见 `scripts/qa/README.md`）。
 
 ## 六、追加实验到附录 A
 
@@ -132,7 +182,8 @@ updated: "2026-12-01"               # 可选：内容更新日期，会显示在
 ## 八、提交前检查清单
 
 - [ ] 中英两份文件都在，`part` / `order` / `status` 一致（`npm run check:content`）
+- [ ] 新术语在 `src/content/glossary.json` 里有中英两种解释；每章同一术语只标一次 `<Term>`（`npm run check:content`）
 - [ ] `npm run check:facts` 通过（地址 / 哈希都有出处，没有密钥）
 - [ ] `npm run build` 通过
-- [ ] 改了样式或组件时：按 `scripts/qa/README.md` 跑 axe 和键盘检查（目标 WCAG 2.2 AA，0 违规）
+- [ ] 改了样式或组件时：按 `scripts/qa/README.md` 跑 axe 和键盘检查（目标 WCAG 2.2 AA，0 违规），以及折行检查 `orphan-check.mjs`（1280 / 1024 / 768 应为 0）
 - [ ] 没有提交 `.env`、私钥、助记词、API 密钥
