@@ -1,0 +1,449 @@
+{
+  "blockchain": {
+    "chapter": "02-who-needs-blockchain",
+    "zh": { "term": "区块链", "def": "一本由很多台电脑共同保存、共同核对的公开账本。新记录按批次（区块）追加在末尾，每一批都引用前一批，所以谁想偷偷改旧账，大家都会发现。可以想成「全班每人一本、内容永远同步的记账本」。" },
+    "en": { "term": "blockchain", "def": "A public ledger that many computers keep and check together. New records are appended in batches (blocks), each pointing to the one before, so a sneaky edit to old entries is easy to spot. Think of a notebook that every classmate holds an identical, always-synced copy of." }
+  },
+  "web3": {
+    "zh": { "term": "Web3", "def": "对「建立在区块链上的应用和服务」的统称。和传统网站最大的区别是：账本和规则不由一家公司单独掌握，用户用自己的钱包登录和签名。它是一个宽泛的说法，不是某个具体产品。" },
+    "en": { "term": "Web3", "def": "An umbrella name for apps and services built on blockchains. The big difference from an ordinary website is that no single company alone controls the ledger and the rules; users sign in and approve actions with their own wallet. It is a loose label, not a specific product." }
+  },
+  "shared-ledger": {
+    "chapter": "02-who-needs-blockchain",
+    "zh": { "term": "共享账本", "def": "几方共同使用、都能查看和核对的同一本账。区块链就是一种「没有单一管理员」的共享账本；如果大家本来就信任同一个记账者，普通数据库更简单。" },
+    "en": { "term": "shared ledger", "def": "One set of books that several parties use and can all inspect. A blockchain is a shared ledger with no single administrator; if everyone already trusts one bookkeeper, an ordinary database is simpler." }
+  },
+  "ethereum": {
+    "chapter": "03-blocks-hashes-consensus",
+    "zh": { "term": "以太坊（Ethereum）", "def": "一条可以运行程序（智能合约）的公共区块链，它自带的币叫 ETH。本书的实验都在以太坊的测试网 Sepolia 上做。" },
+    "en": { "term": "Ethereum", "def": "A public blockchain that can run programs (smart contracts). Its built-in coin is called ETH. Every experiment in this book ran on Ethereum's Sepolia test network." }
+  },
+  "testnet": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "测试网", "def": "专门用来练习和测试的区块链，规则和「真网」几乎一样，但里面的币是免费领的「玩具钱」，没有市场价值。就像驾校的练车场：车和路都是真的，撞了也不会赔钱。" },
+    "en": { "term": "testnet", "def": "A blockchain meant for practice and testing. It follows almost the same rules as the real network, but its coins are free “play money” with no market value. Like a driving-school practice yard: real car, real road rules, no real losses." }
+  },
+  "mainnet": {
+    "zh": { "term": "主网", "def": "正式运行、币有真实价值的那条区块链。在主网上转错账或签错名，损失的是真钱。本书从未使用主网。" },
+    "en": { "term": "mainnet", "def": "The live, production blockchain where coins have real value. A mistake on mainnet costs real money. This book never used mainnet." }
+  },
+  "sepolia": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "Sepolia", "def": "以太坊的一条公共测试网的名字。上面的 ETH（SepETH）可以从「水龙头」免费领取，不能换成真钱，所以很适合新手练习。" },
+    "en": { "term": "Sepolia", "def": "The name of one of Ethereum's public test networks. Its ETH (SepETH) is handed out free by “faucets” and cannot be exchanged for real money, which makes it a safe place for beginners to practise." }
+  },
+  "chainid": {
+    "chapter": "17-credentials-api-keys",
+    "zh": { "term": "chainId（链 ID）", "def": "每条以太坊类网络的身份证号码。以太坊主网是 1，Sepolia 是 11155111。钱包和程序靠它确认「我现在连的是哪条链」，避免把测试网和主网搞混。" },
+    "en": { "term": "chainId", "def": "An ID number for each Ethereum-style network: Ethereum mainnet is 1, Sepolia is 11155111. Wallets and scripts check it to be sure which chain they are talking to, so testnet and mainnet never get mixed up." }
+  },
+  "eth": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "ETH（以太币）", "def": "以太坊自带的币，主要用来支付手续费（gas）。主网上的 ETH 有真实价格；测试网上的 ETH 没有。" },
+    "en": { "term": "ETH (ether)", "def": "Ethereum's built-in coin, used above all to pay transaction fees (gas). ETH on mainnet has a real price; ETH on a testnet does not." }
+  },
+  "sepeth": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "SepETH（测试网 ETH）", "def": "Sepolia 测试网上的 ETH，用来支付测试网的手续费。免费领取，没有市场价值，只能在 Sepolia 上用。" },
+    "en": { "term": "SepETH (test ETH)", "def": "ETH on the Sepolia testnet, used to pay testnet fees. It is free, has no market value and only works on Sepolia." }
+  },
+  "wei": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "wei", "def": "ETH 的最小单位，1 ETH = 1,000,000,000,000,000,000（10¹⁸）wei，就像 1 元 = 100 分，只是小得多。手续费常常用 wei 来记。" },
+    "en": { "term": "wei", "def": "The smallest unit of ETH: 1 ETH = 1,000,000,000,000,000,000 (10¹⁸) wei, much like cents in a dollar, only far smaller. Fees are often written in wei." }
+  },
+  "test-token": {
+    "chapter": "09-lab-mbox-erc20",
+    "zh": { "term": "测试代币", "def": "在测试网上自己部署出来的代币，只用于学习和测试，没有任何市场价值。本书的 MBox、MBox-Burn、UBOX 都是测试代币。" },
+    "en": { "term": "test token", "def": "A token deployed on a testnet purely for learning and testing; it has no market value. MBox, MBox-Burn and UBOX in this book are all test tokens." }
+  },
+  "wallet": {
+    "chapter": "05-wallets-keys-signatures",
+    "zh": { "term": "钱包", "def": "保管私钥并用它签名的软件或硬件，例如浏览器插件钱包。它更像一把「印章和钥匙」，而不是装钱的抽屉：币其实记在链上，钱包只负责证明「这是我同意的」。" },
+    "en": { "term": "wallet", "def": "Software or hardware that keeps your private key and signs with it, such as a browser-extension wallet. It is more like a seal and key than a drawer of money: the coins are recorded on-chain, and the wallet only proves “I approved this”." }
+  },
+  "address": {
+    "chapter": "05-wallets-keys-signatures",
+    "zh": { "term": "地址", "def": "链上账户或合约的公开编号，以 0x 开头，后面是 40 位十六进制字符。可以放心告诉别人，就像收款账号或门牌号；但转账前一定要核对每一位。" },
+    "en": { "term": "address", "def": "The public ID of an account or contract on-chain: 0x followed by 40 hexadecimal characters. It is safe to share, like an account number or street address, but always double-check every character before sending anything." }
+  },
+  "private-key": {
+    "chapter": "05-wallets-keys-signatures",
+    "zh": { "term": "私钥", "def": "控制一个地址的那串秘密数字。谁拿到它，谁就能以这个地址的名义签名、转走全部资产。它不能重置，也没有「找回密码」，绝对不能告诉任何人。" },
+    "en": { "term": "private key", "def": "The secret number that controls an address. Whoever has it can sign as that address and move everything it holds. It cannot be reset and there is no “forgot password”, so never share it with anyone." }
+  },
+  "seed-phrase": {
+    "chapter": "05-wallets-keys-signatures",
+    "zh": { "term": "助记词", "def": "钱包生成的一组单词（通常 12 或 24 个），可以把整个钱包（可能包含多把私钥）恢复出来。它比单把私钥更要紧：任何网站、客服或聊天都不该向你要它。" },
+    "en": { "term": "seed phrase", "def": "A list of words (usually 12 or 24) that a wallet generates and that can restore the whole wallet, possibly many private keys. It matters even more than a single private key: no website, support agent or chat should ever ask for it." }
+  },
+  "signature": {
+    "chapter": "05-wallets-keys-signatures",
+    "zh": { "term": "签名", "def": "钱包用私钥给一条消息或一笔交易盖的「数字印章」。网络能用它确认「这确实是这个地址的主人同意的」，而私钥本身不需要交出去。" },
+    "en": { "term": "signature", "def": "A “digital seal” that a wallet stamps on a message or transaction using the private key. The network can check it really came from the address owner, without the private key ever leaving the wallet." }
+  },
+  "transaction": {
+    "chapter": "05-wallets-keys-signatures",
+    "zh": { "term": "交易", "def": "一条经过签名、要求改变链上状态的指令，例如转账、部署合约或调用合约函数。被打包进区块后才算生效，而且无法撤回。只读的查询不算交易。" },
+    "en": { "term": "transaction", "def": "A signed instruction asking the chain to change something, such as sending coins, deploying a contract or calling a contract function. It takes effect only once included in a block, and cannot be undone. Read-only queries are not transactions." }
+  },
+  "tx-hash": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "交易哈希", "def": "一笔交易的唯一编号（0x 开头的 64 位十六进制），像快递单号。把它贴进区块浏览器，就能看到这笔交易的状态和细节。注意：有哈希只说明交易发出去了，不代表已经上链。" },
+    "en": { "term": "transaction hash", "def": "A transaction's unique ID (0x plus 64 hex characters), like a parcel tracking number. Paste it into a block explorer to see its status and details. Having a hash only means it was sent, not that it made it on-chain." }
+  },
+  "block": {
+    "chapter": "03-blocks-hashes-consensus",
+    "zh": { "term": "区块", "def": "链上记录的一「页」：里面装着一批交易，以及前一个区块的指纹（哈希）。区块一个接一个连起来，就是区块链。" },
+    "en": { "term": "block", "def": "One “page” of the chain's records: a batch of transactions plus the fingerprint (hash) of the previous block. Blocks linked one after another form the blockchain." }
+  },
+  "block-number": {
+    "chapter": "03-blocks-hashes-consensus",
+    "zh": { "term": "区块号", "def": "区块的顺序编号，也叫区块高度。数字越大，区块出现得越晚，可以把它当成链上的「时间刻度」。" },
+    "en": { "term": "block number", "def": "A block's position in the chain, also called block height. Larger numbers came later, so it works as the chain's clock." }
+  },
+  "hash": {
+    "chapter": "03-blocks-hashes-consensus",
+    "zh": { "term": "哈希", "def": "把任意内容算成一串固定长度的「指纹」。同样的内容永远得到同样的指纹，改动一个字指纹就几乎完全不同，而且没法从指纹倒推出原文。" },
+    "en": { "term": "hash", "def": "A fixed-length “fingerprint” computed from any content. The same content always gives the same fingerprint, changing one character changes it almost completely, and you cannot work backwards from the fingerprint to the content." }
+  },
+  "consensus": {
+    "chapter": "03-blocks-hashes-consensus",
+    "zh": { "term": "共识", "def": "很多互不隶属的电脑，按同一套规则共同决定「接受哪一条历史」的机制。没有它，每个人手里的账本就可能不一样。" },
+    "en": { "term": "consensus", "def": "The rules by which many independent computers agree on which history of the ledger to accept. Without it, everyone's copy could drift apart." }
+  },
+  "pos": {
+    "chapter": "03-blocks-hashes-consensus",
+    "zh": { "term": "权益证明（PoS）", "def": "以太坊现在用的共识方式：想参与出块的人先押上一笔 ETH 作为保证金（质押），按规则轮流提议和检查区块，作弊会被罚掉部分保证金。" },
+    "en": { "term": "Proof of Stake (PoS)", "def": "The consensus method Ethereum uses today: participants lock up ETH as a deposit (stake), take turns proposing and checking blocks by the rules, and lose part of the deposit if they cheat." }
+  },
+  "validator": {
+    "chapter": "03-blocks-hashes-consensus",
+    "zh": { "term": "验证者", "def": "在权益证明网络里质押了 ETH、负责提议和检查区块的参与者。你付的小费（tip）就给打包你交易的那个验证者。" },
+    "en": { "term": "validator", "def": "A participant in a Proof of Stake network who has staked ETH and proposes and checks blocks. The tip you pay goes to the validator that includes your transaction." }
+  },
+  "node": {
+    "chapter": "04-nodes-trust",
+    "zh": { "term": "节点", "def": "运行区块链软件、保存和检查链上数据的电脑。很多节点各自独立核对，才让「单方改账」变得困难。" },
+    "en": { "term": "node", "def": "A computer running blockchain software that stores and checks chain data. Many nodes checking independently is what makes one-sided edits hard." }
+  },
+  "archive-node": {
+    "chapter": "04-nodes-trust",
+    "zh": { "term": "archive（归档节点）", "def": "保存链上每一个历史时刻完整状态的节点，可以回答「很久以前某个区块时余额是多少」。免费的公共节点通常不提供。" },
+    "en": { "term": "archive node", "def": "A node that keeps the full state at every point in history, so it can answer “what was this balance many blocks ago?”. Free public nodes usually do not offer it." }
+  },
+  "rpc": {
+    "chapter": "04-nodes-trust",
+    "zh": { "term": "RPC", "def": "程序和节点「对话」的接口，通常是一个网址。钱包或脚本通过它查询数据、发送交易。可以想成节点对外开的服务窗口。" },
+    "en": { "term": "RPC", "def": "The interface programs use to talk to a node, usually a URL. Wallets and scripts use it to read data and send transactions. Think of it as the node's service counter." }
+  },
+  "oracle": {
+    "chapter": "04-nodes-trust",
+    "zh": { "term": "预言机", "def": "把链外信息（价格、天气、物流状态等）送上链的服务。区块链自己无法知道现实世界发生了什么，所以送进来的数据可信不可信，是另一个问题。" },
+    "en": { "term": "oracle", "def": "A service that brings off-chain facts (prices, weather, delivery status…) onto the chain. A blockchain cannot see the real world by itself, so whether that data is true is a separate question." }
+  },
+  "gas": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "Gas（燃料费）", "def": "衡量一次链上操作「工作量」的单位。实际手续费 = 用掉的 gas × 每单位的价格，用 ETH 支付。就像打车：路程（gas）乘以单价（气价）才是车费。" },
+    "en": { "term": "gas", "def": "A unit measuring how much work an on-chain action takes. The fee you pay = gas used × price per unit, paid in ETH. Like a taxi: distance (gas) times the rate (gas price) gives the fare." }
+  },
+  "base-fee": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "base fee（基础费）", "def": "每个区块由协议自动定出的每单位 gas 基础价格，网络越忙越高。这部分费用会被销毁，不归任何人。" },
+    "en": { "term": "base fee", "def": "The per-gas base price the protocol sets for each block automatically; it rises when the network is busy. This part of the fee is burned and goes to no one." }
+  },
+  "tip": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "小费（tip）", "def": "你愿意额外付给验证者的每单位 gas 价格，用来鼓励他们尽快打包你的交易。网络拥堵时，小费太低可能要排很久。" },
+    "en": { "term": "tip", "def": "An extra per-gas amount you offer the validator to include your transaction sooner. When the network is busy, a tiny tip can mean a long wait." }
+  },
+  "eip-1559": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "EIP-1559", "def": "以太坊现在的手续费规则：手续费分成「基础费 + 小费」两部分，基础费销毁、小费给验证者。EIP 是以太坊改进提案的编号。" },
+    "en": { "term": "EIP-1559", "def": "Ethereum's current fee rules: a fee is split into a base fee (burned) and a tip (paid to the validator). An EIP is a numbered Ethereum Improvement Proposal." }
+  },
+  "gas-limit": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "gas limit", "def": "你给一笔交易设的 gas 上限，防止程序意外跑太久花光钱。只按实际用掉的 gas 收费，多设的部分不收。" },
+    "en": { "term": "gas limit", "def": "The maximum gas you allow a transaction to use, so a runaway program cannot drain you. You only pay for the gas actually used; the unused part costs nothing." }
+  },
+  "nonce": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "nonce（交易序号）", "def": "一个账户发出交易的流水号，从 0 开始，每被打包一笔就加一。它保证交易按顺序执行，也防止同一笔交易被重复使用。" },
+    "en": { "term": "nonce", "def": "An account's transaction counter: it starts at 0 and goes up by one for every transaction included in a block. It keeps transactions in order and stops the same one being replayed." }
+  },
+  "eoa": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "外部账户", "def": "由私钥控制的普通账户（相对于由代码控制的合约账户）。你用钱包创建的账户就是外部账户。" },
+    "en": { "term": "externally owned account", "def": "An ordinary account controlled by a private key, as opposed to a contract account controlled by code. The account you create in a wallet is one." }
+  },
+  "mempool": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "内存池（mempool）", "def": "交易发出后、被打包进区块前等待的「候车室」。在这里的交易还可能被替换或丢弃，不能算已经发生。" },
+    "en": { "term": "mempool", "def": "The waiting room where sent transactions sit before being put into a block. A transaction here can still be replaced or dropped, so it has not happened yet." }
+  },
+  "broadcast": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "广播", "def": "把已经签好名的交易发送给网络，让节点们传播和打包。广播之后就收不回来了，所以本书总是先模拟、再确认、最后广播。" },
+    "en": { "term": "broadcast", "def": "Sending a signed transaction to the network so nodes pass it on and include it in a block. Once broadcast it cannot be pulled back, so this book always simulates and confirms first." }
+  },
+  "faucet": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "水龙头（faucet）", "def": "免费发放测试网币的网站或服务，像「免费试用装」。领到的币只能在测试网用，没有市场价值。" },
+    "en": { "term": "faucet", "def": "A website or service that gives out free testnet coins, like free samples. Those coins only work on the testnet and have no market value." }
+  },
+  "block-explorer": {
+    "chapter": "06-gas-nonce-explorer",
+    "zh": { "term": "区块浏览器", "def": "把链上数据做成可搜索网页的网站。输入地址、交易哈希或区块号，就能查到余额、交易状态和历史，像链上的「快递查询网站」。" },
+    "en": { "term": "block explorer", "def": "A website that turns chain data into searchable pages. Type an address, transaction hash or block number to see balances, status and history, like a parcel-tracking site for the chain." }
+  },
+  "etherscan": {
+    "chapter": "17-credentials-api-keys",
+    "zh": { "term": "Etherscan", "def": "最常用的以太坊区块浏览器。Sepolia 测试网有自己的版本：sepolia.etherscan.io，本书的每个链接都指向那里。" },
+    "en": { "term": "Etherscan", "def": "The most widely used Ethereum block explorer. The Sepolia testnet has its own edition at sepolia.etherscan.io, and every link in this book points there." }
+  },
+  "smart-contract": {
+    "chapter": "07-smart-contracts-evm",
+    "zh": { "term": "智能合约", "def": "部署在区块链上的程序，规则公开、由所有节点按同样方式执行。像一台自动售货机：投对了就出货，条件不满足就退回。它不是法律意义上的合同。" },
+    "en": { "term": "smart contract", "def": "A program deployed on a blockchain whose rules are public and run the same way on every node. Like a vending machine: pay correctly and it delivers, otherwise it refuses. It is not a legal contract." }
+  },
+  "evm": {
+    "chapter": "07-smart-contracts-evm",
+    "zh": { "term": "EVM（以太坊虚拟机）", "def": "以太坊上运行智能合约的「标准电脑」。每个节点都用同样的 EVM 执行同样的代码，所以大家能得出同样的结果。" },
+    "en": { "term": "EVM (Ethereum Virtual Machine)", "def": "The standard “computer” that runs smart contracts on Ethereum. Every node runs the same code on the same EVM, so they all reach the same result." }
+  },
+  "solidity": {
+    "chapter": "08-lab-counter",
+    "zh": { "term": "Solidity", "def": "编写以太坊智能合约最常用的编程语言，写法有点像 JavaScript 加上类型。写好的源码要先编译成字节码才能部署。" },
+    "en": { "term": "Solidity", "def": "The most common language for writing Ethereum smart contracts; it looks a bit like typed JavaScript. Source code must be compiled into bytecode before it can be deployed." }
+  },
+  "compile": {
+    "chapter": "08-lab-counter",
+    "zh": { "term": "编译", "def": "把人写的源码翻译成机器能执行的代码。本书用 Solidity 官方编译器 solc，把合约源码编译成 EVM 字节码。" },
+    "en": { "term": "compile", "def": "Translating human-written source code into code a machine can run. This book uses solc, the official Solidity compiler, to turn contract source into EVM bytecode." }
+  },
+  "deploy": {
+    "chapter": "08-lab-counter",
+    "zh": { "term": "部署", "def": "把编译好的合约发布到链上，让它拥有自己的地址。部署本身是一笔交易，要付 gas；部署后代码一般就固定不变了。" },
+    "en": { "term": "deploy", "def": "Publishing a compiled contract to the chain so it gets its own address. Deploying is itself a transaction that costs gas, and the code is normally fixed afterwards." }
+  },
+  "bytecode": {
+    "chapter": "15-evidence-p0",
+    "zh": { "term": "字节码", "def": "合约源码编译后得到的机器代码，一长串十六进制数字。链上真正保存和执行的是字节码，不是源码。" },
+    "en": { "term": "bytecode", "def": "The machine code you get by compiling contract source: a long string of hex. The chain stores and runs the bytecode, not the source." }
+  },
+  "abi": {
+    "chapter": "15-evidence-p0",
+    "zh": { "term": "ABI", "def": "合约的「接口说明书」：有哪些函数、参数是什么类型。钱包和网页靠它知道怎样调用合约、怎样读懂返回的数据。" },
+    "en": { "term": "ABI", "def": "A contract's interface description: which functions it has and what types their inputs and outputs are. Wallets and web pages use it to call the contract and decode results." }
+  },
+  "eth-call": {
+    "chapter": "07-smart-contracts-evm",
+    "zh": { "term": "eth_call（只读调用）", "def": "让节点在本地「试运行」一次合约函数并返回结果。不签名、不花钱、不改变链，常用来读数据或预演交易。" },
+    "en": { "term": "eth_call (read-only call)", "def": "Asks a node to dry-run a contract function locally and return the result. No signature, no cost, no change to the chain; used to read data or rehearse a transaction." }
+  },
+  "simulate": {
+    "chapter": "07-smart-contracts-evm",
+    "zh": { "term": "模拟", "def": "在不真正发交易的情况下，先预演一次会发生什么、要花多少 gas、会不会失败。模拟通过不等于链上已经生效。" },
+    "en": { "term": "simulate", "def": "Rehearsing what a transaction would do, how much gas it needs and whether it fails, without actually sending it. A passing simulation does not mean anything happened on-chain." }
+  },
+  "revert": {
+    "chapter": "07-smart-contracts-evm",
+    "zh": { "term": "回滚（revert）", "def": "合约检查失败时，撤销这次执行做过的所有改动，就像没发生过一样。但已经消耗的 gas 不退。" },
+    "en": { "term": "revert", "def": "When a contract check fails, every change made during that execution is undone, as if it never happened. The gas already used is still paid." }
+  },
+  "event": {
+    "chapter": "07-smart-contracts-evm",
+    "zh": { "term": "事件 / 日志", "def": "合约执行时留下的公开记录（例如「A 转给 B 100」），方便网页和浏览器追踪。它是「发生过什么」的记录，不能代替直接读取当前状态。" },
+    "en": { "term": "event (log)", "def": "A public record a contract leaves while running (e.g. “A sent 100 to B”), handy for apps and explorers to follow. It records what happened; it does not replace reading the current state." }
+  },
+  "storage": {
+    "chapter": "08-lab-counter",
+    "zh": { "term": "存储槽", "def": "合约在链上保存数据的格子，按编号（slot 0、slot 1……）排列，每格 32 字节。写入存储要花 gas，第一次从零写成非零最贵。" },
+    "en": { "term": "storage slot", "def": "The numbered boxes (slot 0, slot 1, …) where a contract keeps data on-chain, 32 bytes each. Writing to storage costs gas, and writing a non-zero value into an empty slot costs the most." }
+  },
+  "owner": {
+    "chapter": "08-lab-counter",
+    "zh": { "term": "owner（所有者）", "def": "合约里记录的一个特殊地址，通常是部署者，只有它能调用某些管理功能（例如本书 Counter 的 reset）。" },
+    "en": { "term": "owner", "def": "A special address stored in a contract, usually the deployer, that alone may call certain admin functions (such as reset on this book's Counter)." }
+  },
+  "token": {
+    "chapter": "09-lab-mbox-erc20",
+    "zh": { "term": "代币", "def": "由一个智能合约记账的「积分」：合约里有一张「谁有多少」的余额表和转账规则。它不一定值钱，也不在钱包里，而是在合约里。" },
+    "en": { "term": "token", "def": "Points kept by a smart contract: the contract holds a table of who owns how much plus the rules for moving it. A token is not necessarily worth anything, and it lives in the contract, not in your wallet." }
+  },
+  "erc20": {
+    "chapter": "09-lab-mbox-erc20",
+    "zh": { "term": "ERC-20", "def": "以太坊上可互换代币最常见的接口标准，规定了查余额、转账、授权等函数的名字和用法。符合标准只说明「接口一样」，不说明规则一样可靠。" },
+    "en": { "term": "ERC-20", "def": "The most common interface standard for interchangeable tokens on Ethereum. It fixes the names and behaviour of functions such as balance, transfer and approve. Following it means the interface matches, not that the rules are equally trustworthy." }
+  },
+  "decimals": {
+    "chapter": "09-lab-mbox-erc20",
+    "zh": { "term": "decimals（小数位）", "def": "代币显示时小数点往左移几位。链上只存整数，decimals 为 18 时，链上的 1000000000000000000 显示为 1 枚。" },
+    "en": { "term": "decimals", "def": "How many places the decimal point moves when a token amount is displayed. The chain stores whole numbers only; with 18 decimals, 1000000000000000000 on-chain shows as 1 token." }
+  },
+  "total-supply": {
+    "chapter": "09-lab-mbox-erc20",
+    "zh": { "term": "总供应（totalSupply）", "def": "一种代币目前一共有多少枚。转账不会改变它；铸造会增加它，销毁会减少它。" },
+    "en": { "term": "total supply", "def": "How many units of a token exist right now. Transfers leave it unchanged; minting raises it and burning lowers it." }
+  },
+  "mint": {
+    "chapter": "09-lab-mbox-erc20",
+    "zh": { "term": "铸造（mint）", "def": "凭空新增代币并记到某个账户上，同时总供应增加。谁有权铸造，是判断一个代币是否可信的关键之一。" },
+    "en": { "term": "mint", "def": "Creating new tokens and crediting them to an account, which raises the total supply. Who is allowed to mint is a key question when judging a token." }
+  },
+  "burn": {
+    "chapter": "11-lab-mbox-burn",
+    "zh": { "term": "销毁（burn）", "def": "把代币永久作废：持有人的余额和总供应同时减少。和「转到一个没人能用的地址」不同，后者总供应不变。" },
+    "en": { "term": "burn", "def": "Permanently destroying tokens: the holder's balance and the total supply both go down. Unlike sending tokens to an unusable address, where the total supply stays the same." }
+  },
+  "zero-address": {
+    "chapter": "11-lab-mbox-burn",
+    "zh": { "term": "零地址（0x0）", "def": "全是 0 的特殊地址，没有人拥有它的私钥。浏览器里「转到 0x0」常表示销毁或铸造，但要读总供应才能确认。" },
+    "en": { "term": "zero address (0x0)", "def": "A special address made of all zeros that nobody holds a key for. “Sent to 0x0” in an explorer often signals burning or minting, but only the total supply confirms it." }
+  },
+  "approve": {
+    "chapter": "10-approve-vs-payment",
+    "zh": { "term": "授权（approve）", "def": "持有人允许另一个地址在一个额度内动用自己的代币。这一步不扣钱、余额不变，但给了对方「以后可以扣」的权限，就像签了一份代扣协议。" },
+    "en": { "term": "approve", "def": "The holder lets another address use up to a set amount of their tokens. Nothing is paid and the balance does not change, but the other side now may take tokens later, like signing a direct-debit form." }
+  },
+  "allowance": {
+    "chapter": "10-approve-vs-payment",
+    "zh": { "term": "额度（allowance）", "def": "被授权者还能代为动用多少代币。每用掉一点就减少；持有人可以随时用新的 approve 覆盖它，设成 0 就是撤销。" },
+    "en": { "term": "allowance", "def": "How many tokens a spender may still move on the holder's behalf. It shrinks as it is used, and the holder can overwrite it at any time with a new approve; setting it to 0 revokes it." }
+  },
+  "spender": {
+    "chapter": "10-approve-vs-payment",
+    "zh": { "term": "被授权者（spender）", "def": "拿到授权额度、可以代持有人转走或销毁代币的那个地址，可能是一个人，也可能是一个合约。" },
+    "en": { "term": "spender", "def": "The address that has been given an allowance and can move or burn tokens on the holder's behalf; it may be a person or a contract." }
+  },
+  "transferfrom": {
+    "chapter": "10-approve-vs-payment",
+    "zh": { "term": "transferFrom（代为转账）", "def": "被授权者在额度内，从持有人账户里把代币转走。真正「动钱」的是这一步，而不是 approve。" },
+    "en": { "term": "transferFrom", "def": "The spender moves tokens out of the holder's account, within the allowance. This is the step that actually moves money, not approve." }
+  },
+  "atomicity": {
+    "chapter": "12-atomicity-batch",
+    "zh": { "term": "原子性", "def": "一组操作要么全部成功，要么全部不发生，不会只做一半。就像银行转账不能「扣了你的钱却没到对方账上」。" },
+    "en": { "term": "atomicity", "def": "A group of operations either all succeed or none happen; never half. Like a bank transfer that can never take money from you without it reaching the other side." }
+  },
+  "proxy": {
+    "chapter": "13-upgradeable-ubox",
+    "zh": { "term": "代理（proxy）", "def": "一个地址固定不变的「门面」合约，它保存数据，却把具体逻辑转交给另一个可替换的实现合约执行。像门牌号不变、后台收银系统可以更换的店铺。" },
+    "en": { "term": "proxy", "def": "A front-door contract whose address never changes. It keeps the data but hands the actual logic to a replaceable implementation contract, like a shop whose address stays the same while the till system behind it gets swapped." }
+  },
+  "implementation": {
+    "chapter": "13-upgradeable-ubox",
+    "zh": { "term": "实现合约", "def": "可升级合约里真正写着逻辑的那份合约。代理借用它的代码运行；升级就是让代理改指向一份新的实现合约。" },
+    "en": { "term": "implementation contract", "def": "The contract in an upgradeable setup that holds the actual logic. The proxy borrows its code; upgrading means pointing the proxy at a new implementation." }
+  },
+  "upgradeable": {
+    "chapter": "13-upgradeable-ubox",
+    "zh": { "term": "可升级合约", "def": "通过代理模式实现的、地址不变但逻辑可以更换的合约。好处是能修 bug，代价是掌握升级权的人能改变规则。" },
+    "en": { "term": "upgradeable contract", "def": "A contract built with the proxy pattern so its logic can be replaced while its address stays the same. It allows bug fixes, but whoever holds the upgrade right can change the rules." }
+  },
+  "proxyadmin": {
+    "chapter": "13-upgradeable-ubox",
+    "zh": { "term": "ProxyAdmin", "def": "唯一有权让代理更换实现合约的管理合约。谁控制 ProxyAdmin，谁就能升级合约，所以它是可升级代币最需要关注的权力。" },
+    "en": { "term": "ProxyAdmin", "def": "The admin contract that alone can switch a proxy to a new implementation. Whoever controls it can upgrade the contract, so it is the power to watch in an upgradeable token." }
+  },
+  "delegatecall": {
+    "chapter": "13-upgradeable-ubox",
+    "zh": { "term": "delegatecall", "def": "EVM 的一种调用方式：借用另一个合约的代码，却在自己的存储上读写数据。代理正是靠它来使用实现合约的逻辑。" },
+    "en": { "term": "delegatecall", "def": "An EVM call that borrows another contract's code but reads and writes the caller's own storage. It is how a proxy uses the implementation's logic." }
+  },
+  "constructor": {
+    "chapter": "13-upgradeable-ubox",
+    "zh": { "term": "构造函数", "def": "合约部署时自动运行一次的初始化代码。可升级合约里它只会写进实现合约自己的存储，写不进代理，所以要另用 initialize。" },
+    "en": { "term": "constructor", "def": "Set-up code that runs once, automatically, when a contract is deployed. In an upgradeable setup it only writes to the implementation's own storage, not the proxy's, so initialize is used instead." }
+  },
+  "initialize": {
+    "chapter": "13-upgradeable-ubox",
+    "zh": { "term": "initialize（初始化函数）", "def": "可升级合约里代替构造函数的普通函数，通过代理调用一次来设定名称、供应、owner 等。它必须只能执行一次，否则可能被人重新铸币或改掉 owner。" },
+    "en": { "term": "initialize", "def": "An ordinary function that replaces the constructor in an upgradeable contract; it is called once through the proxy to set the name, supply, owner and so on. It must only ever run once, or someone could re-mint tokens or change the owner." }
+  },
+  "storage-layout": {
+    "chapter": "13-upgradeable-ubox",
+    "zh": { "term": "存储布局", "def": "合约的每个变量放在第几号存储槽。升级时新版本只能在末尾追加变量，不能重排或插入，否则旧数据会被「读错位置」。" },
+    "en": { "term": "storage layout", "def": "Which storage slot each of a contract's variables lives in. An upgrade may only add variables at the end, never reorder or insert, or old data gets read from the wrong place." }
+  },
+  "openzeppelin": {
+    "chapter": "13-upgradeable-ubox",
+    "zh": { "term": "OpenZeppelin", "def": "一套广泛使用的开源智能合约库，提供经过大量审查的 ERC-20、代理等标准实现，省得自己从头写容易出错的代码。" },
+    "en": { "term": "OpenZeppelin", "def": "A widely used open-source library of smart contracts, with heavily reviewed standard implementations of ERC-20, proxies and more, so you do not have to write error-prone code from scratch." }
+  },
+  "multisig": {
+    "chapter": "13-upgradeable-ubox",
+    "zh": { "term": "多签", "def": "需要多个人中的若干人共同签名才能执行操作的账户，例如「3 人里至少 2 人同意」。常用来分散管理员权力。" },
+    "en": { "term": "multisig", "def": "An account that needs several of a group of people to sign before acting, e.g. “2 of 3 must agree”. Often used to spread out admin power." }
+  },
+  "redenomination": {
+    "chapter": "14-ubox-v3-redenomination",
+    "zh": { "term": "面额重标", "def": "改变记账单位，例如「10,000 个旧单位 = 1 个新单位」，有点像货币去掉几个 0。总价值的比例不变，只是数字变了。" },
+    "en": { "term": "redenomination", "def": "Changing the unit of account, e.g. “10,000 old units = 1 new unit”, much like a currency dropping zeros. Everyone's share stays the same; only the numbers change." }
+  },
+  "dust": {
+    "chapter": "14-ubox-v3-redenomination",
+    "zh": { "term": "粉尘（dust）", "def": "换算后小到显示不出来、也转不出去的零头余额，像找零时被抹掉的几分钱。" },
+    "en": { "term": "dust", "def": "Leftover balances so small after conversion that they neither show up nor can be sent, like the odd cents lost when rounding." }
+  },
+  "invariant": {
+    "chapter": "15-evidence-p0",
+    "zh": { "term": "不变量（invariant）", "def": "无论怎么操作都应该一直成立的规则，例如「所有人的余额加起来 = 总供应」。Invariant 测试会随机做大量操作，检查这条规则有没有被打破。" },
+    "en": { "term": "invariant", "def": "A rule that should hold no matter what happens, e.g. “all balances add up to the total supply”. Invariant tests run many random operations to check it never breaks." }
+  },
+  "unit-test": {
+    "chapter": "15-evidence-p0",
+    "zh": { "term": "单元测试", "def": "针对一个具体场景写的自动检查，例如「非 owner 调用 reset 应该失败」。它只能证明写到的情况没问题。" },
+    "en": { "term": "unit test", "def": "An automatic check for one specific case, e.g. “reset by a non-owner must fail”. It only proves the cases someone thought to write down." }
+  },
+  "fuzz": {
+    "chapter": "15-evidence-p0",
+    "zh": { "term": "Fuzz 测试（模糊测试）", "def": "用大量随机生成的输入反复调用函数，看结果是否总符合预期，专门找人想不到的边界情况。" },
+    "en": { "term": "fuzz test", "def": "Calling a function over and over with large numbers of random inputs to see whether the result always matches expectations, hunting for edge cases people miss." }
+  },
+  "foundry": {
+    "chapter": "15-evidence-p0",
+    "zh": { "term": "Foundry", "def": "一套免费开源的智能合约开发工具，可以编译、测试（包括 Fuzz 和 Invariant 测试）、在本地模拟链，以及提交源码验证。" },
+    "en": { "term": "Foundry", "def": "A free, open-source toolkit for smart contracts: it compiles, tests (including fuzz and invariant tests), runs a local simulated chain and submits source verification." }
+  },
+  "fork": {
+    "chapter": "15-evidence-p0",
+    "zh": { "term": "Fork 模拟", "def": "在自己电脑上复制一份某个时刻的链上状态，在副本里随便试，不会影响真实的链，也不会产生真实交易。" },
+    "en": { "term": "fork simulation", "def": "Copying the chain's state at some moment onto your own computer and experimenting on the copy. Nothing touches the real chain and no real transaction is created." }
+  },
+  "verification": {
+    "chapter": "15-evidence-p0",
+    "zh": { "term": "源码验证", "def": "把合约源码和编译参数交给浏览器或 Sourcify，由它重新编译；如果得到的字节码与链上一致，就公开源码并标记「已验证」，证明「链上跑的就是这份代码」。" },
+    "en": { "term": "source verification", "def": "Handing a contract's source and compiler settings to an explorer or Sourcify, which recompiles it; if the bytecode matches what is on-chain, the source is published and marked verified, proving “this is the code that runs”." }
+  },
+  "sourcify": {
+    "chapter": "15-evidence-p0",
+    "zh": { "term": "Sourcify", "def": "一个开源、免费的合约源码验证服务，和 Etherscan 互相独立。通常不需要 API 密钥。" },
+    "en": { "term": "Sourcify", "def": "A free, open-source contract verification service, independent from Etherscan. It usually needs no API key." }
+  },
+  "audit": {
+    "chapter": "15-evidence-p0",
+    "zh": { "term": "审计", "def": "由独立专业团队对合约代码做的系统安全审查。本书的 P0 复核是项目自己做的，不是第三方审计。" },
+    "en": { "term": "audit", "def": "A systematic security review of contract code by an independent professional team. This book's P0 review was done in-house; it is not a third-party audit." }
+  },
+  "api-key": {
+    "chapter": "17-credentials-api-keys",
+    "zh": { "term": "API 密钥", "def": "网站发给你、让程序代表你调用它的服务的口令。泄露后一般不能转走币，但会被别人冒用额度，所以也要保密。它和私钥完全不是一回事。" },
+    "en": { "term": "API key", "def": "A password-like token a website issues so your programs can use its service as you. A leak usually cannot move coins but lets others burn your quota, so keep it secret too. It is nothing like a private key." }
+  },
+  "viem": {
+    "zh": { "term": "viem", "def": "一个免费开源的 JavaScript/TypeScript 工具库，用来连接以太坊节点、读取数据、模拟和发送交易。本书的脚本用它和 Sepolia 打交道。" },
+    "en": { "term": "viem", "def": "A free, open-source JavaScript/TypeScript library for talking to Ethereum nodes: reading data, simulating and sending transactions. This book's scripts used it to work with Sepolia." }
+  },
+  "defi": {
+    "chapter": "19-next-p1-defi",
+    "zh": { "term": "DeFi（去中心化金融）", "def": "用智能合约实现的金融服务，例如兑换、借贷，没有传统意义上的柜台或银行。本书只在测试网上学习它的原理，不涉及投资。" },
+    "en": { "term": "DeFi (decentralised finance)", "def": "Financial services such as swaps and lending run by smart contracts instead of a bank counter. This book only studies how they work on a testnet; it is not about investing." }
+  },
+  "dex-amm": {
+    "chapter": "19-next-p1-defi",
+    "zh": { "term": "DEX / AMM", "def": "DEX 是去中心化交易所；AMM（自动做市商）是其中常见的一种，用一个装着两种代币的「资金池」和公式自动给出兑换价格，不需要人挂单。" },
+    "en": { "term": "DEX / AMM", "def": "A DEX is a decentralised exchange; an AMM (automated market maker) is a common kind that prices swaps automatically from a pool holding two tokens and a formula, with no one placing orders." }
+  }
+}

@@ -1,0 +1,12 @@
+---
+/*
+ * Plain text with its last few characters glued together (no 1–3 character orphan line).
+ * Same rule as src/lib/rehype-no-orphans.mjs, for text that lives in .astro templates.
+ * Usage: <Nw text="一段文字" />   — renders  一段<span class="nw">文字</span>
+ */
+import { splitText } from '../lib/rehype-no-orphans.mjs'
+interface Props { text: string }
+const text = String(Astro.props.text ?? '')
+const [head, tail] = splitText(text, { got: 0, len: 0, words: 0, cjk: false })
+---
+{head}{tail && <span class="nw">{tail}</span>}

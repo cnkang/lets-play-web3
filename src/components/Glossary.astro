@@ -1,0 +1,23 @@
+---
+import Nw from './Nw.astro'
+// Full glossary, generated from src/content/glossary.json (Appendix C).
+// Usage in MDX: <Glossary lang="zh" />
+import glossary from '../content/glossary.json'
+import { getBook } from '../data/chapters'
+import { href } from '../data/site'
+interface Props { lang: 'zh' | 'en' }
+const { lang } = Astro.props
+const book = await getBook()
+const collator = new Intl.Collator(lang === 'zh' ? 'zh-Hans-CN' : 'en', { sensitivity: 'base' })
+const items = Object.entries(glossary as Record<string, any>)
+  .map(([id, e]) => ({ id, ...e[lang], ch: book.pages.find((c) => c.slug === e.chapter) }))
+  .sort((a, b) => collator.compare(a.term, b.term))
+---
+<dl class="glossary-list">
+  {items.map((x) => (
+    <div id={`g-${x.id}`}>
+      <dt><Nw text={x.term} /></dt>
+      <dd><Nw text={x.def} />{x.ch && <> <a href={href(`${lang}/chapters/${x.ch.slug}/`)}>{lang === 'zh' ? `见 ${x.ch.nav.zh}` : `See ${x.ch.nav.en}`}</a></>}</dd>
+    </div>
+  ))}
+</dl>

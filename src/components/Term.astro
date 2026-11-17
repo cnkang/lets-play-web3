@@ -1,0 +1,53 @@
+---
+/*
+ * Glossary term with a small「?」button that opens a plain-language explanation.
+ * Usage in MDX (no import needed):  <Term id="sepolia">Sepolia 测试网</Term>
+ * Text comes from src/content/glossary.json (one entry, both languages).
+ *
+ * How it works (see BUILD-NOTES.md「Glossary popovers」):
+ *  - Native HTML popover: <button popovertarget> + <span popover="auto">. Opening,
+ *    closing on Esc and closing on outside click/tap work with NO JavaScript.
+ *  - The popover is the button's next DOM sibling, so Tab moves from「?」into the
+ *    popover's close button / link and then on through the page (no focus trap).
+ *  - src/layouts/BaseLayout.astro adds the extras: aria-expanded sync, placement
+ *    next to the button on wide screens, close when focus leaves, and a fallback
+ *    for browsers without the popover API.
+ *  - Without JS AND without popover support the explanation is shown inline.
+ */
+import glossary from '../content/glossary.json'
+import { getBook } from '../data/chapters'
+import { href } from '../data/site'
+
+interface Props { id: string }
+const { id } = Astro.props
+const lang: 'zh' | 'en' = Astro.url.pathname.includes('/en/') ? 'en' : 'zh'
+const entry = (glossary as Record<string, any>)[id]
+if (!entry?.zh || !entry?.en) throw new Error(`<Term id="${id}">: no such entry in src/content/glossary.json (needs zh + en)`)
+const t = entry[lang] as { term: string; def: string }
+
+// Unique, deterministic DOM id per page (the same term may appear in a component and in the chapter).
+const counters = ((globalThis as any).__termCounters ??= new Map<string, number>()) as Map<string, number>
+const n = (counters.get(Astro.url.pathname) ?? 0) + 1
+counters.set(Astro.url.pathname, n)
+const pid = `term-${id}-${n}`
+
+let more: { url: string; label: string } | undefined
+if (entry.chapter && !Astro.url.pathname.includes(`/chapters/${entry.chapter}/`)) {
+  const book = await getBook()
+  const ch = book.pages.find((c) => c.slug === entry.chapter)
+  if (ch) more = { url: href(`${lang}/chapters/${ch.slug}/`), label: ch.nav[lang] }
+}
+const zh = lang === 'zh'
+// Keep the last character(s) of the term glued to its「?」so the button never starts a
+// line on its own. Plain-text slot only (the usual case); otherwise fall back to the word joiner.
+const slotHtml = (await Astro.slots.render('default')).trim()
+let head = slotHtml
+let tail = ''
+// Tail = the last two CJK characters, or the last one or two Latin words (max 24 chars).
+const m = slotHtml.match(/(?:[\u2e80-\u9fff\uf900-\ufaff]{1,2}[」』）)]*|(?:[^\s<>\u2e80-\u9fff]+ )?[^\s<>\u2e80-\u9fff]+)$/u)
+let cand = m?.[0] ?? ''
+if (cand.length > 24) cand = cand.replace(/^\S+ /, '')
+if (cand && cand.length <= 24 && !/[<>&]/.test(cand)) { tail = cand; head = slotHtml.slice(0, -tail.length) }
+const askLabel = zh ? `什么是${t.term}？` : `What is “${t.term}”?`
+---
+<span class="term">{head && <span class="term-text"><Fragment set:html={head} /></span>}{!tail && <>&#8288;</>}<span class="term-nw">{tail && <span class="term-text"><Fragment set:html={tail} /></span>}<button type="button" class="term-btn" popovertarget={pid} aria-controls={pid} aria-label={askLabel} data-pagefind-ignore><span class="term-q" aria-hidden="true">?</span></button></span><span id={pid} popover="auto" class="term-pop" tabindex="-1" data-pagefind-ignore><span class="term-pop-head"><strong class="term-pop-title">{t.term}</strong><button type="button" class="term-close" popovertarget={pid} popovertargetaction="hide" aria-label={zh ? `关闭「${t.term}」的解释` : `Close the explanation of “${t.term}”`}><span aria-hidden="true">×</span></button></span><span class="term-pop-body">{t.def}</span>{more && <a class="term-pop-more" href={more.url}>{zh ? '详细讲解：' : 'More in: '}{more.label}<span aria-hidden="true"> →</span></a>}</span></span>
