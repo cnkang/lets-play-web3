@@ -2,6 +2,7 @@
 import { render } from 'astro:content'
 import BaseLayout from '../../../layouts/BaseLayout.astro'
 import BookToc from '../../../components/BookToc.astro'
+import NumLabel from '../../../components/NumLabel.astro'
 import Addr from '../../../components/Addr.astro'
 import Tx from '../../../components/Tx.astro'
 import Figure from '../../../components/Figure.astro'
@@ -104,9 +105,15 @@ const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz,
         <Content components={components} />
       </div>
       <nav class="pager" aria-label={lang === 'zh' ? '章节翻页' : 'Chapter navigation'}>
-        {prev ? <a class="prev" href={href(`${lang}/chapters/${prev.slug}/`)} rel="prev"><span class="dir">← {t.prev}</span><span class="ttl">{prev.nav[lang]}</span></a> : <span />}
-        {next && <a class="next" href={href(`${lang}/chapters/${next.slug}/`)} rel="next"><span class="dir">{t.next} →</span><span class="ttl">{next.nav[lang]}</span></a>}
+        {prev ? <a class="prev" href={href(`${lang}/chapters/${prev.slug}/`)} rel="prev"><span class="dir">← {t.prev}</span><span class="ttl num-item"><NumLabel label={prev.nav[lang]} /></span></a> : <span />}
+        {next && <a class="next" href={href(`${lang}/chapters/${next.slug}/`)} rel="next"><span class="dir">{t.next} →</span><span class="ttl num-item"><NumLabel label={next.nav[lang]} /></span></a>}
       </nav>
+      <p class="kbd-hint" data-js-only hidden>
+        <span class="kbd-on">{lang === 'zh' ? <>快捷键：<kbd>←</kbd> <kbd>→</kbd> 翻章</> : <>Shortcut: <kbd>←</kbd> <kbd>→</kbd> to change chapter</>}</span>
+        <span class="kbd-off">{lang === 'zh' ? '单键快捷键已关闭' : 'Single-key shortcuts are off'}</span>
+        <span aria-hidden="true"> · </span>
+        <button type="button" class="link-btn" data-kbd-help aria-haspopup="dialog">{lang === 'zh' ? '全部快捷键与开关' : 'All shortcuts & on/off'}</button>
+      </p>
     </article>
     {toc.length > 1 && (
       <nav class="onpage" aria-labelledby="onpage-title">

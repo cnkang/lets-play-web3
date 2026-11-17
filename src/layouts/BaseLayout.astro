@@ -173,11 +173,119 @@ const a11yHref = href(`${lang}/accessibility/`)
           {REPO_URL && <li><a href={`${REPO_URL}/issues`}>{lang === 'zh' ? '报告问题（GitHub Issues）' : 'Report a problem (GitHub Issues)'}</a></li>}
           <li><a href={href('llms.txt')}>llms.txt</a></li>
           <li><a href={href('sitemap.xml')}>{lang === 'zh' ? '站点地图' : 'Sitemap'}</a></li>
+          <li data-js-only hidden><button type="button" class="link-btn" data-kbd-help aria-haspopup="dialog">{lang === 'zh' ? '键盘快捷键' : 'Keyboard shortcuts'}</button></li>
         </ul>
       </div>
     </footer>
 
+    {/* Keyboard shortcuts help (native modal <dialog>: focus containment, Esc, focus return) */}
+    <dialog id="kbd-help" class="kbd-help" aria-labelledby="kbd-help-title" closedby="any">
+      <div class="kbd-help-head">
+        <h2 id="kbd-help-title">{lang === 'zh' ? '键盘快捷键' : 'Keyboard shortcuts'}</h2>
+        <form method="dialog"><button type="submit" class="tool-btn" aria-label={lang === 'zh' ? '关闭键盘快捷键说明' : 'Close keyboard shortcuts'}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" /></svg></button></form>
+      </div>
+      <table class="kbd-table">
+        <caption class="visually-hidden">{lang === 'zh' ? '按键与作用' : 'Keys and what they do'}</caption>
+        <thead><tr><th scope="col">{lang === 'zh' ? '按键' : 'Key'}</th><th scope="col">{lang === 'zh' ? '作用' : 'Action'}</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>{lang === 'zh' ? '上一章 / 下一章（只在章节页）' : 'Previous / next chapter (chapter pages only)'}</td></tr>
+          <tr><td><kbd>/</kbd></td><td>{lang === 'zh' ? '打开搜索' : 'Open search'}</td></tr>
+          <tr><td><kbd>?</kbd></td><td>{lang === 'zh' ? '打开这份说明' : 'Open this list'}</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>{lang === 'zh' ? '关闭说明、菜单或术语小窗' : 'Close this list, the menu or a glossary popup'}</td></tr>
+          <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>{lang === 'zh' ? '在链接和按钮之间前后移动' : 'Move between links and buttons'}</td></tr>
+        </tbody>
+      </table>
+      <p class="kbd-help-note">{lang === 'zh' ? '在输入框里打字、选中文字、按住 Ctrl / Alt / ⌘ / Shift，或焦点在可以左右滚动的表格、代码、示意图里时，← → 不会翻章。' : 'Arrow keys never change the chapter while you type in a field, select text, hold Ctrl / Alt / ⌘ / Shift, or while focus is in a table, code block or diagram that scrolls sideways.'}</p>
+      <label class="kbd-toggle"><input type="checkbox" id="kbd-enabled" autofocus /> <span>{lang === 'zh' ? '启用单键快捷键（← → / ?）' : 'Use single-key shortcuts (← → / ?)'}</span></label>
+      <p class="kbd-help-note">{lang === 'zh' ? '关闭后，随时可以在页脚「键盘快捷键」重新打开。设置只保存在这个浏览器里。' : 'If you turn them off, you can turn them back on from “Keyboard shortcuts” in the footer. The setting is saved in this browser only.'}</p>
+    </dialog>
+
     <script>
+      // ---- Keyboard shortcuts: ← → change chapter, / opens search, ? opens the help dialog.
+      // Single keys with an off switch (WCAG 2.1.4), saved as localStorage 'kbdShortcuts' = 'off'.
+      ;(() => {
+        const KEY = 'kbdShortcuts'
+        const html = document.documentElement
+        const dlg = document.getElementById('kbd-help') as HTMLDialogElement | null
+        const box = document.getElementById('kbd-enabled') as HTMLInputElement | null
+        const prev = document.querySelector<HTMLAnchorElement>('.pager a[rel="prev"]')
+        const next = document.querySelector<HTMLAnchorElement>('.pager a[rel="next"]')
+        const searchHref = document.querySelector<HTMLAnchorElement>('.main-nav a[href$="/search/"]')?.href
+        let on = true
+        try { on = localStorage.getItem(KEY) !== 'off' } catch {}
+        const apply = () => {
+          html.dataset.kbd = on ? 'on' : 'off'
+          if (box) box.checked = on
+          for (const [a, k] of [[prev, 'ArrowLeft'], [next, 'ArrowRight']] as const) {
+            if (!a) continue
+            if (on) a.setAttribute('aria-keyshortcuts', k); else a.removeAttribute('aria-keyshortcuts')
+          }
+        }
+        apply()
+        document.querySelectorAll<HTMLElement>('[data-js-only]').forEach((el) => { el.hidden = false })
+        box?.addEventListener('change', () => {
+          on = box.checked
+          try { if (on) localStorage.removeItem(KEY); else localStorage.setItem(KEY, 'off') } catch {}
+          apply()
+        })
+        const openHelp = () => { if (dlg && !dlg.open) dlg.showModal() }
+        document.addEventListener('click', (e) => {
+          if ((e.target as HTMLElement).closest('[data-kbd-help]')) openHelp()
+        })
+        // Light dismiss for browsers without <dialog closedby> (click on the backdrop)
+        dlg?.addEventListener('click', (e) => { if (e.target === dlg) dlg.close() })
+
+        let lastPointer: Element | null = null
+        // Where the reader last clicked: Chrome scrolls that region with ← → even when nothing is focused
+        document.addEventListener('pointerdown', (e) => { lastPointer = e.target as Element }, true)
+
+        const TYPING = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="searchbox"], [role="combobox"], [role="slider"], [role="spinbutton"], [role="listbox"], [role="menu"], [role="menubar"], [role="grid"], [role="tablist"], [role="tree"], [role="radiogroup"], video, audio'
+        const overlayOpen = () => {
+          if (dlg?.open || document.querySelector('dialog[open]')) return true
+          if (document.getElementById('menu-panel')?.dataset.open === 'true') return true
+          try { if (document.querySelector(':popover-open')) return true } catch {}
+          return !!document.querySelector('.term-pop.is-open')
+        }
+        const inSideScroller = (start: Element | null) => {
+          for (let el = start; el && el !== document.body && el !== html; el = el.parentElement) {
+            const ox = getComputedStyle(el).overflowX
+            if ((ox === 'auto' || ox === 'scroll') && el.scrollWidth > el.clientWidth + 1) return true
+          }
+          return false
+        }
+        const blocked = (e: KeyboardEvent) => {
+          if (!on || e.defaultPrevented || e.isComposing || e.keyCode === 229 || e.repeat) return true
+          if (e.ctrlKey || e.altKey || e.metaKey) return true
+          const t = e.target as HTMLElement
+          if (t?.isContentEditable || t?.closest?.(TYPING)) return true
+          if (overlayOpen()) return true
+          const sel = window.getSelection()
+          if (sel && !sel.isCollapsed && sel.toString().trim()) return true
+          return false
+        }
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            if (e.shiftKey || blocked(e)) return
+            const a = e.key === 'ArrowLeft' ? prev : next
+            if (!a) return
+            const active = document.activeElement
+            if (inSideScroller(active && active !== document.body ? active : lastPointer)) return
+            if (html.scrollWidth > html.clientWidth + 1) return // page itself scrolls sideways (zoomed in)
+            e.preventDefault()
+            location.assign(a.href)
+          } else if (e.key === '?') {
+            if (blocked(e)) return
+            e.preventDefault()
+            openHelp()
+          } else if (e.key === '/') {
+            if (blocked(e)) return
+            const q = document.getElementById('q') as HTMLInputElement | null
+            e.preventDefault()
+            if (q) { q.focus(); q.select() } else if (searchHref) location.assign(searchHref + '#q')
+          }
+        })
+      })()
+
       // ---- Language preference. An explicit choice (language switcher, root links,
       // or the hint below) is saved as localStorage 'lang' and used by the root page.
       // Language pages never auto-redirect; they only offer a dismissible hint.
