@@ -11,6 +11,8 @@ import SafetyNotice from '../../../components/SafetyNotice.astro'
 import Snapshot from '../../../components/Snapshot.astro'
 import Quiz from '../../../components/Quiz.astro'
 import Lab from '../../../components/Lab.astro'
+import Term from '../../../components/Term.astro'
+import Glossary from '../../../components/Glossary.astro'
 import { ui, langs, type Lang } from '../../../data/book'
 import { getBook, partOf } from '../../../data/chapters'
 import { href, absolute, htmlLang, authorFor, authorLd, PUBLISHED, SNAPSHOT_ISO } from '../../../data/site'
@@ -79,7 +81,7 @@ if (slug === '18-glossary-quiz') {
   })
 }
 // Every MDX component is available in every chapter without an import.
-const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz, Lab }
+const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz, Lab, Term, Glossary }
 ---
 <BaseLayout lang={lang} title={title} description={entry.data.description} path={path} jsonLd={jsonLd} ogType="article" currentSlug={slug} noindex={isDraft}
   navKey={slug === '16-appendix-addresses-txs' ? 'appendix' : slug === '18-glossary-quiz' ? 'glossary' : slug === '01-how-to-read' ? 'start' : undefined}>
@@ -95,7 +97,7 @@ const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz,
         <p class="meta-line">
           <span>{lang === 'zh' ? `整理：${byline}` : `By ${byline}`}</span>
           <span>{lang === 'zh' ? '页面发布：' : 'Published: '}<time datetime={PUBLISHED}>{PUBLISHED}</time>{modified !== PUBLISHED && <>{lang === 'zh' ? ' · 更新：' : ' · Updated: '}<time datetime={modified}>{modified}</time></>}</span>
-          <span>{lang === 'zh' ? '链上快照：' : 'Chain snapshot: '}<time datetime={SNAPSHOT_ISO}>2026-11-12 15:39:55 (UTC+8)</time>{lang === 'zh' ? '，区块 12117419' : ', block 12117419'}</span>
+          <span>{lang === 'zh' ? '链上快照：' : 'Chain snapshot: '}<time datetime={SNAPSHOT_ISO}>2026-11-12 15:39:55 (UTC+8)</time>{lang === 'zh' ? <>，<span class="nw">区块 12117419</span></> : <>, <span class="nw">block 12117419</span></>}</span>
         </p>
       </header>
       <div class="prose">
