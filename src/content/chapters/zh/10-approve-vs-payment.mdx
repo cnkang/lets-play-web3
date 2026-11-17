@@ -7,15 +7,15 @@ order: 100
 status: published
 ---
 
-<p class="lead">三方角色：持有人、被授权者、收款人。授权和扣款是两次不同的动作。</p>
+<p class="lead">三方角色：持有人、<Term id="spender">被授权者</Term>、收款人。授权和扣款是两次不同的动作。</p>
 
 ## 为什么钱包常弹「授权」而不是「付款」？
 
-许多去中心化交易或服务的流程，会先让持有人**批准**某个智能合约支配某种代币的一个额度（`approve`），然后再由那个合约根据用户之后的操作执行 `transferFrom`。
+许多<Term id="dex-amm">去中心化交易</Term>或服务的流程，会先让持有人**批准**某个<Term id="smart-contract">智能合约</Term>支配某种代币的一个<Term id="allowance">额度</Term>（`approve`），然后再由那个合约根据用户之后的操作执行 `transferFrom`。
 
 - **`approve` 不是付款**：它只在代币合约里写下「B 最多可以从 A 这里动用多少」，**余额一分不变**。
-- 真正动余额的是之后由被授权者发起的 `transferFrom`（转走）或 `burnFrom`（销毁）。
-- 授权会**一直有效**，直到额度被用完，或持有人再发一笔 `approve` 改掉它。
+- 真正动余额的是之后由被授权者发起的 `transferFrom`（转走）或 `burnFrom`（<Term id="burn">销毁</Term>）。
+- <Term id="approve">授权</Term>会**一直有效**，直到额度被用完，或持有人再发一笔 `approve` 改掉它。
 
 所以授权虽然不是「钱已经转出」，但长期存在的授权，就是一份「将来可以被扣款的权限」。
 
@@ -39,7 +39,7 @@ MBox-Burn 上 allowance(A, B) 在实验中的真实变化。授权和代扣是�
 
 <Callout type="warn" title="撤销也有时间窗口">
 
-撤销交易必须由**持有人**发出，而且要在链上确认后才生效。在撤销交易被打包之前，原来的授权仍然可以被使用。
+撤销<Term id="transaction">交易</Term>必须由**持有人**发出，而且要在链上确认后才生效。在撤销交易被打包之前，原来的授权仍然可以被使用。
 
 </Callout>
 

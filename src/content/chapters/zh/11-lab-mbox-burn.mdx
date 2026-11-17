@@ -7,39 +7,39 @@ order: 110
 status: published
 ---
 
-<p class="lead">销毁会让总供应真的下降；撤销授权只改额度，不动余额。</p>
+<p class="lead"><Term id="burn">销毁</Term>会让<Term id="total-supply">总供应</Term>真的下降；撤销授权只改额度，不动余额。</p>
 
 ## 部署一枚能销毁的代币
 
-已经部署的 MBox 没有销毁功能，也不能事后加上，所以另外部署了一个带 `burn` / `burnFrom` 的代币：
+已经部署的 MBox 没有销毁功能，也不能事后加上，所以另外部署了一个带 `burn` / `burnFrom` 的<Term id="token">代币</Term>：
 
-- 合约地址：<Addr a="0x2AE6BbE8b524381535D1f443fe95018b1f64e3F2" />
+- 合约<Term id="address">地址</Term>：<Addr a="0x2AE6BbE8b524381535D1f443fe95018b1f64e3F2" />
 - 名称：`超级无敌宇宙第一老马斯克看了都不知道该叫什么的焚烧Token`，符号 `MBox-Burn`，初始供应 1,000,000 枚，全部给账户 A
 
 部署之后，A 自己销毁了 1,000 枚：`totalSupply` 从 1,000,000 降到 **999,000**。旧的 MBox 合约没有任何变化。
 
 ## burn 不等于「转到 0x0」
 
-- **`burn`** 会**同时减少**持有人余额和 `totalSupply`，并发出 `Transfer(持有人 → 0x0, 数量)` 事件。
-- **普通 `transfer` 到零地址**（如果合约允许）只改变余额，**不减少** `totalSupply`。
+- **`burn`** 会**同时减少**持有人余额和 `totalSupply`，并发出 `Transfer(持有人 → 0x0, 数量)` <Term id="event">事件</Term>。
+- <strong>普通 `transfer` 到<Term id="zero-address">零地址</Term></strong>（如果合约允许）只改变余额，**不减少** `totalSupply`。
 
-两种情况都可能在浏览器上看到「转到 0x0」的事件。供应到底有没有减少，要读 `totalSupply()`，不能只看事件。本实验用的是专门的 `burn`，所以供应确实下降了。
+两种情况都可能在<Term id="block-explorer">浏览器</Term>上看到「转到 0x0」的事件。供应到底有没有减少，要读 `totalSupply()`，不能只看事件。本实验用的是专门的 `burn`，所以供应确实下降了。
 
 ## approve 500，burnFrom 100
 
-1. A 先给 B 转了 **0.0001 SepETH** 作为测试 gas（B 没有单独领水龙头）。
-2. A 调用 `approve(B, 500)`：额度 500，余额不变。
+1. A 先给 B 转了 <strong>0.0001 <Term id="sepeth">SepETH</Term></strong> 作为测试 <Term id="gas">gas</Term>（B 没有单独领<Term id="faucet">水龙头</Term>）。
+2. A 调用 `approve(B, 500)`：<Term id="allowance">额度</Term> 500，余额不变。
 3. B 调用 `burnFrom(A, 100)`：A 减少 100，供应再降 100 到 **998,900**，额度剩 **400**。
 
 剩下的 400 后来又被第 12 章的两笔 `transferFrom` 用掉 300，**还剩 100**。这 100 的授权在实验之后一直留着，没有清零。
 
 ## D-01：撤销遗留的 100 授权
 
-P0 复核把这笔遗留授权记为一个 Low 级发现（F-ALLOW-001）：不是合约被攻破，而是实验残留——B 若签名，仍然可以动用最多 100 枚测试币。决策 **D-01** 批准撤销：重新读取额度、nonce、余额并模拟之后，由 A 广播**仅此一笔** `approve(B, 0)`：
+P0 复核把这笔遗留授权记为一个 Low 级发现（F-ALLOW-001）：不是合约被攻破，而是实验残留——B 若<Term id="signature">签名</Term>，仍然可以动用最多 100 枚测试币。决策 **D-01** 批准撤销：重新读取额度、<Term id="nonce">nonce</Term>、余额并<Term id="simulate">模拟</Term>之后，由 A <Term id="broadcast">广播</Term>**仅此一笔** `approve(B, 0)`：
 
 <Tx h="0x4571e581958308c820ab16da26aa9d1a2622caa7c720ebe164b5d2c29a3747f2" />
 
-- 区块 **12117312**，状态成功；gasUsed 24,538，有效气价 69 wei，手续费 1,693,122 wei
+- 区块 **12117312**，状态成功；gasUsed 24,538，有效气价 69 <Term id="wei">wei</Term>，手续费 1,693,122 wei
 - `allowance(A, B)`：**100 → 0**
 - 余额和供应**都不变**：A 998,800，B 100，`totalSupply` 998,900
 - A 的 nonce 19 → **20**
@@ -78,9 +78,9 @@ B 的两笔 `transferFrom` 见第 12 章。
 
 ## 自己核查可以看三类信息
 
-- **交易详情**：网络是 Sepolia，发起人是 A，目标是 MBox-Burn 合约，状态成功。
+- **交易详情**：网络是 <Term id="sepolia">Sepolia</Term>，发起人是 A，目标是 MBox-Burn 合约，状态成功。
 - **事件或合约读取**：`Approval` 事件，或直接读 `allowance(A, B)`，确认已经是 0。
-- **余额与供应**：授权的变化**不应**改变持有人的资产。
+- **余额与供应**：<Term id="approve">授权</Term>的变化**不应**改变持有人的资产。
 
 <Callout type="note" title="最小必要权限">
 

@@ -7,11 +7,11 @@ order: 120
 status: published
 ---
 
-<p class="lead">「两次调用」不是「一笔交易」。要么全部成功、要么全部不发生，叫做原子性。</p>
+<p class="lead">「两次调用」不是「一笔交易」。要么全部成功、要么全部不发生，叫做<Term id="atomicity">原子性</Term>。</p>
 
 ## 实验一：两笔独立的 transferFrom（不是原子的）
 
-B 用 MBox-Burn 上还剩的 400 额度，分**两笔普通交易**从 A 那里转出代币：
+B 用 MBox-Burn 上还剩的 400 <Term id="allowance">额度</Term>，分<strong>两笔普通<Term id="transaction">交易</Term></strong>从 A 那里转出代币：
 
 <T label="两笔独立的 transferFrom（MBox-Burn）">
 
@@ -22,37 +22,37 @@ B 用 MBox-Burn 上还剩的 400 额度，分**两笔普通交易**从 A 那里�
 
 </T>
 
-两笔都成功了。结果：A 持有 998,800，B 持有 100，剩余额度 100，总供应仍是 998,900。A 的 nonce 没有变化——这两笔是 B 签名的。
+两笔都成功了。结果：A 持有 998,800，B 持有 100，剩余额度 100，总供应仍是 998,900。A 的 <Term id="nonce">nonce</Term> 没有变化——这两笔是 B <Term id="signature">签名</Term>的。
 
-**关键点**：这是两笔各自独立的交易。第一笔上链之后，就算第二笔失败（额度不够、gas 不够、节点出问题……），第一笔转出的 100 也**不会自动退回**。
+**关键点**：这是两笔各自独立的交易。第一笔上链之后，就算第二笔失败（额度不够、<Term id="gas">gas</Term> 不够、<Term id="node">节点</Term>出问题……），第一笔转出的 100 也**不会自动退回**。
 
 <Callout type="note" title="自转账：有事件，净额为零">
 
-第二笔把 200 从 A 转给 A 自己。余额不变，但链上照样记下了 `Transfer(A, A, 200)` 事件。不要把「有事件」直接等同于「资产变了」。
+第二笔把 200 从 A 转给 A 自己。余额不变，但链上照样记下了 `Transfer(A, A, 200)` <Term id="event">事件</Term>。不要把「有事件」直接等同于「资产变了」。
 
 </Callout>
 
 ## 实验二：一批故意失败的 batchTransfer（原子的）
 
-升级到 V2 之后（第 13 章），UBOX 代币有了 `batchTransfer`：在**同一笔交易**里给多个收款人转账，任何一项失败，整笔回滚。
+升级到 V2 之后（第 13 章），UBOX <Term id="token">代币</Term>有了 `batchTransfer`：在**同一笔交易**里给多个收款人转账，任何一项失败，整笔<Term id="revert">回滚</Term>。
 
 A 发出一笔批量转账，故意让第二项不可能成功：
 
 - 给 B 转 **100**
-- 给临时地址 C 转 **2,000,000**（超过总供应 1,000,000）
+- 给临时地址 C 转 **2,000,000**（超过<Term id="total-supply">总供应</Term> 1,000,000）
 
 <Tx h="0x7dd2f8636c730acd9b1dbe095a1d6ebd6f9b327f5090042bcd448a80f60c1243" />
 
-- 2026-11-12 12:32:12（新加坡时间），区块 **12116493**，状态 **reverted（失败）**——这正是实验想要的结果
+- 2026-11-12 12:32:12（新加坡时间），<Term id="block">区块</Term> **12116493**，状态 **reverted（失败）**——这正是实验想要的结果
 - 回滚原因（发送前的 `eth_call` 已确认）：`insufficient balance`
-- gas used **51,719**，手续费 **3,516,892 wei**；A 的 nonce 15 → 16
+- gas used **51,719**，手续费 <strong>3,516,892 <Term id="wei">wei</Term></strong>；A 的 nonce 15 → 16
 - 失败后：A 仍是 1,000,000，B 仍是 0，C 仍是 0——第一项的 100 **也没有**到 B
 
 演示地址 C（内存中临时生成，不保存密钥，收到 0）：<Addr a="0x6E7F8eF4353DB8012Dea3F70eb523aB1A3051711" />
 
 <Callout type="warn" title="失败交易也是交易">
 
-它占用了 nonce 15，付了 gas，在浏览器上可以查到，只是状态被回滚。另外，对一笔必然失败的调用，`estimateGas` 本身也会失败，所以这次的 gas limit（322,418）是按成功路径的估算 × 1.2 设定的；多余的 limit 不收费。
+它占用了 nonce 15，付了 gas，在<Term id="block-explorer">浏览器</Term>上可以查到，只是状态被回滚。另外，对一笔必然失败的调用，`estimateGas` 本身也会失败，所以这次的 <Term id="gas-limit">gas limit</Term>（322,418）是按成功路径的估算 × 1.2 设定的；多余的 limit 不收费。
 
 </Callout>
 

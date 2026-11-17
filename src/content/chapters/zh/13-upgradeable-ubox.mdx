@@ -7,13 +7,13 @@ order: 130
 status: published
 ---
 
-<p class="lead">用「店铺门牌地址不变，后台收银系统更换」来理解代理（Proxy）。</p>
+<p class="lead">用「店铺门牌地址不变，后台收银系统更换」来理解<Term id="proxy">代理</Term>（Proxy）。</p>
 
 ## 可升级必须在部署时就设计好
 
-第 8、9 章看到：普通合约一旦部署，逻辑就冻在那个地址上。UBOX 从一开始就用了代理模式，把「用户永远调用的地址」固定为**代理**，把逻辑放在可替换的**实现合约**里。
+第 8、9 章看到：普通合约一旦<Term id="deploy">部署</Term>，逻辑就冻在那个地址上。UBOX 从一开始就用了代理模式，把「用户永远调用的地址」固定为**代理**，把逻辑放在可替换的<strong><Term id="implementation">实现合约</Term></strong>里。
 
-采用的是 OpenZeppelin 5.6.1 的 `TransparentUpgradeableProxy` 和 `ProxyAdmin`，没有自己写代理，便于对照官方的存储槽规范（ERC-1967）和升级接口。
+采用的是 <Term id="openzeppelin">OpenZeppelin</Term> 5.6.1 的 `TransparentUpgradeableProxy` 和 `ProxyAdmin`，没有自己写代理，便于对照官方的<Term id="storage">存储槽</Term>规范（ERC-1967）和升级接口。
 
 <Figure name="proxy" n="5" alt="用户调用固定的 UBOX 代理地址，代理保存余额等存储，并通过 delegatecall 执行当前实现 V3；V1、V2 的代码仍在但已不被指向；V4 只在本地。ProxyAdmin 的 owner 是账户 A，可调用 upgradeAndCall 更换实现。">
 用户访问固定的代理；代理用实现合约的代码、在自己的存储上运行；升级权由 ProxyAdmin 控制。
@@ -21,11 +21,11 @@ status: published
 
 - **代理**保存所有状态：余额、授权、名称……用户、钱包和其他合约都只认这个地址。
 - **实现合约**只提供代码。代理用 `delegatecall` 借用它的代码，但读写的是**代理自己的存储**。
-- **ProxyAdmin** 是唯一能让代理换实现的合约，它的 owner 是账户 A。
+- <strong><Term id="proxyadmin">ProxyAdmin</Term></strong> 是唯一能让代理换实现的合约，它的 <Term id="owner">owner</Term> 是账户 A。
 
 ## initialize 不是构造函数
 
-构造函数只会写进**实现合约自己的存储**，不会写进代理。所以可升级合约改用一个普通函数 `initialize()` 来设定名称、供应和 owner，并通过代理调用一次。它必须**只能执行一次**——再执行一次，可能重新铸币或改掉 owner。
+<Term id="constructor">构造函数</Term>只会写进**实现合约自己的存储**，不会写进代理。所以可升级合约改用一个普通的<Term id="initialize">初始化函数</Term> `initialize()` 来设定名称、供应和 owner，并通过代理调用一次。它必须**只能执行一次**——再执行一次，可能重新<Term id="mint">铸币</Term>或改掉 owner。
 
 ## 第一步：部署 V1 与代理（当时不部署 V2）
 
@@ -39,7 +39,7 @@ status: published
 
 </T>
 
-代币名称 `可升级沙盒代币`，符号 `UBOX`，18 位小数，`initialize` 后 1,000,000 枚全部铸给 A。三个地址都与按 A 的 nonce 11、12 预测的一致；ProxyAdmin 由代理的构造过程创建，不额外消耗 A 的 nonce。
+代币名称 `可升级沙盒代币`，符号 `UBOX`，18 位<Term id="decimals">小数</Term>，`initialize` 后 1,000,000 枚全部铸给 A。三个地址都与按 A 的 <Term id="nonce">nonce</Term> 11、12 预测的一致；ProxyAdmin 由代理的构造过程创建，不额外消耗 A 的 nonce。
 
 <T label="UBOX V1 部署交易">
 
@@ -50,14 +50,14 @@ status: published
 
 </T>
 
-模拟阶段遇到并修正过三个问题（都发生在广播之前）：中文名必须用 `unicode"..."`；`_initialized` 起初是 `bool`，会和 `owner` 打包进同一个存储槽，导致按「各占一槽」写入的模拟读到错乱数据，后来改成单独占用 slot 0 的 `uint256`；在同一次模拟里连续创建两个合约时，要把 nonce 设成「V1 已部署之后」的值，否则会碰到 `CreateCollision`。
+<Term id="simulate">模拟</Term>阶段遇到并修正过三个问题（都发生在<Term id="broadcast">广播</Term>之前）：中文名必须用 `unicode"..."`；`_initialized` 起初是 `bool`，会和 `owner` 打包进同一个存储槽，导致按「各占一槽」写入的模拟读到错乱数据，后来改成单独占用 slot 0 的 `uint256`；在同一次模拟里连续创建两个合约时，要把 nonce 设成「V1 已部署之后」的值，否则会碰到 `CreateCollision`。
 
 ## 第二步：升级到 V2（不再调用 initialize）
 
-V2 不新增状态变量、不重排存储，只增加原子的 `batchTransfer` / `batchTransferFrom`（第 12 章用的就是它们）。
+V2 不新增状态变量、不重排存储，只增加<Term id="atomicity">原子</Term>的 `batchTransfer` / `batchTransferFrom`（第 12 章用的就是它们）。
 
 - V2 实现：<Addr a="0x0711Ef7C97b061fd3C87026ad38703dd253E779F" />
-- A 通过 `ProxyAdmin.upgradeAndCall(代理, V2, 0x)` 升级，calldata 为空 `0x`：**不再调用 initialize，也不发任何转账**。V1 的 initialize 已经执行过，再调用会因为「already initialized」失败，还可能误触铸币逻辑。
+- A 通过 `ProxyAdmin.upgradeAndCall(代理, V2, 0x)` 升级，附带的调用数据（calldata）为空 `0x`：**不再调用 initialize，也不发任何转账**。V1 的 initialize 已经执行过，再调用会因为「already initialized」失败，还可能误触铸币逻辑。
 
 <T label="UBOX V2 升级交易">
 
@@ -68,11 +68,11 @@ V2 不新增状态变量、不重排存储，只增加原子的 `batchTransfer` 
 
 </T>
 
-升级后名称、供应、余额、owner 全部不变，**代理地址也不变**：仍是 `0xc3F20D5488784D922aC3428a54125715fA98db04`。升级交易本身只用了 41,724 gas，远少于重新部署一整套代理——这就是「地址和状态保留、只换逻辑」的好处。
+升级后名称、供应、余额、owner 全部不变，**代理地址也不变**：仍是 `0xc3F20D5488784D922aC3428a54125715fA98db04`。升级交易本身只用了 41,724 <Term id="gas">gas</Term>，远少于重新部署一整套代理——这就是「地址和状态保留、只换逻辑」的好处。
 
 ## 所有升级都留在链上
 
-- 升级是**普通的链上交易**：有哈希、消耗 gas，发出 `Upgraded` 事件，并改写 ERC-1967 实现槽。没有「静默升级」。
+- 升级是**普通的链上交易**：有<Term id="tx-hash">哈希</Term>、消耗 gas，发出 `Upgraded` <Term id="event">事件</Term>，并改写 ERC-1967 实现槽。没有「静默升级」。
 - 旧的 V1 代码**仍然留在原地址**上，只是代理不再指向它。
 - 模拟时用的 `stateOverride` 只是在本地「假装」链上已有某段代码或存储，**不会改变真实的链**。
 
@@ -80,8 +80,8 @@ V2 不新增状态变量、不重排存储，只增加原子的 `batchTransfer` 
 
 - **好处**：修 bug 或加功能时，用户不必更换所有对接地址。
 - **代价**：管理员权限如果被盗或被滥用，可能改变应用之后执行的规则（包括转账规则，理论上甚至 `name()` 的返回值）。
-- **技术风险**：新版本的存储布局如果不兼容（重排、插入变量），会把旧数据「读错位置」。规则是**只追加、不重排**。
-- **治理问题**：谁有升级权？是不是多签？有没有延迟、公告和退出机制？
+- **技术风险**：新版本的<Term id="storage-layout">存储布局</Term>如果不兼容（重排、插入变量），会把旧数据「读错位置」。规则是**只追加、不重排**。
+- **治理问题**：谁有升级权？是不是<Term id="multisig">多签</Term>？有没有延迟、公告和退出机制？
 
 在本实验里，ProxyAdmin 的 owner 是单个测试账户 A——这是一个明确接受的教学模型，**不是**去中心化发行。
 
