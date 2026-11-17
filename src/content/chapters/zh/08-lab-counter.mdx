@@ -7,11 +7,11 @@ order: 80
 status: published
 ---
 
-<p class="lead">从「能读懂一次链上状态变化」开始，而不是一上来就把智能合约等同于金融。</p>
+<p class="lead">从「能读懂一次链上状态变化」开始，而不是一上来就把<Term id="smart-contract">智能合约</Term>等同于金融。</p>
 
 ## 合约做了什么
 
-Counter 是一个教学用的计数器，源码只有十几行：
+Counter 是一个教学用的计数器，源码用 <Term id="solidity">Solidity</Term> 写成，只有十几行：
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -36,11 +36,11 @@ contract Counter {
 }
 ```
 
-任何人都能 `increment`（加一并发出 `Incremented` 事件），只有部署者 `owner` 能 `reset`（清零）。实际用 solc 0.8.34 编译。
+任何人都能 `increment`（加一并发出 `Incremented` <Term id="event">事件</Term>），只有<Term id="deploy">部署</Term>者 `owner` 能 `reset`（清零）。实际用 solc 0.8.34 <Term id="compile">编译</Term>。
 
 ## 链上结果
 
-合约地址（由账户 A 的 nonce 0 预先算出，部署后完全一致）：
+合约<Term id="address">地址</Term>（由账户 A 的 <Term id="nonce">nonce</Term> 0 预先算出，部署后完全一致）：
 
 <Addr a="0xAf6f88Cf8bf6e9211CD11B375AECBa37d61CD00f" />
 
@@ -66,11 +66,11 @@ Counter 每一步都是一笔已上链的交易；读取 <code>count()</code> �
 
 ## 从数字里能学到什么
 
-- **链在替你记账**：`count` 和 `owner` 都写在链上，事件日志也在链上。要改状态必须自己付 gas。
+- **链在替你记账**：`count` 和 `owner` 都写在链上，事件日志也在链上。要改状态必须自己付 <Term id="gas">gas</Term>。
 - **部署远比调用贵**：部署用了 1,652,641 gas，reset 只用 23,626 gas。主要成本是把合约代码写进链上状态，而不是那几行加减逻辑。
-- **同一个函数的 gas 会变**：从 0 变成 1 的 increment 用了 127,229 gas，从 1 变成 2 只用了 29,309 gas。原因是存储槽从零写成非零更贵，已经非零再改就便宜得多。
-- **已确认的交易不能撤销**：reset 把数字清零，但抹不掉之前 increment 的交易和事件，历史仍在。
-- **这段合约不能再加功能**：想增加批量操作或升级能力，必须在部署时就采用可升级模式——这直接引出了后面的 UBOX（第 13 章）。
+- **同一个函数的 gas 会变**：从 0 变成 1 的 increment 用了 127,229 gas，从 1 变成 2 只用了 29,309 gas。原因是<Term id="storage">存储槽</Term>从零写成非零更贵，已经非零再改就便宜得多。
+- <strong>已确认的<Term id="transaction">交易</Term>不能撤销</strong>：reset 把数字清零，但抹不掉之前 increment 的交易和事件，历史仍在。
+- **这段合约不能再加功能**：想增加批量操作或升级能力，必须在部署时就采用<Term id="upgradeable">可升级</Term>模式——这直接引出了后面的 UBOX（第 13 章）。
 
 ## 生活对应
 

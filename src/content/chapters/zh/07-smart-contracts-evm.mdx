@@ -11,14 +11,14 @@ status: published
 
 ## 自动售货机
 
-自动售货机收到正确的付款后，按预设条件出货；条件不满足就退回。智能合约同样把规则写成程序，部署到链上，由所有节点按同样的方式执行。
+自动售货机收到正确的付款后，按预设条件出货；条件不满足就退回。<Term id="smart-contract">智能合约</Term>同样把规则写成程序，<Term id="deploy">部署</Term>到链上，由所有<Term id="node">节点</Term>按同样的方式执行。
 
-**以太坊虚拟机（EVM）** 在执行交易时读取状态、检查条件、更新状态，或者在条件失败时**回滚**。它不会主动上网查实时天气，也不会自己判断货物是否真的发出——那是第 4 章说的「预言机问题」。
+**以太坊虚拟机（EVM）** 在执行交易时读取状态、检查条件、更新状态，或者在条件失败时**回滚**。它不会主动上网查实时天气，也不会自己判断货物是否真的发出——那是第 4 章说的「<Term id="oracle">预言机</Term>问题」。
 
 ## 读与写
 
-- **读**（例如查询 Counter 当前的数字）：通常通过 RPC 做一次 `eth_call`，在节点本地执行，**不签名、不花 gas、不改变链上状态**。
-- **写**（例如调用 `increment`）：要签名并发送交易，被打包成功后状态才改变，并消耗 gas。
+- **读**（例如查询 Counter 当前的数字）：通常通过 <Term id="rpc">RPC</Term> 做一次 `eth_call`，在节点本地执行，<strong>不签名、不花 <Term id="gas">gas</Term>、不改变链上状态</strong>。
+- **写**（例如调用 `increment`）：要<Term id="signature">签名</Term>并发送<Term id="transaction">交易</Term>，被打包成功后状态才改变，并消耗 gas。
 - **条件失败**：代码里的 `require` 等检查不通过时，交易**回滚**（revert）：这次执行做的所有状态改动都不保留，但 gas 已经花掉了。
 
 <T label="观察一次合约调用时看什么">
@@ -27,21 +27,21 @@ status: published
 | --- | --- |
 | 交易成功 | EVM 执行没有被回滚 |
 | 计数值增加 | 合约存储里的值发生了变化 |
-| 事件日志（若合约实现） | 供界面或索引服务追踪，**不能代替**直接读取状态 |
+| <Term id="event">事件日志</Term>（若合约实现） | 供界面或索引服务追踪，**不能代替**直接读取状态 |
 | 支付 gas | 维护一份共同状态是有执行成本的 |
 
 </T>
 
 ## 先模拟，再广播
 
-本书每一笔上链交易，都先用 viem 做 `eth_call`、`estimateGas`，必要时用 `eth_simulateV1` 或 `stateOverride` 模拟。**模拟不会改变链**：它不占 nonce、不扣 ETH。只有经确认后真正广播的交易才会改变链上状态。
+本书每一笔上链交易，都先用 <Term id="viem">viem</Term> 做 `eth_call`、`estimateGas`，必要时用 `eth_simulateV1` 或 `stateOverride` 模拟。<strong><Term id="simulate">模拟</Term>不会改变链</strong>：它不占 <Term id="nonce">nonce</Term>、不扣 <Term id="eth">ETH</Term>。只有经确认后真正<Term id="broadcast">广播</Term>的交易才会改变链上状态。
 
 ## 部署之后就冻住了
 
 一段普通合约一旦部署，它的代码就**固定在那个地址上**，不能事后打补丁或加功能。想改逻辑，只有两条路：
 
 1. 部署一个新合约，让大家约定改用新地址；
-2. 在**部署时**就采用代理等可升级模式（第 13 章）。
+2. 在**部署时**就采用<Term id="proxy">代理</Term>等可升级模式（第 13 章）。
 
 <Callout type="note" title="记忆点">
 

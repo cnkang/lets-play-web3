@@ -11,24 +11,24 @@ status: published
 
 ## 启动资金从哪里来
 
-实验开始时，账户 A 在 **2026-11-11 15:58:24（新加坡时间）** 收到 **0.05 SepETH**（测试网 ETH），在区块 **12110419**：
+实验开始时，账户 A 在 **2026-11-11 15:58:24（新加坡时间）** 收到 <strong>0.05 <Term id="sepeth">SepETH</Term></strong>（测试网 ETH），在<Term id="block">区块</Term> **12110419**：
 
-- 入账交易：<Tx h="0xc8b5c548e4e42c69c9f0b9cd8a9a8c4381d7cb2a1e0823b1ef22f539d344d92b" />
-- 来源地址：<Addr a="0x52f1984Cd3e46e1214dB222D3Ff63712E7aCEedD" />
+- <Term id="transaction">入账交易</Term>：<Tx h="0xc8b5c548e4e42c69c9f0b9cd8a9a8c4381d7cb2a1e0823b1ef22f539d344d92b" />
+- 来源<Term id="address">地址</Term>：<Addr a="0x52f1984Cd3e46e1214dB222D3Ff63712E7aCEedD" />
 
-这类免费发放测试币的服务叫**水龙头**（faucet）。来源地址在浏览器上**没有官方名称标签**，所以本书只写可以核对的地址和金额，不猜它属于哪个品牌。测试币没有市场价值，实验没有花任何真钱。
+这类免费发放测试币的服务叫**水龙头**（faucet）。来源地址在<Term id="block-explorer">浏览器</Term>上**没有官方名称标签**，所以本书只写可以核对的地址和金额，不猜它属于哪个品牌。测试币没有市场价值，实验没有花任何真钱。
 
 ## Gas：执行要付的「计量费」
 
-**Gas** 是 EVM 执行操作时消耗的计量单位。可以类比寄包裹：费用不只看「寄没寄」，还和处理成本、当时的拥堵程度有关。
+**Gas** 是 <Term id="evm">EVM</Term> 执行操作时消耗的计量单位。可以类比寄包裹：费用不只看「寄没寄」，还和处理成本、当时的拥堵程度有关。
 
-在 EIP-1559 费用市场下：
+在 <Term id="eip-1559">EIP-1559</Term> 费用市场下：
 
 - 实付手续费 = `gasUsed × 有效气价`
 - 有效气价 ≈ `base fee + 小费（tip）`
-- **`gasUsed × base fee` 被销毁**（从流通中移除，不进入任何人的账户）；**`gasUsed × tip` 给打包区块的验证者**。
+- **`gasUsed × base fee` 被销毁**（从流通中移除，不进入任何人的账户）；<strong>`gasUsed × tip` 给打包区块的<Term id="validator">验证者</Term></strong>。
 
-谁占大头，取决于当时的 base fee 和 tip，不是一个固定比例。用实验里 Counter 合约的五笔真实交易来核对（单位都是 wei）：
+谁占大头，取决于当时的 <Term id="base-fee">base fee</Term> 和 <Term id="tip">tip</Term>，不是一个固定比例。用实验里 Counter 合约的五笔真实交易来核对（单位都是 <Term id="wei">wei</Term>）：
 
 <T label="Counter 交易的手续费拆分（单位 wei）">
 
@@ -46,13 +46,13 @@ status: published
 
 <Callout type="warn" title="失败的交易也要付钱">
 
-失败的交易仍然是交易：它会占用 nonce、消耗 gas、出现在浏览器里，只是状态改动被回滚。第 12 章有一笔故意失败的交易，用了 51,719 gas。不过 gas limit 设得再高，多出来的部分也不会收：只按 `gasUsed × 有效气价` 收费。
+失败的交易仍然是交易：它会占用 nonce、消耗 gas、出现在浏览器里，只是状态改动被<Term id="revert">回滚</Term>。第 12 章有一笔故意失败的交易，用了 51,719 gas。不过 <Term id="gas-limit">gas limit</Term> 设得再高，多出来的部分也不会收：只按 `gasUsed × 有效气价` 收费。
 
 </Callout>
 
 ## nonce：账户的交易序号
 
-对普通的外部账户来说，**nonce** 是这个账户发出交易的序号，从 0 开始，每发出一笔被打包的交易就加一，用来排序、防止同一笔交易被重放。
+对普通的<Term id="eoa">外部账户</Term>来说，**nonce** 是这个账户发出交易的序号，从 0 开始，每发出一笔被打包的交易就加一，用来排序、防止同一笔交易被重放。
 
 快照时**账户 A 的 nonce 为 20**。意思是：A 已经发出了 20 笔被打包的交易，用掉了 nonce 0 到 19，下一笔将使用 nonce 20。它**不是**「余额 20」，也不是「20 次成功调用」（第 15 号就是一笔故意失败的交易，它同样占用了一个 nonce）。账户 B 的 nonce 为 3（用掉了 0、1、2）。
 
@@ -61,9 +61,9 @@ status: published
 小费越低，在拥堵时越可能排在后面。实验专门做了低小费练习：
 
 - **nonce 3**：一笔只给 **1 wei 小费**的 increment。当时链不拥堵，它仍然被打包了：<Tx h="0xd61e57686959b7c4c9d774a6aa35b0fb9dac72e8317055146da4676a9e4e4b31" short />（区块 12111091）。
-- **nonce 4**：替换脚本 `replace-stuck.mjs` 的设计是：先在 nonce 4 发一笔 1 wei 小费、故意很难被打包的交易并观察；如果它还在待处理队列（内存池）里，就用**同一个 nonce、更高的小费（2 wei）**发一笔替换交易。链上 nonce 4 的那笔交易，形态与这个脚本完全一致（gas limit 140,000，小费 2 wei）：<Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short />（区块 12111181）。
+- **nonce 4**：替换脚本 `replace-stuck.mjs` 的设计是：先在 nonce 4 发一笔 1 wei 小费、故意很难被打包的交易并观察；如果它还在待处理队列（<Term id="mempool">内存池</Term>）里，就用<strong>同一个 nonce、更高的小费（2 wei）</strong>发一笔替换交易。链上 nonce 4 的那笔交易，形态与这个脚本完全一致（gas limit 140,000，小费 2 wei）：<Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short />（区块 12111181）。
 
-**链上只能看到最终被打包的那一笔。** 被替换掉的交易从未进入任何区块，不会留下成功收据。所以本书**不把任何未上链交易的哈希当作事实**——你在钱包或脚本里看到一个哈希，只说明「发出去了」，不说明「上链了」。
+**链上只能看到最终被打包的那一笔。** 被替换掉的交易从未进入任何区块，不会留下成功收据。所以本书**不把任何未上链交易的哈希当作事实**——你在钱包或脚本里看到一个<Term id="tx-hash">哈希</Term>，只说明「发出去了」，不说明「上链了」。
 
 <Callout type="note" title="为什么同一个 nonce 能替换？">
 
@@ -75,10 +75,10 @@ status: published
 
 （流程图见第 5 章图 2。）
 
-1. **Network**：确认是 Sepolia（地址栏是 `sepolia.etherscan.io`），别把测试网和主网混淆。
+1. **Network**：确认是 Sepolia（地址栏是 `sepolia.etherscan.io`），别把<Term id="testnet">测试网</Term>和<Term id="mainnet">主网</Term>混淆。
 2. **Status**：成功还是失败。失败交易也可能消耗了 gas。
 3. **From / To**：谁发起的，发给了哪个账户或合约。
-4. **Method / Logs**：调用了哪个方法、发出了哪些事件。事件不完全等于资产的最终状态（第 11–12 章会看到「有事件但净额为零」）。
+4. **Method / Logs**：调用了哪个方法、发出了哪些<Term id="event">事件</Term>。事件不完全等于资产的最终状态（第 11–12 章会看到「有事件但净额为零」）。
 5. **Block / Transaction Hash**：交易所在的区块和它的唯一标识。
 
 一笔交易的链上结果，应当同时看**状态、事件和余额变化**；不能只凭某个程序或机器人说「执行成功」。

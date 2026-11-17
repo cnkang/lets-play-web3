@@ -7,16 +7,16 @@ order: 90
 status: published
 ---
 
-<p class="lead">理解「代币」首先是合约维护的一组账户余额和规则，而不是某种必然升值的资产。</p>
+<p class="lead">理解「<Term id="token">代币</Term>」首先是合约维护的一组账户余额和规则，而不是某种必然升值的资产。</p>
 
 ## ERC-20 是什么
 
-**ERC-20** 是以太坊上可互换代币最常见的接口标准，规定了一组函数，例如：
+**ERC-20** 是<Term id="ethereum">以太坊</Term>上可互换代币最常见的接口标准，规定了一组函数，例如：
 
 - `balanceOf(账户)`：查某个账户的余额（只读）
 - `transfer(收款人, 数量)`：持有人自己转账
 - `approve(被授权者, 额度)`、`allowance(持有人, 被授权者)`：授权与查询额度（第 10 章）
-- `transferFrom(持有人, 收款人, 数量)`：被授权者在额度内代为转账
+- `transferFrom(持有人, 收款人, 数量)`：<Term id="spender">被授权者</Term>在额度内代为转账
 
 把代币理解成「联盟商户共同使用的积分单位」，比理解成「会升值的资产」更适合入门。标准接口只是交互约定：一个代币仍然可能有特殊限制、手续费或管理权限，不能因为它「符合 ERC-20」就默认经济规则完全相同。
 
@@ -34,9 +34,9 @@ status: published
 
 ## 实验：部署 MBox
 
-- 合约地址（与按 A 的 nonce 5 预测的地址一致）：<Addr a="0xc4B187783f074111EbeFC50B9a1901f2a4F94630" />
-- 名称：`超级无敌宇宙第一老马斯克看了都不知道该叫什么的Token`（在 Solidity 里必须写成 `unicode"..."` 字符串，否则编译报 Invalid character）
-- 符号：`MBox`；小数位 `decimals`：18；初始供应 **1,000,000** 枚，全部铸给账户 A
+- 合约<Term id="address">地址</Term>（与按 A 的 <Term id="nonce">nonce</Term> 5 预测的地址一致）：<Addr a="0xc4B187783f074111EbeFC50B9a1901f2a4F94630" />
+- 名称：`超级无敌宇宙第一老马斯克看了都不知道该叫什么的Token`（在 <Term id="solidity">Solidity</Term> 里必须写成 `unicode"..."` 字符串，否则编译报 Invalid character）
+- 符号：`MBox`；<Term id="decimals">小数位</Term> `decimals`：18；初始供应 **1,000,000** 枚，全部<Term id="mint">铸造</Term>（新发行）给账户 A
 
 <T label="MBox 的两笔交易">
 
@@ -47,7 +47,7 @@ status: published
 
 </T>
 
-转账之后的余额（一直保持到快照）：A 持有 **999,000**，演示地址持有 **1,000**，`totalSupply` 仍是 **1,000,000**——转账不会改变总供应。
+转账之后的余额（一直保持到快照）：A 持有 **999,000**，演示地址持有 **1,000**，`totalSupply` 仍是 **1,000,000**——转账不会改变<Term id="total-supply">总供应</Term>。
 
 ## 转给无私钥地址：永远拿不回来
 
@@ -55,7 +55,7 @@ status: published
 
 <Addr a="0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E" />
 
-这个地址**从来没有保存过私钥**，也没有任何 SepETH。没有私钥，就没有人能为它签名转出；已确认的交易又不能撤回。所以这 1,000 枚 MBox **永久锁死，无法找回**。
+这个地址<strong>从来没有保存过<Term id="private-key">私钥</Term></strong>，也没有任何 <Term id="sepeth">SepETH</Term>。没有私钥，就没有人能为它签名转出；已确认的<Term id="transaction">交易</Term>又不能撤回。所以这 1,000 枚 MBox **永久锁死，无法找回**。
 
 <Callout type="danger" title="不要再往这个地址转任何东西">
 
@@ -65,11 +65,11 @@ status: published
 
 ## 名字和符号不唯一：认地址，不认名字
 
-`name()` 和 `symbol()` 只是合约返回的**未注册字符串**，链上没有「代币名称登记处」。任何人都可以再部署一个名字、符号一模一样的合约，钱包会照样显示出来。
+`name()` 和 `symbol()` 只是合约返回的**未注册字符串**，链上没有「代币名称登记处」。任何人都可以再部署一个名字、符号一模一样的合约，<Term id="wallet">钱包</Term>会照样显示出来。
 
 **识别一个代币，只能靠它的合约地址。** 看到「MBox」三个字母不代表就是本书这个合约；地址是 `0xc4B187783f074111EbeFC50B9a1901f2a4F94630` 才是。
 
 ## 其他观察
 
-- 部署 gas（6,212,065）再次远高于转账（141,540）：要写入的代码更长，还包括那个很长的中文名称。
-- 已部署的 MBox 不能事后加上 `burn` 功能。要演示销毁，只能部署一个新合约——这就是第 11 章的 MBox-Burn。
+- <Term id="deploy">部署</Term> <Term id="gas">gas</Term>（6,212,065）再次远高于转账（141,540）：要写入的代码更长，还包括那个很长的中文名称。
+- 已部署的 MBox 不能事后加上 `burn` 功能。要演示<Term id="burn">销毁</Term>，只能部署一个新合约——这就是第 11 章的 MBox-Burn。
