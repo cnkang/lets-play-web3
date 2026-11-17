@@ -100,8 +100,34 @@ Goal: a reader who can use a computer but has never touched a blockchain can rea
 | Real `404.html` (bilingual, noindex), not an SPA fallback | `src/pages/404.astro` |
 | Search page is `noindex` and excluded from the sitemap | `search.astro` |
 | Visible attribution, publish date and snapshot on every chapter; FAQ in real HTML (`<details>`); no ratings; "not affiliated" footer | layout / chapter page |
-| Root `/` → `/zh/` (meta refresh 0 + visible links + canonical) | `src/pages/index.astro` |
+| Root `/` picks an edition by saved choice / browser language (see below); no JS → `/zh/` via `<noscript>` meta refresh; visible links to both + canonical | `src/pages/index.astro` |
 | Minimal JS: one small inline module (theme, menu, copy) + Pagefind only on the search page; fonts are self-hosted variable fonts with `unicode-range` subsets and `font-display: swap` | |
+
+## Language by browser preference (2026-11-17)
+
+Static hosting only; no server-side `Accept-Language`.
+
+- **Root `/`** (the only language-neutral entry) runs a tiny inline script before paint: (1) a saved choice `localStorage.lang` (`zh`/`en`) wins; (2) else the first tag in `navigator.languages` that is `zh*` → `/zh/`, `en*` → `/en/` (other tags are skipped, so `ja, zh-CN` → zh); (3) else `/en/` (a reader whose browser is neither Chinese nor English is likelier to read English). `location.replace` keeps `?query#hash` and adds no history entry. Without JS a `<noscript>` meta refresh goes to `/zh/` (the x-default edition), and the page always shows links to both editions. canonical / hreflang / x-default (→ `/zh/`) unchanged. All URLs come from `href()`, so BASE is respected.
+- **Language pages never redirect** (deep links, shared links and crawlers get exactly the URL they asked for). If no choice is saved and the browser prefers the *other* edition, a small hint bar under the header says so in that language (「本页也有中文版。阅读中文版」 / "This page is also available in English. Read in English") with a dismiss button. Not sticky, not a live region, `lang` set, 32 px (44 px on touch) close button, focus moves to `<main>` on dismiss.
+- **Saved choice**: clicking the top-right switcher, a root link or the hint link saves the target edition; dismissing the hint saves the current one. Either way the hint stops appearing.
+- **QA**: `scripts/qa/lang-check.mjs` — 8 root cases (zh-CN, zh-TW, en-GB first, ja→zh, fr/de, empty list, saved en vs zh browser, saved zh vs en browser), query/hash kept, no-JS fallback, hreflang, hint shown/hidden matrix, keyboard dismiss + focus, switcher saves choice, axe on the hint light/dark × 1280/390.
+
+## Diagram text fit (2026-11-17)
+
+Diagram SVGs are shown as `<img>`, so their text uses the *visitor's* system fonts (SF Pro, Segoe UI, Roboto, Noto…), whose widths differ. `scripts/qa/diagram-overflow-check.mjs` loads every built SVG (7 × zh/en + 2 OG cards) and, with `getBBox()`, requires each `<text>` to stay inside the smallest rect/circle that contains its anchor (8 px padding) or inside the viewBox; it also flags text overlapping text or an arrow line. It runs a second **stress pass with wide fonts** (DejaVu Sans / DejaVu Sans Mono, 6 px padding) so a diagram that passes also fits on wider platform fonts. The OG cards are rendered once to PNG with the site's own fonts, so they get the normal pass only.
+It also flags arrow tips that run into a box and boxes closer than 16 px to the canvas edge.
+Fixed 2026-11-17 (before: 10 text issues, mostly English, + 4 arrow / 1 edge issue): **proxy** (zh + en layout: wider proxy column, longer delegatecall arrow; en: short title + subtitle, title 17 px, shorter V4 note, two-line bottom note in a taller box), **approve** (en title + subtitle, shorter line 2; both: 160 px cards so arrows stop at the next card and the row ends at 920 like the note), **blocks** (en line 2), **redenomination** (en line 3; both: rows and red note spaced to fill their boxes), **wallet-flow** (both: 156 px cards so the row ends at 920 instead of touching the edge; zh card 2 on three lines). Checked, unchanged: counter, test-layers, OG cards (zh/en). After: 0 issues in both passes.
+
+## Alignment pass (2026-11-17)
+
+- Glossary「?」: Chinese text sat ~2.5 px above the dot centre → `:lang(zh) .term-btn { top: -2px }` (now 0.4–0.9 px); `margin-inline-end: -2px` removes the gap before「, . ）」 while the target stays 24×24 (`term-check` minTarget 24).
+- Figure captions: MDX wrapped the caption text in `<p>`, which pushed「图 5｜」/ "Figure 5 ·" onto a line of its own; the `<p>` is now inline and the "open full size" link is its own block.
+- Measured and fine: header icon + label (≤ 1 px), callout titles, table cells (left/top; numeric columns right/top), cards.
+- Not changed: in the English home h1 the comma after "life" looks spaced; that is Plus Jakarta Sans' own comma side-bearing at weight 800 with tight tracking (verified via CDP: glyph is from the web font), not an extra space.
+
+## Modern Web Guidance (Chrome team) used 2026-11-17
+
+`npx modern-web-guidance` (`--skill-version 2026_05_16-c5e7870`): *improve-text-layout-and-legibility* (confirms our `balance` on short headings only and `pretty` on running text; no change), *precise-text-alignment* (`text-box` is Limited availability, not needed: measured offsets ≤ 1 px after the fixes above), *position-aware-tooltips* / *viewport-aware-dropdowns* (anchor positioning is not Baseline Widely available; the JS placement + bottom sheet stays), *dark-mode* (MANDATORY: JS reading `prefers-color-scheme` must handle `change` → the theme now follows later OS changes until the reader uses the toggle), *language-detection* (per its catalog entry it detects the language of page or user text, not the reader's preference, so not applicable; we use `navigator.languages`).
 
 ## No orphan last lines (2026-11-17)
 

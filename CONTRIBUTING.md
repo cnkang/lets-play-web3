@@ -173,6 +173,8 @@ Every fee is paid in <Term id="eth">ETH</Term>.
 
 示意图由 `scripts/build_diagrams.py` 生成（中英文各一份，配色与网站一致）。新增图时仿照已有函数写一个，加进文件末尾的列表，运行 `npm run diagrams`，然后在章节里用 `<Figure name="…">`。图中所有数字都要来自实验记录。
 
+英文通常比中文长，而且图里的字用的是读者电脑自带的字体（宽窄不一）。改完图请跑 `scripts/qa/diagram-overflow-check.mjs`（见 `scripts/qa/README.md`）：它会检查每段文字有没有超出所在方框或画布、有没有和别的文字或箭头重叠，并用一套偏宽的字体再测一遍，必须 0 问题。放不下时优先拆成两行（`lines()`）、加大方框或缩短文案，不要把字号缩到 14px 以下。
+
 分享图（Open Graph）改了文字或配色后，按 `scripts/qa/README.md` 运行 `render-og.mjs` 重新生成 PNG，再运行 `node scripts/binary-assets.mjs encode` 更新 `.b64` 文件。
 
 ### 为什么分享图是 `.png.b64`？
@@ -186,4 +188,6 @@ Every fee is paid in <Term id="eth">ETH</Term>.
 - [ ] `npm run check:facts` 通过（地址 / 哈希都有出处，没有密钥）
 - [ ] `npm run build` 通过
 - [ ] 改了样式或组件时：按 `scripts/qa/README.md` 跑 axe 和键盘检查（目标 WCAG 2.2 AA，0 违规），以及折行检查 `orphan-check.mjs`（1280 / 1024 / 768 应为 0）
+- [ ] 改了示意图时：`diagram-overflow-check.mjs` 为 0 问题（中英文、默认字体和宽字体两轮）
+- [ ] 改了语言切换 / 首页跳转时：`lang-check.mjs` 全部通过
 - [ ] 没有提交 `.env`、私钥、助记词、API 密钥

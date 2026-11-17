@@ -16,6 +16,8 @@ node keyboard-check.mjs                # skip link, mobile-menu focus trap + Esc
 node term-check.mjs                    # glossary「?」popovers: keyboard, Esc, outside click, 320px sheet, no-JS, axe with a popover open
 node orphan-check.mjs                  # orphan last lines (≤3 CJK chars / one short word) on every page at 1280/1024/768/390/320
 node orphan-check.mjs --no-pretty      # same, simulating browsers without text-wrap: pretty (Safari/Firefox)
+node diagram-overflow-check.mjs        # every diagram <text> inside its box / the viewBox, no text-text or text-arrow overlap; default + wide-font stress pass (exit 1 on issues)
+node lang-check.mjs                    # root redirect by saved choice / navigator.languages, no-JS fallback, hint bar on language pages, axe on the hint (exit 1 on failure)
 node render-og.mjs /path/to/lets-play-web3   # re-render public/og/{zh,en}.png from the SVG sources
 ```
 
