@@ -7,7 +7,7 @@ order: 190
 status: published
 ---
 
-<p class="lead">This chapter is reserved for later. The P1 DeFi experiments <strong>have not started yet</strong>, and nothing below is an on-chain result.</p>
+<p class="lead">This chapter is reserved for later. The P1 <Term id="defi">DeFi</Term> experiments <strong>have not started yet</strong>, and nothing below is an on-chain result.</p>
 
 <Callout type="warn" title="Status: not started">
 
@@ -17,12 +17,12 @@ This chapter has no deployments, no transactions and no addresses. When P1 is ac
 
 ## What P0 gave you
 
-You have already deployed contracts, read state, made transfers and approvals, upgraded a proxy, run tests and verified source. For the next phase, aim for **one minimal, observable trading loop**:
+You have already deployed contracts, read state, made transfers and <Term id="approve">approvals</Term>, upgraded a <Term id="proxy">proxy</Term>, run tests and verified source. For the next phase, aim for **one minimal, observable trading loop**:
 
-1. understand how a DEX / AMM works;
-2. prepare test tokens;
+1. understand how a <Term id="dex-amm">DEX / AMM</Term> works;
+2. prepare <Term id="test-token">test tokens</Term>;
 3. approve a **limited** amount (never infinite);
-4. simulate a swap first;
+4. <Term id="simulate">simulate</Term> a swap first;
 5. observe inputs, outputs and the change in reserves;
 6. **revoke the allowance**;
 7. review the fees and slippage.
@@ -44,12 +44,12 @@ You have already deployed contracts, read state, made transfers and approvals, u
 
 ## Principles to keep
 
-- **Low cost**: testnet only, budget still $0.
-- **Verifiable**: number every new experiment and record its goal, steps, transaction hashes, blocks, outputs and risks.
+- **Low cost**: <Term id="testnet">testnet</Term> only, budget still $0.
+- **Verifiable**: number every new experiment and record its goal, steps, <Term id="tx-hash">transaction hashes</Term>, blocks, outputs and risks.
 - **Few approvals**: approve limited amounts and `approve(spender, 0)` right after use.
 - **Simulate locally first**: a passing simulation is not an on-chain result; write the two up separately.
 - Keep phase 1 as the "2026-11-12 historical snapshot" and **never overwrite old evidence with new results**; keep theory, project evidence, assumptions and open questions apart.
-- Never present testnet amounts, passing tests or source verification as earnings or an audit guarantee.
+- Never present testnet amounts, passing tests or source verification as earnings or an <Term id="audit">audit</Term> guarantee.
 
 ## Where to read more
 
