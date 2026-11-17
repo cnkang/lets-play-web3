@@ -692,6 +692,28 @@ main {
 .prose pre:focus-visible {
   outline-offset: 0;
 }
+.code-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+.code-tools + pre {
+  margin-top: 0.4rem;
+}
+.code-copy {
+  min-height: 44px;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--brand);
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.code-copy:hover {
+  text-decoration: underline;
+}
 
 /* Tables: scroll inside a labelled region on small screens */
 .table-wrap {

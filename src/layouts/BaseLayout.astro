@@ -438,7 +438,28 @@ const a11yHref = href(`${lang}/accessibility/`)
       window.addEventListener('scroll', reflow, { passive: true })
       window.addEventListener('resize', () => { if (openPop) place(openPop) })
 
-      // ---- Copy buttons for addresses / hashes (status announced politely)
+      // ---- Copy code as plain text. Controls sit outside <pre> so they cannot
+      // overlap long lines or become part of the copied code. No JS: select as usual.
+      const copyZh = document.documentElement.lang.startsWith('zh')
+      document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre, i) => {
+        const code = pre.querySelector('code')
+        if (!code) return
+        const bar = document.createElement('div')
+        bar.className = 'code-tools'
+        bar.dataset.pagefindIgnore = ''
+        const button = document.createElement('button')
+        button.type = 'button'
+        button.className = 'copy-btn code-copy'
+        button.textContent = copyZh ? '复制代码' : 'Copy code'
+        button.dataset.copy = code.textContent ?? ''
+        button.dataset.done = copyZh ? '已复制' : 'Copied'
+        button.setAttribute('aria-label', copyZh ? `复制代码：第 ${i + 1} 段` : `Copy code block ${i + 1}`)
+        bar.appendChild(button)
+        pre.before(bar)
+      })
+
+      // ---- Shared clipboard handler (status announced politely, without
+      // reading a whole code block aloud). Report failure honestly.
       const live = document.createElement('div')
       live.className = 'visually-hidden'
       live.setAttribute('aria-live', 'polite')
@@ -447,13 +468,30 @@ const a11yHref = href(`${lang}/accessibility/`)
         const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.copy-btn')
         if (!b) return
         const v = b.dataset.copy ?? ''
-        try { await navigator.clipboard.writeText(v) } catch {
-          const ta = document.createElement('textarea'); ta.value = v; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove()
+        const originalLabel = b.getAttribute('aria-label')
+        const restoreLabel = () => { if (originalLabel !== null) b.setAttribute('aria-label', originalLabel) }
+        let copied = false
+        try { await navigator.clipboard.writeText(v); copied = true } catch {
+          const ta = document.createElement('textarea')
+          ta.value = v
+          ta.setAttribute('aria-label', copyZh ? '待复制内容' : 'Text to copy')
+          ta.style.cssText = 'position:fixed;left:-9999px;top:0'
+          document.body.appendChild(ta)
+          try { ta.select(); copied = document.execCommand('copy') } catch {} finally { ta.remove(); b.focus({ preventScroll: true }) }
+        }
+        if (!copied) {
+          const label = b.textContent
+          b.textContent = copyZh ? '请手动复制' : 'Copy manually'
+          b.setAttribute('aria-label', `${b.textContent}: ${originalLabel ?? ''}`)
+          live.textContent = copyZh ? '复制失败，请手动选择并复制。' : 'Copy failed. Please select and copy the text manually.'
+          setTimeout(() => { b.textContent = label; restoreLabel() }, 2500)
+          return
         }
         const old = b.textContent
         b.textContent = b.dataset.done ?? 'Copied'
-        live.textContent = `${b.dataset.done}: ${v}`
-        setTimeout(() => { b.textContent = old }, 1500)
+        b.setAttribute('aria-label', `${b.textContent}: ${originalLabel ?? ''}`)
+        live.textContent = b.classList.contains('code-copy') ? (copyZh ? '代码已复制。粘贴前请核对占位符与网络。' : 'Code copied. Check placeholders and the network before pasting.') : `${b.dataset.done}: ${v}`
+        setTimeout(() => { b.textContent = old; restoreLabel() }, 1500)
       })
     </script>
   </body>

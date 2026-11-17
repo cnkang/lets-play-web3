@@ -22,4 +22,8 @@ node lang-check.mjs                    # root redirect by saved choice / navigat
 node render-og.mjs /path/to/lets-play-web3   # re-render public/og/{zh,en}.png from the SVG sources
 ```
 
-They expect Google Chrome at `/usr/bin/google-chrome`.
+Most scripts expect Google Chrome at `/usr/bin/google-chrome`; `lang-check.mjs`, `keyboard-check.mjs`, `term-check.mjs` and `toc-indent-check.mjs` also accept `CHROME=/path/to/chrome`. On macOS use `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome` (or adapt the executable path in a scratch copy). Keep scratch dependencies and screenshots outside this repository.
+
+The dependency-free `npm run check:build` runs against `dist/` without a browser. Use the same `SITE_URL` and `BASE` as the build; it checks local links/fragments, assets, canonical/hreflang URLs, JSON-LD, sitemap, robots and llms links. It does not replace browser interaction or accessibility checks.
+
+Code blocks have progressive copy buttons in both languages. After editing them, verify a multiline shell block and Solidity block copy exactly as plain text, keyboard activation, manual-copy fallback when the clipboard is unavailable, and no-JavaScript text selection. A copied command never runs automatically.
