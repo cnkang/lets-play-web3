@@ -12,7 +12,8 @@ python3 -m http.server 4399 --directory /path/to/lets-play-web3/dist
 node axe-check.mjs                     # axe-core: WCAG 2.0/2.1/2.2 A+AA + best-practice, light/dark, 1280/375
 W=320 node overflow-check.mjs /zh/ /en/chapters/16-appendix-addresses-txs/   # body horizontal overflow
 W=1024 node focus-not-obscured.mjs /zh/chapters/16-appendix-addresses-txs/  # WCAG 2.4.11
-node keyboard-check.mjs                # skip link, mobile-menu focus trap + Esc, copy-button sizes (fine/coarse)
+node keyboard-check.mjs                # ← → paging + every no-fire case, ? dialog, / search, off switch, skip link, menu trap + Esc, popover Esc, quiz, every Tab stop visible & not under the header (7 pages × light/dark × 1280/390), target sizes; exit 1 on failure
+node toc-indent-check.mjs              # numbered labels (book contents in sidebar / mobile menu / home, prev-next pager): wrapped titles hang under their first line, number column aligned, MBox-Burn not split; zh+en × 1280/1024/390/320 × light/dark; SHOTS=dir PREFIX=after for screenshots; exit 1 on failure
 node term-check.mjs                    # glossary「?」popovers: keyboard, Esc, outside click, 320px sheet, no-JS, axe with a popover open
 node orphan-check.mjs                  # orphan last lines (≤3 CJK chars / one short word) on every page at 1280/1024/768/390/320
 node orphan-check.mjs --no-pretty      # same, simulating browsers without text-wrap: pretty (Safari/Firefox)

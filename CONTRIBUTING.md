@@ -190,4 +190,6 @@ Every fee is paid in <Term id="eth">ETH</Term>.
 - [ ] 改了样式或组件时：按 `scripts/qa/README.md` 跑 axe 和键盘检查（目标 WCAG 2.2 AA，0 违规），以及折行检查 `orphan-check.mjs`（1280 / 1024 / 768 应为 0）
 - [ ] 改了示意图时：`diagram-overflow-check.mjs` 为 0 问题（中英文、默认字体和宽字体两轮）
 - [ ] 改了语言切换 / 首页跳转时：`lang-check.mjs` 全部通过
+- [ ] 改了目录、翻页卡片或章节 `navTitle` 时：`toc-indent-check.mjs` 全部通过（`navTitle` 写成「11　标题」/「11 · Title」/「附录 A　标题」/「Appendix A · Title」，编号会自动拆成编号列）
+- [ ] 改了页眉、翻页、弹窗或快捷键时：`keyboard-check.mjs` 全部通过（← → 翻章在输入、选字、小窗打开、横向滚动区域等情况下不能触发）
 - [ ] 没有提交 `.env`、私钥、助记词、API 密钥
