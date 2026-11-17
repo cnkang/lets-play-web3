@@ -316,6 +316,21 @@ const a11yHref = href(`${lang}/accessibility/`)
         })
       })()
 
+      // ---- Keep the reader in the same section when they switch language.
+      // Only the in-page language controls on language pages carry a hash;
+      // the root path's preference logic is deliberately left unchanged.
+      // An anchor that does not exist in the other edition simply lands at
+      // the top of the target chapter, which is a safe fallback.
+      ;(() => {
+        const links = document.querySelectorAll<HTMLAnchorElement>('.lang-switch, .lang-hint-go')
+        links.forEach((a) => { a.dataset.baseHref = a.getAttribute('href') ?? '' })
+        document.addEventListener('click', (e) => {
+          const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('.lang-switch, .lang-hint-go')
+          if (!a?.dataset.baseHref || !location.hash || location.hash === '#') return
+          a.setAttribute('href', a.dataset.baseHref + location.hash)
+        }, true)
+      })()
+
       // ---- Theme toggle (persisted, respects prefers-color-scheme by default)
       const root = document.documentElement
       const toggle = document.querySelector<HTMLButtonElement>('.theme-toggle')
@@ -458,18 +473,24 @@ const a11yHref = href(`${lang}/accessibility/`)
         pre.before(bar)
       })
 
-      // ---- Shared clipboard handler (status announced politely, without
-      // reading a whole code block aloud). Report failure honestly.
+      // ---- Shared clipboard handler. The visible label never changes: success
+      // adds a small mark and the live region announces a short status, never
+      // the copied text. A per-button sequence number makes rapid clicks and a
+      // retry after failure safe: stale timeouts cannot reset a newer result.
+      // Without JavaScript the code is still selectable by hand.
       const live = document.createElement('div')
       live.className = 'visually-hidden'
       live.setAttribute('aria-live', 'polite')
       document.body.appendChild(live)
+      const seq = new WeakMap<HTMLButtonElement, number>()
       document.addEventListener('click', async (e) => {
         const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.copy-btn')
         if (!b) return
+        const mine = (seq.get(b) ?? 0) + 1
+        seq.set(b, mine)
+        b.classList.remove('is-copied', 'is-failed')
+        b.removeAttribute('title')
         const v = b.dataset.copy ?? ''
-        const originalLabel = b.getAttribute('aria-label')
-        const restoreLabel = () => { if (originalLabel !== null) b.setAttribute('aria-label', originalLabel) }
         let copied = false
         try { await navigator.clipboard.writeText(v); copied = true } catch {
           const ta = document.createElement('textarea')
@@ -479,19 +500,19 @@ const a11yHref = href(`${lang}/accessibility/`)
           document.body.appendChild(ta)
           try { ta.select(); copied = document.execCommand('copy') } catch {} finally { ta.remove(); b.focus({ preventScroll: true }) }
         }
+        if (seq.get(b) !== mine) return // a newer click or retry superseded this one
         if (!copied) {
-          const label = b.textContent
-          b.textContent = copyZh ? '请手动复制' : 'Copy manually'
-          b.setAttribute('aria-label', `${b.textContent}: ${originalLabel ?? ''}`)
+          b.classList.add('is-failed')
+          b.setAttribute('title', copyZh ? '复制失败，请手动选择文本' : 'Copy failed. Select the text manually.')
           live.textContent = copyZh ? '复制失败，请手动选择并复制。' : 'Copy failed. Please select and copy the text manually.'
-          setTimeout(() => { b.textContent = label; restoreLabel() }, 2500)
+          setTimeout(() => { if (seq.get(b) === mine) b.classList.remove('is-failed') }, 2500)
           return
         }
-        const old = b.textContent
-        b.textContent = b.dataset.done ?? 'Copied'
-        b.setAttribute('aria-label', `${b.textContent}: ${originalLabel ?? ''}`)
-        live.textContent = b.classList.contains('code-copy') ? (copyZh ? '代码已复制。粘贴前请核对占位符与网络。' : 'Code copied. Check placeholders and the network before pasting.') : `${b.dataset.done}: ${v}`
-        setTimeout(() => { b.textContent = old; restoreLabel() }, 1500)
+        b.classList.add('is-copied')
+        live.textContent = b.classList.contains('code-copy')
+          ? (copyZh ? '代码已复制。粘贴前请核对占位符与网络。' : 'Code copied. Check placeholders and the network before pasting.')
+          : (b.dataset.done ?? (copyZh ? '已复制' : 'Copied'))
+        setTimeout(() => { if (seq.get(b) === mine) b.classList.remove('is-copied') }, 1500)
       })
     </script>
   </body>
