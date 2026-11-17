@@ -84,7 +84,7 @@ A <Term id="redenomination">redenomination</Term> changes the bookkeeping and th
 
 ## Dust and findings
 
-- **Dust**: raw balances that are not multiples of 10,000 are truncated for display, so they look like 0 yet cannot be moved (recorded in P0 as Low findings F-V3-002 and F-V3-003). **At the snapshot every known holder's raw balance was divisible by 10,000**, so this does not affect current holders.
+- **Dust**: raw balances that are not multiples of 10,000 are truncated for display, so they look like 0 yet cannot be moved (recorded in Phase-0 as Low findings F-V3-002 and F-V3-003). **At the snapshot every known holder's raw balance was divisible by 10,000**, so this does not affect current holders.
 - **Medium finding F-V3-001**: `approve(spender, type(uint256).max)` <Term id="revert">reverts</Term> with `"amount overflow"` because `value × 10000` overflows (exceeds the largest value that number type can hold); V3 has no "infinite <Term id="allowance">allowance</Term>" sentinel (a special number meaning "no limit"). Many protocols rely on max approvals, so **do not plug UBOX into a protocol that depends on max approve**. It is a compatibility and numeric-boundary issue, not damaged assets; at the snapshot all UBOX allowances on-chain were 0.
 
 <Callout type="note" title="Everyday analogy: converting points">

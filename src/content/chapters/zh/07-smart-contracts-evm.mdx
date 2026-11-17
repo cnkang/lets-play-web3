@@ -17,7 +17,7 @@ status: published
 
 ## 读与写
 
-- **读**（例如查询 Counter 当前的数字）：通常通过 <Term id="rpc">RPC</Term> 做一次 `eth_call`，在节点本地执行，<strong>不签名、不花 <Term id="gas">gas</Term>、不改变链上状态</strong>。
+- **读**（例如查询 Counter 当前的数字）：通常通过 <Term id="rpc">RPC</Term> 做一次 `eth_call`，在节点本地执行，<strong>不签名、不支付 <Term id="gas">gas</Term> 手续费、不改变链上状态</strong>。
 - **写**（例如调用 `increment`）：要<Term id="signature">签名</Term>并发送<Term id="transaction">交易</Term>，被打包成功后状态才改变，并消耗 gas。
 - **条件失败**：代码里的 `require` 等检查不通过时，交易**回滚**（revert）：这次执行做的所有状态改动都不保留，但 gas 已经花掉了。
 

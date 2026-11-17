@@ -24,6 +24,8 @@ Using the 400 still <Term id="allowance">approved</Term> on MBox-Burn, B moved t
 
 Both succeeded. Result: A held 998,800, B held 100, 100 of the allowance remained, and total supply stayed 998,900. A's <Term id="nonce">nonce</Term> did not change, because B <Term id="signature">signed</Term> both.
 
+Those were the values immediately after these two calls. D-01 in Chapter 11 later revoked the remaining 100; the allowance was 0 at the snapshot.
+
 **The key point**: these are two independent transactions. Once the first is mined, the 100 it moved is **not returned automatically** even if the second one fails (allowance too low, not enough <Term id="gas">gas</Term>, a <Term id="node">node</Term> problem…).
 
 <Callout type="note" title="Self-transfer: an event, but zero net change">

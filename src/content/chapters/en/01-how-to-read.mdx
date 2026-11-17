@@ -1,13 +1,13 @@
 ---
 title: "How to read this book"
-description: "The two sources behind this book, the reading path, the safety notice, and the questions you should be able to answer. Every on-chain experiment ran only on the Ethereum Sepolia testnet with a $0 budget."
+description: "Start this free bilingual guide with a read-only transaction check. Tell general principles, on-chain results, local tests and future plans apart. Phase-0 used Sepolia only, with a $0 budget."
 navTitle: "1 · How to read this book"
 part: everyday
 order: 10
 status: published
 ---
 
-<p class="lead">First understand why you might need it, then how it works, and finally check it against real testnet experiments. This book keeps all three on one line.</p>
+<p class="lead">Why would a group of shops share a blockchain instead of a database? Start with questions like this, learn how the pieces work, then inspect real transaction records. If you can use a computer and browse the web, you are ready.</p>
 
 <Callout type="note" title="Never touched a blockchain before?">
 
@@ -17,12 +17,16 @@ No problem. When you meet an unfamiliar word, press the small <strong>?</strong>
 
 <SafetyNotice lang="en" />
 
-## Two sources of information
+## Start by looking, or read in order
 
-The content comes from two places. Please keep them apart as you read:
+You do not need to connect a wallet, claim test coins or create an account to read. To see a real action first, try the [read-only exercise in Chapter 8](../08-lab-counter/#inspect-a-transaction): open an existing transaction and check its status, token transfers and event. Then return to the reading path below. Learning to inspect a record is a useful first hands-on step.
 
-1. **General knowledge and everyday analogies**: <Term id="blockchain">blockchain</Term> basics added to explain ideas, such as "a hash is like a content fingerprint" or "a contract is like a vending machine". Analogies help understanding, but an analogy is not a definition.
-2. **Real Sepolia experiments**: from the afternoon of 11 November to the afternoon of 12 November 2026 (Singapore time), <Term id="smart-contract">smart contracts</Term> were deployed (that is, small programs were published on the chain), <Term id="transaction">transactions</Term> sent and upgrades performed on the <Term id="ethereum">Ethereum</Term> Sepolia testnet (chainId 11155111), then reviewed in "Phase 0" (P0, the first review round). Every concrete contract address, <Term id="tx-hash">transaction hash</Term>, <Term id="block-number">block number</Term>, balance and test result in this book comes from that lab notebook and its review reports, and each one links to Sepolia <Term id="etherscan">Etherscan</Term> (a public website for looking up on-chain records) so you can check it yourself.
+## Four kinds of content
+
+1. **Principles and everyday analogies** explain <Term id="blockchain">blockchains</Term> and <Term id="smart-contract">smart contracts</Term>, using shared records and vending machines as examples. An analogy helps explain an idea; it is neither a definition nor an experimental result.
+2. **On-chain results** come from deployments, <Term id="transaction">transactions</Term> and upgrades on <Term id="ethereum">Ethereum</Term>’s Sepolia testnet on 11–12 November 2026 (Singapore time). Look up addresses, <Term id="tx-hash">transaction hashes</Term> (the IDs used to find transactions) and <Term id="block-number">block numbers</Term> on Sepolia <Term id="etherscan">Etherscan</Term>. Read balances at the recorded block; today’s values do not replace the historical snapshot.
+3. **Local tests and simulations** supply test counts, assertions and the UBOX V4 simulation. These are local records, not explorer transactions. V4 was never deployed on-chain. Chapter 15 explains the review’s results and limits.
+4. **Future plans** describe work still to do. Phase-0 basics, experiments and review are complete. Phase-1 means the next DeFi work, which has not started. A plan is not a completed experiment.
 
 <Snapshot lang="en" />
 
@@ -37,13 +41,13 @@ The content comes from two places. Please keep them apart as you read:
 | Tokens and allowances | ERC-20, approval is not payment, burning, atomicity | 9–12 |
 | Upgradeable contracts | Proxies, upgrades and redenomination: benefits and costs | 13–14 |
 | Evidence and wrap-up | What tests, source matching and reviews each prove | 15 and appendices |
-| What comes next | The reserved P1 DeFi chapter | Last chapter |
+| What comes next | The reserved Phase-1 DeFi chapter | Last chapter |
 
 </T>
 
 Each chapter can be read on its own, but reading in order works best because later experiments use earlier ideas. The experiments are not tucked away in a separate "lab log": each one lives in the chapter it illustrates. The Counter contract follows the chapter on smart contracts, and the allowance revocation follows "Approval is not payment".
 
-## Phase-1 rules
+## Rules for the Phase-0 labs
 
 The whole lab followed a few rules. The rules are themselves habits worth learning:
 

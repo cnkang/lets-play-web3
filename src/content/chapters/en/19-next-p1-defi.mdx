@@ -1,23 +1,23 @@
 ---
-title: "Next stop: P1 DeFi (not started yet)"
-description: "A reserved chapter. Phase 0 is wrapped up; Phase 1 (DeFi) has not started. Planned topics - DEX / AMM, swaps and price impact, slippage, liquidity, impermanent loss, and always revoking allowances after each experiment."
-navTitle: "Next stop: P1 DeFi (not started yet)"
+title: "Next stop: Phase-1 DeFi (not started yet)"
+description: "Phase-0 basics, experiments and review are complete; Phase-1 DeFi has not started. Plans cover swaps, price impact, slippage, liquidity, impermanent loss and revoking allowances. No DeFi results yet."
+navTitle: "Next stop: Phase-1 DeFi (not started yet)"
 part: p1-defi
 order: 190
 status: published
 ---
 
-<p class="lead">This chapter is reserved for later. The P1 <Term id="defi">DeFi</Term> experiments <strong>have not started yet</strong>, and nothing below is an on-chain result.</p>
+<p class="lead">This chapter is reserved for later. The Phase-1 <Term id="defi">DeFi</Term> experiments <strong>have not started yet</strong>, and nothing below is an on-chain result.</p>
 
 <Callout type="warn" title="Status: not started">
 
-This chapter has no deployments, no transactions and no addresses. When P1 is actually done, its experiments will be added to this book as new chapters, with verifiable transactions and block numbers like the ones before.
+This chapter has no deployments, no transactions and no addresses. When Phase-1 is actually done, its experiments will be added to this book as new chapters, with verifiable transactions and block numbers like the ones before.
 
 </Callout>
 
-## What P0 gave you
+## What Phase-0 gave you
 
-You have already deployed contracts, read state, made transfers and <Term id="approve">approvals</Term>, upgraded a <Term id="proxy">proxy</Term>, run tests and verified source. For the next phase, aim for **one minimal, observable trading loop**:
+The records so far show deployments, state reads, transfers and <Term id="approve">approvals</Term>, <Term id="proxy">proxy</Term> upgrades, tests and source checks. You can inspect them even if you have not sent a transaction yourself. The next phase plans **one minimal, observable swap workflow**:
 
 1. understand how a <Term id="dex-amm">DEX / AMM</Term> works;
 2. prepare <Term id="test-token">test tokens</Term>;
@@ -29,7 +29,7 @@ You have already deployed contracts, read state, made transfers and <Term id="ap
 
 ## Planned topics
 
-<T label="Planned P1 topics">
+<T label="Planned Phase-1 topics">
 
 | Topic | Everyday analogy | Suggested order |
 | --- | --- | --- |
@@ -48,7 +48,7 @@ You have already deployed contracts, read state, made transfers and <Term id="ap
 - **Verifiable**: number every new experiment and record its goal, steps, <Term id="tx-hash">transaction hashes</Term>, blocks, outputs and risks.
 - **Few approvals**: approve limited amounts and `approve(spender, 0)` right after use.
 - **Simulate locally first**: a passing simulation is not an on-chain result; write the two up separately.
-- Keep phase 1 as the "2026-11-12 historical snapshot" and **never overwrite old evidence with new results**; keep theory, project evidence, assumptions and open questions apart.
+- Preserve Phase-0’s "2026-11-12 historical snapshot" and date later evidence separately with its block number. **Never overwrite old evidence**; distinguish principles, on-chain results, local tests and future plans.
 - Never present testnet amounts, passing tests or source verification as earnings or an <Term id="audit">audit</Term> guarantee.
 
 ## Where to read more

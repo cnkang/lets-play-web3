@@ -63,7 +63,7 @@ status: published
 - **nonce 3**：一笔只给 **1 wei 小费**的 increment。当时链不拥堵，它仍然被打包了：<Tx h="0xd61e57686959b7c4c9d774a6aa35b0fb9dac72e8317055146da4676a9e4e4b31" short />（区块 12111091）。
 - **nonce 4**：替换脚本 `replace-stuck.mjs` 的设计是：先在 nonce 4 发一笔 1 wei 小费、故意很难被打包的交易并观察；如果它还在待处理队列（<Term id="mempool">内存池</Term>）里，就用<strong>同一个 nonce、更高的小费（2 wei）</strong>发一笔替换交易。链上 nonce 4 的那笔交易，形态与这个脚本完全一致（gas limit 140,000，小费 2 wei）：<Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short />（区块 12111181）。
 
-**链上只能看到最终被打包的那一笔。** 被替换掉的交易从未进入任何区块，不会留下成功收据。所以本书**不把任何未上链交易的哈希当作事实**——你在钱包或脚本里看到一个<Term id="tx-hash">哈希</Term>，只说明「发出去了」，不说明「上链了」。
+**链上只能看到最终被打包的那一笔。** 本书没有把待处理交易当成已上链结果。钱包或脚本可以在广播前就算出<Term id="tx-hash">哈希</Term>；有编号本身既不能证明广播成功，也不能证明已经进区块，要继续查收据和区块号。
 
 <Callout type="note" title="为什么同一个 nonce 能替换？">
 

@@ -1,195 +1,107 @@
-# 怎样给「一起玩 Web3」加章节和实验
+# Contributing to Let’s Play Web3
 
-源码仓库：https://github.com/cnkang/lets-play-web3 · 整理：Kang（署名可用环境变量 `AUTHOR_NAME` 覆盖）
+**English** · [简体中文](CONTRIBUTING.zh-CN.md)
 
-这本书设计成「往里加内容不用改代码」：**加一章 = 加两个 MDX 文件**（中文一个、英文一个，文件名相同）。目录、上一章 / 下一章、站点地图（sitemap）、hreflang、`llms.txt`、站内搜索、JSON-LD 都会在构建时自动更新。
+Write for someone who can use a computer and browse the web but has never used a blockchain. Explain what a concept helps them understand, use everyday examples, and let them inspect the evidence. Readers must be able to learn without connecting a wallet. Source: [cnkang/lets-play-web3](https://github.com/cnkang/lets-play-web3); compiled by Kang (`AUTHOR_NAME` can override attribution).
 
-> 先读一遍安全底线：只用 Sepolia 测试网；不要把私钥、助记词、API 密钥、`.env` 写进仓库；书里每个 `0x` 地址 / 哈希都必须能在实验记录里找到。
+Use Sepolia only. Never commit private keys, seed phrases, API keys, `.env` files or private lab logs. Published addresses and hashes need a source in the lab records.
 
-## 一、加一章（最常用）
+## Add a bilingual chapter
 
-**方法 A：用脚本生成（推荐）**
+Use Node 24 (`nvm use`), then `npm ci`. Scaffold a draft pair:
 
 ```bash
 npm run new:chapter -- 20-p1-dex-amm --part p1-defi --order 200
 ```
 
-会生成两个草稿文件：
-
-```
-src/content/chapters/zh/20-p1-dex-amm.mdx
-src/content/chapters/en/20-p1-dex-amm.mdx
-```
-
-**方法 B：手动复制模板**：把 `templates/chapter.zh.mdx` 和 `templates/chapter.en.mdx` 复制到上面两个位置，删掉开头的 `#` 注释行。
-
-然后：
-
-1. 填写两份文件的 frontmatter（见下表）和正文。
-2. `npm run dev`，打开 http://localhost:4321/zh/ 预览（草稿只在开发模式可见）。
-3. 写好后把**两份文件**的 `status` 都改成 `published`。
-4. 运行 `npm run check:content`、`npm run check:facts`、`npm run build`，都通过再提交。
-
-**slug（文件名）规则**：小写字母、数字和连字符，例如 `20-p1-dex-amm`。中英文必须完全相同，因为右上角的语言切换就是靠同名文件对应的。slug 一旦发布就不要再改（会改变网址）。
-
-## 二、frontmatter 字段
+This creates `src/content/chapters/zh/20-p1-dex-amm.mdx` and the matching file under `en/`. Alternatively copy `templates/chapter.{zh,en}.mdx` to those paths and remove the introductory comment lines. Slugs use lowercase letters, numbers and hyphens. Keep the same filename in both languages; do not change a published slug, because it changes the URL.
 
 ```yaml
 ---
-title: "授权不是付款"              # 页面标题（<h1>、浏览器标题、分享卡片）
-description: "一两句话的摘要"       # 搜索结果、社交卡片、llms.txt 用
-navTitle: "10　授权不是付款"        # 可选：目录和翻页里显示的短标题（默认用 title）
-part: tokens                        # 属于哪个「部分」，取 src/content/parts.json 里的 id
-order: 100                          # 排序数字；建议用 10 的倍数，以后好在中间插章
-status: published                   # published / upcoming / draft
-updated: "2026-12-01"               # 可选：内容更新日期，会显示在页面并写进 sitemap 和 JSON-LD
+title: "Approval is not payment"
+description: "What an allowance permits, and what it does not do."
+navTitle: "10 · Approval is not payment"
+part: tokens
+order: 100
+status: published
+updated: "2026-12-01"
 ---
 ```
 
-`part`、`order`、`status` **中英两份必须一致**，否则构建会报错并告诉你哪里不一致。
+| Field | Rule |
+| --- | --- |
+| `title`, `description` | Required, meaningful text in each language; used in page headings, search and metadata |
+| `navTitle` | Optional short navigation label; otherwise `title` is used |
+| `part` | Required ID from `src/content/parts.json`; identical in both files |
+| `order` | Required number; identical in both files; multiples of 10 leave room for additions |
+| `status` | Keep identical: `published`, `upcoming` or `draft` (omitted means `published`) |
+| `updated` | Optional content date used on-page, in sitemap and JSON-LD; use the actual date of the change |
 
-### status 三种状态
+`draft` appears only in development with a noindex banner. `upcoming` needs both files but may have an empty body: it appears without a link in the contents and in the “Coming soon” list in `llms.txt`; it has no page, search entry or sitemap URL. `published` is built and indexed. Chapter 19 is a published explanation of future plans; that does not mean Phase-1 experiments are complete.
 
-| 状态 | 目录里 | 有没有页面 | sitemap / 搜索 / llms.txt |
-| --- | --- | --- | --- |
-| `published` | 正常链接 | 有 | 收录 |
-| `upcoming` | 显示「即将推出 / Coming soon」，不可点击 | 没有 | 不收录（llms.txt 的 Coming soon 列表里会写标题） |
-| `draft` | 只在 `npm run dev` 里出现（带「草稿」标记） | 只在开发模式 | 正式构建完全排除 |
+Run `npm run dev` and preview **both** `http://localhost:4321/en/` and `http://localhost:4321/zh/`. Change both statuses to `published` only when ready. Search requires `npm run build` followed by `npm run preview`.
 
-提示：`upcoming` 也需要中英两份文件，但正文可以先空着，只写好 frontmatter。
+The content check and Astro both enforce pairing and shared fields. `ALLOW_UNPAIRED=1` warns and skips unpaired chapters; do not use it for a release. Contents, pagination, routes, sitemap, hreflang, search, `llms.txt` and JSON-LD follow the content automatically.
 
-## 三、部分（part）与阶段（phase）
+## Parts and phases
 
-- **阶段**写在 `src/content/phases.json`，例如 `p0`（基础与第一批实验）、`p1`（DeFi）。以后开 P2，就加一行：
-  ```json
-  { "id": "p2", "order": 2, "zh": "P2 · 新阶段名", "en": "P2 · New phase" }
-  ```
-- **部分**写在 `src/content/parts.json`，每个部分属于一个阶段：
-  ```json
-  { "id": "p1-dex", "order": 70, "phase": "p1", "zh": "第六部分 · 去中心化交易", "en": "Part VI · Decentralised exchanges" }
-  ```
-- 目录按「阶段 → 部分 → 章节 order」排序；有多个阶段时，目录里会显示阶段小标签。没有任何章节的部分不会显示。
+Phases live in `src/content/phases.json`; parts in `src/content/parts.json`. A phase has `id`, `order`, `zh`, `en`; a part also has `phase`, pointing to a phase ID. Contents sort by phase, part and chapter order; empty parts stay hidden. Add both language labels when adding either. Use **Phase-0** for the completed basics, experiments and review, and **Phase-1** for the DeFi work that has not started.
 
-## 四、中英配对检查
+## Write and illustrate
 
-每一章都必须有中文和英文两份。缺一份时：
+- Start with the reader’s question, explain the idea, then point to relevant evidence. General principles do not all have an on-chain proof.
+- Write natural English and Chinese with the same meaning; do not copy sentence structure mechanically. Explain a new term briefly or mark its first use with `<Term>`.
+- Start headings at `##`; the page supplies the H1. Use descriptive link text.
+- Give every figure useful `alt` text and a caption that explains the takeaway and key numbers.
+- Keep navigation labels like `11 · Title`, `11　标题`, `Appendix A · Title` or `附录 A　标题` so the number column aligns.
 
-- `npm run check:content`（`npm run build` 会先自动跑它）直接失败，并告诉你缺的是哪个文件；
-- Astro 构建里还有第二道同样的检查（`src/data/chapters.ts`）。
+Components are available in MDX without imports:
 
-如果临时只想先发布别的内容，可以 `ALLOW_UNPAIRED=1 npm run build`：缺翻译的章节会被跳过，并打印警告。**正式发布不要用这个开关。**
+| Component | Use |
+| --- | --- |
+| `<Lab title="…" goal="…">` | Lab card; optional `network="Sepolia"`, `status="planned"` (default `done`) |
+| `<Addr a="…" />`, `<Tx h="…" />` | Public Sepolia address/hash, explorer link and copy button; `short` abbreviates the display |
+| `<Callout type="warn" title="…">` | `note`, `warn` or `danger` notice |
+| `<Figure name="approve" n="4" alt="…">` | Localised diagram in `public/diagrams/{zh,en}/`, plus caption |
+| `<T label="…">` | Accessible scrolling table; leave blank lines around the Markdown table |
+| `<SafetyNotice lang="en" />`, `<Snapshot lang="en" />` | Shared safety and historical snapshot text |
+| `<Term id="gas">gas</Term>`, `<Glossary lang="en" />` | Term explanation and full glossary |
 
-## 五、可以直接用的组件（不用 import）
+UI labels follow the page language. Add glossary entries in `src/content/glossary.json` with both `zh` and `en`, each containing `term` and `def`. IDs use lowercase letters, digits and hyphens. An optional `chapter` links to an existing chapter slug. Definitions should be 1–3 plain sentences of general knowledge, without lab-specific hashes or balances.
 
-| 组件 | 用途 | 例子 |
-| --- | --- | --- |
-| `<Lab>` | 实验卡片：标题、目标、网络、完成状态 | `<Lab title="部署 Counter" goal="看懂一次链上状态变化">…步骤…</Lab>`；可加 `network="Sepolia"`、`status="planned"` |
-| `<Addr>` | 地址：等宽显示 + Sepolia Etherscan 链接 + 复制按钮 | `<Addr a="0x…40 位…" />`，加 `short` 缩略显示 |
-| `<Tx>` | 交易哈希：同上 | `<Tx h="0x…64 位…" />` |
-| `<Callout>` | 提示框，`note` / `warn` / `danger` | `<Callout type="warn" title="注意">…</Callout>` |
-| `<Figure>` | 示意图 + 图注 + 替代文字 | `<Figure name="approve" n="4" alt="图里画了什么">图注</Figure>`，图片放在 `public/diagrams/{zh,en}/<name>.svg` |
-| `<T>` | 宽表格：手机上可在表格内横向滑动，键盘可聚焦 | `<T label="表格用途">`（空一行）Markdown 表格（空一行）`</T>` |
-| `<SafetyNotice>` / `<Snapshot>` | 安全须知 / 链上快照说明 | `<SafetyNotice lang="zh" />` |
-| `<Term>` | 术语：文字后面带一个「?」按钮，点开是一段大白话解释（见下文） | `<Term id="gas">手续费（gas）</Term>` |
-| `<Glossary>` | 自动生成的完整术语表（附录 C 在用） | `<Glossary lang="zh" />` |
+Mark an ID once per MDX file, preferably its first use. Do not put `<Term>` in headings, links or code. Keep the two editions’ coverage aligned without filling every sentence with `?` buttons. Check Tab → Enter/Space → Esc; native popovers also work without JavaScript in supported browsers. Popover text is excluded from search; Appendix C carries the searchable glossary.
 
-组件里的文字会按页面语言自动切换（「实验 / Lab」「复制 / Copy」等）。
+Wrapping is automatic: `src/lib/rehype-no-orphans.mjs` keeps short paragraph endings together and short table cells on one line. Do not insert manual spaces or line breaks. Astro templates can use `<Nw text={...} />`; long addresses can still wrap. See the orphan check in [QA instructions](scripts/qa/README.md).
 
-**写作小规范**
+Diagrams come from `scripts/build_diagrams.py`. Add a function and register it at the end, then run `npm run diagrams`. Check both languages with `diagram-overflow-check.mjs`, including its wide-font pass: aim for zero overlaps/overflow. Split text, enlarge boxes or shorten labels before reducing type below 14px. If OG artwork changes, render with `scripts/qa/render-og.mjs` and run `node scripts/binary-assets.mjs encode`. Committed `assets/og/*.png.b64` are the PNG sources; decoded `public/og/*.png` are ignored and restored automatically before dev/build/preview. This preserves the original text-only publishing workflow.
 
-- 每章先用生活类比讲直觉，再讲术语，最后用链上证据核对。
-- 图片必须写 `alt`（给读屏软件）；图注里重复关键数字。
-- 标题层级从 `##` 开始（`#` 由页面自动生成），不要跳级。
-- 链接文字要说清去哪里，不要写「点这里」。
-- 写给「会用电脑、会上网，但没碰过区块链」的读者：第一次出现的专有名词要么在句子里顺手解释（例如「测试网，也就是专门用来练习的区块链」），要么加 `<Term>`。
+## Keep evidence and history distinct
 
-### 术语「?」小窗（`<Term>`）
+Preserve **2026-11-12 15:39:55 UTC+8 / Sepolia block 12117419**. Add later evidence with its own date, network, block, source and scope. Do not replace the global snapshot constants or overwrite a later review with early notes.
 
-全书的术语解释只写在**一个文件**里：`src/content/glossary.json`。章节里的 `<Term>`、附录 C 的完整术语表都从这里读，所以改一处，全书同步。
+- **Principles and analogies** explain ideas; they are not experimental results.
+- **On-chain results** identify the network, transaction and target block. A current explorer read may differ from the snapshot. MBox-Burn’s leftover allowance was revoked by D-01.
+- **Local tests and simulations** need their own label. UBOX V4 was never deployed to Sepolia and has no broadcast transaction hash.
+- **Plans** stay explicit: Phase-1 DeFi has not started. Sourcify matched 8/8 addresses, but only 5 were exact; Etherscan was queued at the snapshot. PASS WITH FINDINGS does not mean no vulnerabilities. Use Chapter 15 and the corresponding original evidence.
 
-**1. 加一个新术语**：在 `glossary.json` 里加一项（键就是术语 id，只用小写字母、数字和连字符）：
+Appendix A is generated; edit its generator rather than the two MDX tables. When a separately authorised experiment is complete:
 
-```json
-"slippage": {
-  "chapter": "20-p1-dex-amm",
-  "zh": { "term": "滑点", "def": "下单时看到的价格和最终成交价之间的差。就像排队买菜，轮到你时菜价可能已经变了。" },
-  "en": { "term": "slippage", "def": "The gap between the price you saw and the price you finally got, like a market stall changing its price while you queue." }
-}
+1. Append the transaction to §5.2 of the external `实验记录.md`, retaining the existing nonce / account / purpose / status / fee / transaction-link format.
+2. Add its block to `blocks` (key: first 10 hash characters), its English purpose to `en_purpose` (optional Chinese wording in `zh_purpose`), and new addresses to `contracts` / `accounts` in `scripts/gen_appendix.py`.
+3. Run `python3 scripts/gen_appendix.py /absolute/path/to/实验记录.md` (without an argument it uses `/workspace/web3-sandbox/实验记录.md`), then `SOURCES_DIR=/absolute/path/to/web3-sandbox npm run check:facts` and `npm run build`. Missing blocks or English labels stop generation with a list.
+4. Add subsequent evidence as dated additions; retain the historical snapshot. Check the generator’s output diff before committing.
+
+`check:facts` always scans for suspected secrets. Without external source files it skips address/hash provenance; report that skip. Its default source directory is `/workspace/web3-sandbox`. It verifies literal presence, not the semantics of a claim; see [deployment docs](docs/DEPLOYMENT.md).
+
+## Checks before submitting
+
+```bash
+npm run check:content
+SOURCES_DIR=/absolute/path/to/web3-sandbox npm run check:facts
+SITE_URL=https://letsplayweb3.liukang.com BASE=/ npm run build
+SITE_URL=https://letsplayweb3.liukang.com BASE=/ npm run check:build
+SITE_URL=https://example.github.io BASE=/lets-play-web3/ npm run build
+SITE_URL=https://example.github.io BASE=/lets-play-web3/ npm run check:build
 ```
 
-- `zh` 和 `en` **都必须有**，每种语言都要有 `term`（小窗标题）和 `def`（解释）。
-- `def` 写 1–3 句大白话，能用生活类比就用；只写通用知识，不要放具体地址、哈希或实验数字。
-- `chapter` 可选：填详细讲这个概念的章节 slug，小窗底部会出现「详细讲解：第 X 章」链接（在那一章本身里不显示）。
-
-**2. 在正文里用**：把第一次出现的那个词包起来，显示的文字可以和 `term` 不同（比如带复数或加括号）：
-
-```mdx
-后面的实验都在 <Term id="sepolia">Sepolia</Term> 测试网上做。
-Every fee is paid in <Term id="eth">ETH</Term>.
-```
-
-规则（`npm run check:content` 会自动检查）：
-
-- 用到的 id 必须在 `glossary.json` 里；每个术语都要中英两种语言。
-- **每个文件里同一个 id 只标一次**——只标这一页第一次出现的地方，别处照常写字。
-- 不要放进标题（`##`）、链接文字、代码块或 `` `代码` `` 里；表格单元格里可以用，但优先标在正文段落里。
-- 中英两份章节尽量标同一批术语。
-- 不要一句话里堆三四个「?」：能在句子里用几个字解释清楚的，就直接写在句子里。
-
-**3. 自查**：`npm run dev` 打开页面，点「?」看小窗；键盘按 Tab 移到「?」，Enter / 空格打开，Esc 关闭。
-
-小窗用的是浏览器原生的 popover：不开 JavaScript 也能点开、按 Esc 或点空白处关闭；小窗里的文字不会进站内搜索（`data-pagefind-ignore`），完整解释在附录 C 可以被搜到。技术细节见 `BUILD-NOTES.md`「Glossary popovers」。
-
-### 折行：不要让最后一行只剩一两个字
-
-网站会自动避免「最后一行只剩 1–3 个字（或一个英文单词）」的难看折行，写作时**不用手动加空格或换行**：
-
-- 正文、列表、表格、标题会在构建时自动处理（`src/lib/rehype-no-orphans.mjs`）：把段落最后约 4 个汉字（或最后两个英文单词）包进 `<span class="nw">` 不让它们分开；表格里每格都很短的列（≤ 约 11 个汉字，例如「自动履约的数字凭证」）会保持一行。复制、搜索、读屏软件看到的文字不变。
-- `.astro` 模板里的长句用 `<Nw text={...} />` 组件；短标题、按钮、目录靠 CSS `text-wrap: balance` 自动平衡。
-- 「?」按钮总是和术语最后一两个字黏在一起，不会单独跑到下一行开头。
-- 长链接会在「/」后断行；长哈希 / 地址照常可以在任意位置断开，不会撑出页面。
-- 检查：`scripts/qa/orphan-check.mjs`（见 `scripts/qa/README.md`）。
-
-## 六、追加实验到附录 A
-
-附录 A（`16-appendix-addresses-txs.mdx`，中英两份）是由脚本从实验记录**自动生成**的，不要手改。新做了实验时：
-
-1. 在实验仓库的 `实验记录.md` §5.2 交易表末尾按原格式追加新交易行：
-   `| nonce | A/B | 用途 | success/**reverted** | 手续费 | [交易](https://sepolia.etherscan.io/tx/0x…) |`
-2. 打开 `scripts/gen_appendix.py`：
-   - 在 `blocks` 里加上新交易的区块号（键是哈希前 10 个字符）；
-   - 在 `en_purpose` 里给每个新「用途」加英文说明（`zh_purpose` 可选，用来美化中文写法）；
-   - 新合约 / 新账户地址加到 `contracts` / `accounts`。
-3. 运行：
-   ```bash
-   npm run appendix        # 默认读取 /workspace/web3-sandbox/实验记录.md，也可以传路径
-   npm run check:facts     # 确认每个地址 / 哈希都能在实验记录里找到
-   npm run build
-   ```
-   如果缺区块号或英文说明，脚本会停下并逐条列出缺什么。
-4. 如果快照时间 / 区块变了，同时更新 `src/data/site.ts` 的 `SNAPSHOT_ISO`、`SNAPSHOT_BLOCK`，以及 `src/data/book.ts` 里的 `snapshot` 文案和 `Snapshot.astro`。
-
-## 七、新示意图
-
-示意图由 `scripts/build_diagrams.py` 生成（中英文各一份，配色与网站一致）。新增图时仿照已有函数写一个，加进文件末尾的列表，运行 `npm run diagrams`，然后在章节里用 `<Figure name="…">`。图中所有数字都要来自实验记录。
-
-英文通常比中文长，而且图里的字用的是读者电脑自带的字体（宽窄不一）。改完图请跑 `scripts/qa/diagram-overflow-check.mjs`（见 `scripts/qa/README.md`）：它会检查每段文字有没有超出所在方框或画布、有没有和别的文字或箭头重叠，并用一套偏宽的字体再测一遍，必须 0 问题。放不下时优先拆成两行（`lines()`）、加大方框或缩短文案，不要把字号缩到 14px 以下。
-
-分享图（Open Graph）改了文字或配色后，按 `scripts/qa/README.md` 运行 `render-og.mjs` 重新生成 PNG，再运行 `node scripts/binary-assets.mjs encode` 更新 `.b64` 文件。
-
-### 为什么分享图是 `.png.b64`？
-
-这个仓库是通过只接受文本文件的 API 发布到 GitHub 的，所以两张二进制分享图以 base64 文本保存为 `assets/og/zh.png.b64`、`assets/og/en.png.b64`（这是唯一的「源文件」）。`scripts/binary-assets.mjs`（无依赖）会在 `npm run dev` / `build` / `preview` 以及 CI 构建前自动把它们解码成 `public/og/*.png`；PNG 缺失或内容不一致时才重写，解码后的字节与原图完全相同（已用 sha256 核对）。`public/og/*.png` 已加入 `.gitignore`，不要直接提交 PNG。
-
-## 八、提交前检查清单
-
-- [ ] 中英两份文件都在，`part` / `order` / `status` 一致（`npm run check:content`）
-- [ ] 新术语在 `src/content/glossary.json` 里有中英两种解释；每章同一术语只标一次 `<Term>`（`npm run check:content`）
-- [ ] `npm run check:facts` 通过（地址 / 哈希都有出处，没有密钥）
-- [ ] `npm run build` 通过
-- [ ] 改了样式或组件时：按 `scripts/qa/README.md` 跑 axe 和键盘检查（目标 WCAG 2.2 AA，0 违规），以及折行检查 `orphan-check.mjs`（1280 / 1024 / 768 应为 0）
-- [ ] 改了示意图时：`diagram-overflow-check.mjs` 为 0 问题（中英文、默认字体和宽字体两轮）
-- [ ] 改了语言切换 / 首页跳转时：`lang-check.mjs` 全部通过
-- [ ] 改了目录、翻页卡片或章节 `navTitle` 时：`toc-indent-check.mjs` 全部通过（`navTitle` 写成「11　标题」/「11 · Title」/「附录 A　标题」/「Appendix A · Title」，编号会自动拆成编号列）
-- [ ] 改了页眉、翻页、弹窗或快捷键时：`keyboard-check.mjs` 全部通过（← → 翻章在输入、选字、小窗打开、横向滚动区域等情况下不能触发）
-- [ ] 没有提交 `.env`、私钥、助记词、API 密钥
+Use plain `npm run check:facts` if sources are unavailable, and say that provenance was skipped. Preview both editions and inspect the relevant glossary popovers. For component/style changes run axe, keyboard and orphan checks; diagram changes need diagram-overflow; language changes need lang-check; navigation/navTitle changes need toc-indent. Header, pagination, popovers or shortcut changes also need keyboard-check. Commands and scratch dependencies are in [scripts/qa/README.md](scripts/qa/README.md); do not add those dependencies to the site. The accessibility target is WCAG 2.2 AA, self-assessed.

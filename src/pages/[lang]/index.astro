@@ -14,20 +14,20 @@ const { lang } = Astro.params as { lang: Lang }
 const t = ui[lang]
 const zh = lang === 'zh'
 const description = zh
-  ? '一本写给初学者的中英双语区块链教材：用日常类比讲原理，再用真实的 Ethereum Sepolia 测试网实验（Counter、ERC-20、授权、可升级代理、面额重标）逐一验证。仅测试网，不构成投资建议。'
-  : 'A bilingual beginner blockchain textbook: everyday analogies first, then real Ethereum Sepolia testnet experiments (Counter, ERC-20, allowances, an upgradeable proxy, redenomination). Testnet only, not financial advice.'
+  ? '免费的中英双语区块链入门指南：从生活例子理解什么时候需要区块链，再打开 Sepolia 测试网交易记录，观察实验里实际发生了什么。阅读无需钱包。'
+  : 'A free, bilingual guide to blockchains for beginners. Learn through everyday examples, then inspect real Sepolia testnet transactions. No wallet needed to read.'
 const cards = zh
   ? [
       { t: '先问「为什么需要」', d: '用社区积分、商场联合收银、自动售货机这些日常场景，弄清区块链什么时候值得用、什么时候不值得。', s: '02-who-needs-blockchain' },
-      { t: '每个结论都有链上证据', d: 'Counter、MBox、MBox-Burn、可升级的 UBOX：8 个合约地址、每一笔发出的交易，都附 Sepolia Etherscan（公开的链上查询网站）链接。', s: '08-lab-counter' },
+      { t: '打开记录，看实际发生了什么', d: '从 Counter 计数器开始，看交易是否成功、记录了什么变化。地址和交易都链接到 Sepolia Etherscan，一个公开查询链上记录的网站。', s: '08-lab-counter' },
       { t: '把安全习惯练成肌肉记忆', d: '授权不是付款；转错地址无法找回；可升级意味着管理员权力；测试全过也不等于没有漏洞。', s: '10-approve-vs-payment' },
-      { t: '一本会继续长的书', d: '第一阶段（P0）已经收尾。下一阶段 P1 DeFi 会作为新章节接着写进同一本书。', s: '19-next-p1-defi' }
+      { t: '基础已完成，DeFi 还没开始', d: 'Phase-0 基础实验与复核已结束。Phase-1 DeFi 是下一步计划，会作为新章节加入；目前没有 DeFi 实验结果。', s: '19-next-p1-defi' }
     ]
   : [
       { t: 'Ask "why" before "how"', d: 'Community points, a shared mall checkout, a vending machine: everyday scenes that show when a blockchain is worth it and when it is not.', s: '02-who-needs-blockchain' },
-      { t: 'Every claim has on-chain evidence', d: 'Counter, MBox, MBox-Burn and the upgradeable UBOX: 8 contract addresses and every transaction sent, each linked to Sepolia Etherscan, a public site for checking on-chain records.', s: '08-lab-counter' },
+      { t: 'Open a record and see what happened', d: 'Start with Counter: check whether a transaction succeeded and what changed. Addresses and transactions link to Sepolia Etherscan, a public explorer.', s: '08-lab-counter' },
       { t: 'Turn safety into habit', d: 'Approval is not payment; a wrong address cannot be undone; upgradeable means an admin holds power; passing tests do not prove there are no bugs.', s: '10-approve-vs-payment' },
-      { t: 'A book that keeps growing', d: 'Phase 0 is wrapped up. Phase 1 (DeFi) will be added to this same book as new chapters.', s: '19-next-p1-defi' }
+      { t: 'Basics complete; DeFi comes next', d: 'Phase-0 basics, experiments and review are complete. Phase-1 DeFi has not started. Its future experiments will become new chapters.', s: '19-next-p1-defi' }
     ]
 const jsonLd = [
   {
@@ -63,21 +63,22 @@ const jsonLd = [
    <div class="hero-deco" aria-hidden="true"><span class="glow"></span><span class="d1"></span><span class="d2"></span><span class="d3"></span><span class="d4"></span></div>
    <div class="hero">
     <div>
-      <p class="kicker"><span class="pill">{t.siteTitle}</span><span>{zh ? '一本连续教材 · 中英双语 · 仅 Sepolia 测试网' : 'A continuous textbook · Chinese & English · Sepolia testnet only'}</span></p>
-      <h1 id="hero-title">{zh ? '从生活理解区块链，再亲手在测试网上验证' : 'Understand blockchains through everyday life, then verify it yourself on a testnet'}</h1>
+      <p class="kicker"><span class="pill">{t.siteTitle}</span><span>{zh ? '免费入门指南 · 中英双语 · 测试网实验' : 'A hands-on guide for beginners · Free · Bilingual'}</span></p>
+      <h1 id="hero-title">{t.siteTagline}</h1>
       <p class="sub">
         {zh
-          ? '写给会用电脑、会上网，但从没接触过区块链的读者。每一章先用日常类比讲清原理，再拿真实的实验来核对。实验都做在以太坊的 Sepolia 测试网上：那是一条用免费「玩具币」练习的公共区块链，不花一分真钱。书里每个地址、每笔交易的编号都能点开，在公开网站上自己查到；遇到生词，点旁边的 ? 就有大白话解释。'
-          : 'For readers who can use a computer and browse the web but have never touched a blockchain. Each chapter explains an idea with an everyday analogy, then checks it against real experiments. They ran on Ethereum’s Sepolia testnet, a public practice blockchain that uses free “play” coins, so no real money was spent. Every address and transaction ID in the book can be opened and checked on a public website, and any unfamiliar word has a ? next to it with a plain explanation.'}
+          ? '会用电脑、会上网，却不知道区块链有什么用？从几家店共用积分这样的例子出发，分清什么时候需要区块链、什么时候普通数据库就够了。再跟着真实实验，看懂交易、合约和授权。实验使用 Sepolia——以太坊专门用来练习的测试网，预算 $0。遇到生词，点旁边的 ?。'
+          : 'Comfortable with a computer, but new to blockchains? Start with everyday examples to learn when a blockchain helps and when a database is enough. Then follow real experiments to understand transactions, contracts and approvals. The labs used Sepolia, Ethereum’s practice network, with a $0 budget. Press ? beside a new term for an explanation.'}
       </p>
       <div class="btn-row">
         <a class="btn primary" href={href(`${lang}/chapters/01-how-to-read/`)}>{zh ? '从第 1 章开始读' : 'Start with Chapter 1'}</a>
-        <a class="btn ghost" href={href(`${lang}/chapters/16-appendix-addresses-txs/`)}>{zh ? '查看地址与交易总表' : 'See every address and transaction'}</a>
+        <a class="btn ghost" href={href(`${lang}/chapters/08-lab-counter/#inspect-a-transaction`)}>{zh ? '看一笔测试网交易' : 'Inspect a testnet transaction'}</a>
       </div>
+      <p><Nw text={zh ? '只想先看看？第二个入口会带你核对交易状态、代币转账和事件。无需连接钱包、领币或注册账号。' : 'Just looking? The second link walks you through status, token transfers and an event. No wallet connection, faucet or account needed.'} /></p>
     </div>
     <div class="hero-art">
-      <img src={href(`diagrams/${lang}/proxy.svg`)} width="960" height="540"
-        alt={zh ? '示意图：用户始终调用同一个代理地址，代理把调用转给可替换的实现合约 V1、V2、V3，升级由 ProxyAdmin 控制。' : 'Diagram: users always call the same proxy address; the proxy forwards calls to a replaceable implementation (V1, V2, V3); upgrades are controlled by ProxyAdmin.'} />
+      <img src={href(`diagrams/${lang}/counter.svg`)} width="960" height="540"
+        alt={zh ? 'Counter 实验：计数从 0 加到 1，清零，再加到 2；每一步都留下交易记录，清零不会抹掉历史。' : 'The Counter lab: the count rises from 0 to 1, resets, then reaches 2. Each step leaves a transaction record; resetting does not erase history.'} />
     </div>
    </div>
   </section>

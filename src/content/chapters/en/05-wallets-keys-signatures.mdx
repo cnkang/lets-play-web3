@@ -51,6 +51,8 @@ Appendix B explains how to obtain and store an <Term id="api-key">API key</Term>
 - The private keys lived only in a local, Git-ignored folder (folder permission 700, file permission 600). They were never printed and never written into public records or this book.
 - Broadcast scripts checked that the account's ETH balance was **no more than 0.1 ETH**, as a guard against accidentally using a key that might hold mainnet funds.
 
+That balance cap was only an extra guard in the lab scripts. **It cannot prove the same key holds no assets on another network.** Isolation comes from fresh, dedicated test accounts and checking the network before acting. Reading this guide needs no wallet creation or connection.
+
 The public addresses of the two test accounts (addresses only, not keys):
 
 - Account A (deployer, <Term id="owner">owner</Term> of UBOX): <Addr a="0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC" />

@@ -1,6 +1,6 @@
 ---
 title: "Lab: the Counter contract"
-description: "The first on-chain contract, Counter (0xAf6f88Cf8bf6e9211CD11B375AECBa37d61CD00f) - deployment, increment, reset and the low-tip exercise; count() is 2 and owner is account A; why deploying costs far more than calling."
+description: "No wallet needed: inspect a Counter transaction’s status, token transfers and event log. Follow five deployment, increment and reset records; at the historical snapshot count was 2 and owner was account A."
 navTitle: "8 · Lab: the Counter contract"
 part: accounts
 order: 80
@@ -8,6 +8,32 @@ status: published
 ---
 
 <p class="lead">Start by reading one on-chain state change, rather than equating <Term id="smart-contract">smart contracts</Term> with finance from day one.</p>
+
+<h2 id="inspect-a-transaction">Inspect a transaction without a wallet</h2>
+
+Open the first `increment` transaction, which added one to the counter:
+
+<Tx h="0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73" />
+
+This completed experiment appears in the table below, at Sepolia block **12110964**. You only need a browser: no wallet connection, faucet or account. Check three things:
+
+1. **Status** should be **Success**: the call completed successfully.
+2. **Tokens Transferred**: this call made no token transfer. Increasing a counter is not a payment, though the sender still paid a network fee.
+3. **Logs** record the `Incremented` event. If the explorer can decode it, `newCount` is **1**. Decoding needs the interface description; if fields are unavailable, compare the code and record below rather than guessing.
+
+This describes that one call, not the counter today. The historical snapshot’s `count()` of 2 comes after the later calls.
+
+### Optional: read the same receipt in a terminal
+
+If your computer has `curl`, copy this whole block. The recorded transaction hash is already filled in. This **does not sign or send a transaction** and needs no key:
+
+```bash
+curl -sS https://ethereum-sepolia-rpc.publicnode.com \
+  -H 'Content-Type: application/json' \
+  --data '{"jsonrpc":"2.0","id":1,"method":"eth_getTransactionReceipt","params":["0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73"]}'
+```
+
+Look at `result.status` (`0x1` means success), `blockNumber` and `logs`. RPC block numbers are hexadecimal; the explorer displays decimal. If the result is `null` or the service returns an error, check the network or try later. A failed lookup does not mean a failed transaction.
 
 ## What the contract does
 

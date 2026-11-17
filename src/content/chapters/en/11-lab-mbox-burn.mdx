@@ -31,11 +31,11 @@ Both can show a "transfer to 0x0" <Term id="event">event</Term> in an <Term id="
 2. A called `approve(B, 500)`: <Term id="allowance">allowance</Term> 500, balances unchanged.
 3. B called `burnFrom(A, 100)`: A lost 100, supply fell another 100 to **998,900**, and **400** of the allowance remained.
 
-Two `transferFrom` calls in Chapter 12 later used 300 of those 400, **leaving 100**. That 100 allowance stayed in place after the lab; nobody cleared it.
+Two `transferFrom` calls in Chapter 12 later used 300 of those 400, **leaving 100 at that point**. D-01 below subsequently revoked that leftover allowance; it was 0 at the snapshot.
 
 ## D-01: revoking the leftover 100
 
-The P0 review recorded this leftover allowance as a Low finding (F-ALLOW-001): not a compromised contract but a leftover from the experiment. If B <Term id="signature">signed</Term>, it could still move up to 100 test tokens. Decision **D-01** approved revoking it. After re-reading the allowance, <Term id="nonce">nonce</Term> and balances and <Term id="simulate">simulating</Term> again, A <Term id="broadcast">broadcast</Term> **exactly one** `approve(B, 0)`:
+The Phase-0 review recorded this leftover allowance as a Low finding (F-ALLOW-001): not a compromised contract but a leftover from the experiment. If B <Term id="signature">signed</Term>, it could still move up to 100 test tokens. Decision **D-01** approved revoking it. After re-reading the allowance, <Term id="nonce">nonce</Term> and balances and <Term id="simulate">simulating</Term> again, A <Term id="broadcast">broadcast</Term> **exactly one** `approve(B, 0)`:
 
 <Tx h="0x4571e581958308c820ab16da26aa9d1a2622caa7c720ebe164b5d2c29a3747f2" />
 

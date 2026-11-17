@@ -1,4 +1,4 @@
 [
-  { "id": "p0", "order": 0, "zh": "P0 · 基础与第一批实验", "en": "P0 · Basics and first labs" },
-  { "id": "p1", "order": 1, "zh": "P1 · DeFi", "en": "P1 · DeFi" }
+  { "id": "p0", "order": 0, "zh": "Phase-0 · 基础实验与复核", "en": "Phase-0 · Basics, labs and review" },
+  { "id": "p1", "order": 1, "zh": "Phase-1 · DeFi", "en": "Phase-1 · DeFi" }
 ]

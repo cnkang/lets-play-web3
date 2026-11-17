@@ -24,6 +24,8 @@ B 用 MBox-Burn 上还剩的 400 <Term id="allowance">额度</Term>，分<strong
 
 两笔都成功了。结果：A 持有 998,800，B 持有 100，剩余额度 100，总供应仍是 998,900。A 的 <Term id="nonce">nonce</Term> 没有变化——这两笔是 B <Term id="signature">签名</Term>的。
 
+这里说的是两笔交易刚完成时的结果。剩余的 100 后来已由第 11 章的 D-01 撤销；快照时额度为 0。
+
 **关键点**：这是两笔各自独立的交易。第一笔上链之后，就算第二笔失败（额度不够、<Term id="gas">gas</Term> 不够、<Term id="node">节点</Term>出问题……），第一笔转出的 100 也**不会自动退回**。
 
 <Callout type="note" title="自转账：有事件，净额为零">

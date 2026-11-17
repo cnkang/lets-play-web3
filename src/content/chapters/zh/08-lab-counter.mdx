@@ -1,6 +1,6 @@
 ---
 title: "实验：Counter 计数器"
-description: "第一份上链合约 Counter（0xAf6f88Cf8bf6e9211CD11B375AECBa37d61CD00f）的部署、increment、reset 与低小费练习；count() 为 2，owner 为账户 A；为什么部署比调用贵得多。"
+description: "无需钱包，打开一笔 Counter 交易，核对成功状态、代币转账和计数事件。再看部署、加一与清零的五笔记录；历史快照中 count 为 2，owner 为账户 A。"
 navTitle: "8　实验：Counter 计数器"
 part: accounts
 order: 80
@@ -8,6 +8,32 @@ status: published
 ---
 
 <p class="lead">从「能读懂一次链上状态变化」开始，而不是一上来就把<Term id="smart-contract">智能合约</Term>等同于金融。</p>
+
+<h2 id="inspect-a-transaction">先看一笔交易：不用钱包的练习</h2>
+
+打开第一次 `increment`（计数加一）的交易：
+
+<Tx h="0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73" />
+
+这是本章表格中的已完成实验，位于 Sepolia 区块 **12110964**。只需浏览网页，不用连接钱包、领币或注册账号。先看三项：
+
+1. **Status** 应为 **Success**：说明这次调用执行成功。
+2. **Tokens Transferred**：这次操作没有代币转账。计数加一不等于付款，但发送者仍付了网络手续费。
+3. **Logs**（事件日志）记录 `Incremented`；若页面能解码，`newCount` 为 **1**。解码需要接口说明；看不到字段时不要猜，先对照下方代码和记录。
+
+这说的是那一次调用，不是今天的计数。全书历史快照中的 `count()` 为 2，来自后面的操作。
+
+### 可选：在终端只读查询同一笔收据
+
+电脑已有 `curl` 时，可以整段复制。这里已经填入本书的交易哈希，**不会签名或发送交易**，也不需要密钥：
+
+```bash
+curl -sS https://ethereum-sepolia-rpc.publicnode.com \
+  -H 'Content-Type: application/json' \
+  --data '{"jsonrpc":"2.0","id":1,"method":"eth_getTransactionReceipt","params":["0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73"]}'
+```
+
+看返回的 `result.status`（`0x1` 表示成功）、`blockNumber` 和 `logs`。RPC 返回的区块号是十六进制；浏览器显示十进制。若返回 `null` 或服务报错，先检查网络或稍后重试，不要把「没查到」当作「交易失败」。
 
 ## 合约做了什么
 

@@ -63,7 +63,7 @@ The lower the tip, the more likely a transaction waits at the back of the queue 
 - **Nonce 3**: an increment with a tip of only **1 wei**. The chain was not busy, so it was still mined: <Tx h="0xd61e57686959b7c4c9d774a6aa35b0fb9dac72e8317055146da4676a9e4e4b31" short /> (block 12111091).
 - **Nonce 4**: the replacement script `replace-stuck.mjs` was designed to first send a 1 wei tip transaction at nonce 4 that would be hard to mine and watch it; if it was still waiting in the pending queue (the <Term id="mempool">mempool</Term>), it would send a replacement with **the same nonce and a higher tip (2 wei)**. The transaction mined at nonce 4 matches that script exactly (gas limit 140,000, tip 2 wei): <Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short /> (block 12111181).
 
-**Only the transaction that was finally mined is visible on-chain.** A replaced transaction never enters any block and leaves no successful receipt. That is why this book **never treats the hash of an unmined transaction as fact**: a <Term id="tx-hash">hash</Term> shown by your wallet or script only says "sent", not "landed".
+**Only the transaction that was finally mined is visible on-chain.** This book does not count a pending transaction as an on-chain result. A wallet or script can compute a <Term id="tx-hash">hash</Term> before broadcasting, so an ID alone proves neither successful broadcast nor inclusion in a block. Check its receipt and block number.
 
 <Callout type="note" title="Why can the same nonce replace a transaction?">
 

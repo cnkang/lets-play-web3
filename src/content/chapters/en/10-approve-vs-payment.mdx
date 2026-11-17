@@ -1,6 +1,6 @@
 ---
 title: "Approval is not payment"
-description: "Holder, spender and recipient; approve only records an allowance and leaves balances unchanged; transferFrom or burnFrom is what moves tokens; three risks of allowances and one habit - revoke with approve(spender, 0) when you are done."
+description: "An approval lets a spender use a limited amount of tokens; it does not transfer them. Follow MBox-Burn approvals, spending and revocation. Approval still costs a network fee; D-01 cleared the leftover allowance."
 navTitle: "10 · Approval is not payment"
 part: tokens
 order: 100
@@ -18,6 +18,8 @@ Many <Term id="dex-amm">decentralised exchanges</Term> and services first ask th
 - An <Term id="approve">approval</Term> **stays valid** until the <Term id="allowance">allowance</Term> is used up or the holder sends another `approve` to change it.
 
 So although an approval is not "money already gone", a long-lived approval is a standing permission for future deductions.
+
+“Balances do not change” refers to this token’s balances. Sending an approval transaction still costs a network fee. Looking up the allowance is read-only and needs no signature or fee.
 
 <Figure name="approve" n="4" alt="Five steps: A calls approve(B,500), allowance 500, balances unchanged; B calls burnFrom(A,100), allowance 400; B calls transferFrom moving 100 from A to B, allowance 300; B calls transferFrom moving 200 from A to A, allowance 100; A calls approve(B,0), allowance 0.">
 The real history of allowance(A, B) on MBox-Burn in the lab. Approving and spending are different transactions; revoking takes another approve(B, 0), effective only once it is mined.
@@ -45,6 +47,8 @@ A revocation <Term id="transaction">transaction</Term> must be sent by the **hol
 
 ## Everyday analogy
 
-You authorise a food-delivery platform to deduct "up to 100 loyalty points a month". Nothing is deducted at that moment; points are only taken when the platform actually places an order. Later you stop using it and set the deductible limit to 0. That withdraws permission; it does not hand 100 points to anyone.
+You let a food-delivery platform deduct up to 100 loyalty points in total. Nothing is deducted yet. Each use reduces the remaining allowance; **it does not reset every month**. When you stop using the service, setting the limit to 0 withdraws permission rather than handing anyone 100 points.
+
+The lab initially left an allowance of 100, which D-01 later revoked. The next chapter links that successful transaction: look for an `Approval` event with value 0 and no token transfer. The early leftover amount is not the snapshot state.
 
 The next chapter is this whole process as a real experiment on Sepolia.

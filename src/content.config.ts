@@ -9,7 +9,7 @@ import { z } from 'astro/zod'
  * derived from these files (see src/data/chapters.ts). See CONTRIBUTING.md.
  */
 
-// Phases group parts (P0 basics, P1 DeFi, future phases …).
+// Phases group parts (Phase-0 basics, Phase-1 DeFi, future phases …).
 const phases = defineCollection({
   loader: file('src/content/phases.json'),
   schema: z.object({ order: z.number(), zh: z.string(), en: z.string() })

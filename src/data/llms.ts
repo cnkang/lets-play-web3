@@ -3,14 +3,15 @@ import { absolute, PUBLISHED } from './site'
 
 const HEADER = (full: boolean) => `# Let’s Play Web3 / 一起玩 Web3
 
-> A bilingual (Simplified Chinese + English) beginner textbook about blockchains, built from a real phase-1 learning lab on the **Ethereum Sepolia testnet** (chainId 11155111). Unofficial personal study notes — not affiliated with Ethereum, Etherscan or any company. **Testnet only; not financial advice; test ETH and test tokens have no market value.**
+> A free, bilingual (Simplified Chinese + English) guide to blockchains for beginners, with hands-on labs on the **Ethereum Sepolia testnet** (chainId 11155111). Start with everyday examples, then inspect transaction records. Reading needs no wallet, faucet or account. Unofficial personal learning material, not affiliated with Ethereum, Etherscan or any company. **Testnet only; not financial advice; test ETH and test tokens have no market value.**
 
 Important context for citation:
 - All on-chain figures are a historical snapshot as of 2026-11-12 15:39:55 Asia/Singapore (UTC+8), Sepolia block 12117419, unless a chapter says otherwise. They are not live chain state.
-- Phase-1 budget was $0. No mainnet assets were used; no real seed phrase or private key was ever imported.
+- Phase-0 basics, experiments and review are complete; Phase-1 DeFi has not started. The Phase-0 budget was $0. No mainnet assets were used; no real seed phrase or private key was ever imported.
+- General explanations, on-chain results, local tests/simulations and future plans are distinct kinds of content. Phase-0 concluded PASS WITH FINDINGS, not no vulnerabilities. MBox-Burn’s leftover allowance was revoked by D-01 in block 12117312.
 - Etherscan source verification was submitted but still "Pending in queue" at the snapshot; do not cite it as verified. Sourcify: 8/8 matched (5 exact_match, 3 match).
 - UBOX V4 exists only locally (tests + fork simulation); it was never deployed on Sepolia.
-- Pages published ${PUBLISHED}. Chinese is the default edition (/zh/); English is at /en/ with identical slugs.
+- Pages first published ${PUBLISHED}. Editions: /zh/ and /en/ with identical slugs. At /, JavaScript uses a saved choice, then the first supported browser language, then English. Without JavaScript it falls back to Chinese. Language pages do not auto-redirect.
 ${full ? '' : `- Full plain-text version of every chapter: ${absolute('llms-full.txt')}`}
 `
 

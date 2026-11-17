@@ -308,7 +308,7 @@ def redenom(lang):
 def tests(lang):
     zh = lang == "zh"
     b = heading("测试分层：每一层回答不同的问题" if zh else "Test layers: each answers a different question",
-                "P0 复核（Foundry）的实际参数与结果" if zh else "Actual parameters and results of the P0 review (Foundry)")
+                "Phase-0 复核（Foundry）的实际参数与结果" if zh else "Actual parameters and results of the Phase-0 review (Foundry)")
     layers = [
         ("单元测试" if zh else "Unit tests", "49 / 49", "我想到的具体情况对不对？" if zh else "Do the cases I thought of behave?", 560),
         ("Fuzz", "9 / 9 × 1000 runs", "随机输入下断言还成立吗？（seed 0x5030）" if zh else "Do assertions hold for random inputs? (seed 0x5030)", 620),
@@ -327,10 +327,10 @@ def tests(lang):
                           ["Beyond tests:", "", "· on-chain txs,", "  events, storage", "· source match:", "  Sourcify 5 exact", "  + 3 match", "· Etherscan:", "  still queued at", "  the snapshot"]), 15, gap=1.55, fill=C["ink2"])
     b += box(40, 412, 880, 100, C["amberSoft"], C["amberLine"], 14)
     if zh:
-        b += lines(64, 448, ["全部通过 ≠ 没有漏洞：P0 仍记录了 1 个 Medium、3 个 Low、6 个 Info 发现。",
+        b += lines(64, 448, ["全部通过 ≠ 没有漏洞：Phase-0 仍记录了 1 个 Medium、3 个 Low、6 个 Info 发现。",
                              "batchTransferFrom 的 16 次 Handler 意外回退（约 0.5%）被视为测试脚手架残留，不是合约漏洞。"], 16.5, gap=1.65, fill=C["amber"])
     else:
-        b += lines(64, 448, ["All green ≠ no bugs: P0 still recorded 1 Medium, 3 Low and 6 Info findings.",
+        b += lines(64, 448, ["All green ≠ no bugs: Phase-0 still recorded 1 Medium, 3 Low and 6 Info findings.",
                              "16 unexpected Handler reverts on batchTransferFrom (~0.5%) were treated as test-scaffold residue."], 16.5, gap=1.65, fill=C["amber"])
     svg("test-layers", lang,
         "单元测试、Fuzz 与 Invariant 测试分层" if zh else "Unit, fuzz and invariant test layers",

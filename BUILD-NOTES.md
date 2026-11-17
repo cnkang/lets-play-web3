@@ -1,8 +1,12 @@
 # BUILD-NOTES
 
-Build log and acceptance notes for **「一起玩 Web3」 / Let’s Play Web3** (Astro static site; working title until 2026-11-16: “Web3 Sandbox Guide”). Times are Asia/Singapore (UTC+8). Intended future public repository: `lets-play-web3` (the local folder keeps its old name).
+Build log and acceptance notes for **「一起玩 Web3」 / Let’s Play Web3** (Astro static site; working title until 2026-11-16: “Web3 Sandbox Guide”). Times are Asia/Singapore (UTC+8). Public repository: `cnkang/lets-play-web3`.
+
+This file preserves dated engineering history, including old terminology and test results. Current instructions: [README](README.md), [中文 README](README.zh-CN.md), [deployment](docs/DEPLOYMENT.md) / [中文部署](docs/DEPLOYMENT.zh-CN.md), and [contributing](CONTRIBUTING.md) / [中文贡献](CONTRIBUTING.zh-CN.md). Reader-facing phase names are now **Phase-0** (basics, labs and review) and **Phase-1** (DeFi, not started).
 
 ## Commands
+
+Current source directory default: `/workspace/web3-sandbox`. Use `SOURCES_DIR=/absolute/path/to/web3-sandbox npm run check:facts` for another location. The deployment workflow defaults to the custom domain and `BASE=/`; the project-path command below is an additional compatibility check.
 
 ```bash
 npm ci
@@ -11,7 +15,7 @@ npm run build          # check-content → astro build → pagefind  → dist/ (
 npm run check:content  # every chapter has zh + en with the same slug; frontmatter valid
 npm run new:chapter -- <slug> --part <id> --order <n>   # scaffold a draft pair from templates/
 npm run preview        # http://localhost:4321/zh/
-npm run check:facts    # every 0x address/hash must exist in the lab sources + secret scan
+npm run check:facts    # secret scan always; provenance skipped without external lab sources
 npm run assets         # decode assets/og/*.png.b64 → *.png (automatic before dev/build/preview)
 npm run diagrams       # regenerate public/diagrams/{zh,en}/*.svg and public/og/*.svg (PNG: scripts/qa/render-og.mjs)
 npm run appendix       # regenerate Appendix A tables from 实验记录.md
@@ -44,7 +48,7 @@ BASE=/lets-play-web3/ SITE_URL=https://example.github.io npm run build
 - `upcoming`: listed in the contents as “即将推出 / Coming soon” (not a link), no page, not in sitemap/search; listed under “Coming soon” in llms.txt. `draft`: only in `astro dev` (noindex + banner); excluded from production builds.
 - Pairing check: `scripts/check-content.mjs` runs first in `npm run build` (and in CI) and fails with the exact missing file; the same rules are enforced again inside Astro. `ALLOW_UNPAIRED=1` downgrades to a warning and skips the unpaired chapter. Tested: zh-only file → clear failure; upcoming pair → “coming soon”, no page/sitemap entry; draft pair → absent from build.
 - Components available in every chapter without imports: `Lab` (new experiment box), `Addr`, `Tx`, `Callout`, `Figure`, `T`, `SafetyNotice`, `Snapshot`, `Quiz`.
-- Templates: `templates/chapter.{zh,en}.mdx`; scaffold with `npm run new:chapter`. Chinese guide: `CONTRIBUTING.md` (adding chapters, parts/phases, statuses, components, appending experiments to Appendix A, diagrams, pre-commit checklist).
+- Templates: `templates/chapter.{zh,en}.mdx`; scaffold with `npm run new:chapter`. English guide: `CONTRIBUTING.md`; Chinese guide: `CONTRIBUTING.zh-CN.md` (adding chapters, parts/phases, statuses, components, appending experiments to Appendix A, diagrams, pre-commit checklist).
 - `scripts/gen_appendix.py` now writes the new frontmatter, documents how to append experiments, and stops with a list of missing block numbers / English labels instead of a bare assert (output verified byte-identical to the committed appendix).
 
 ## Glossary popovers for beginners (2026-11-17)
@@ -293,3 +297,13 @@ Tools: axe-core 4.14.0 via puppeteer-core in Google Chrome 156 (headless), tags 
     │   └── [lang]/ index.astro search.astro accessibility.astro chapters/[slug].astro
     └── styles/global.css
 ```
+
+## Bilingual entry, evidence and copy controls (2026-11-17)
+
+- English-first README and CONTRIBUTING with Chinese counterparts; paired deployment guides retain URL configuration and migration instructions. GitHub metadata commands are delivered separately in `docs/GITHUB-METADATA.md`; remote settings were read, not changed.
+- Reviewed all 19 chapter pairs. Reader-facing stage names use **Phase-0 / Phase-1**, keeping slugs and IDs stable. Home and Chapter 1 lead to a wallet-free Counter transaction inspection. Code blocks now offer localised copy controls, keyboard activation, truthful failure feedback and a readable no-JavaScript fallback. Optional receipt commands are read-only; copied commands never execute automatically.
+- Original evidence: owner-supplied `web3-sandbox-repo.zip`; `docs/evidence/` includes notebook excerpts with original line ranges and checksum. No wallets, credentials, raw logs or executable lab scripts were added. Later D-01–D-05 outcomes take precedence over early plans. No on-chain experiments were rerun.
+- Node **24.22.1** (`.nvmrc`: 24): `npm ci` passed, lockfile unchanged. `npm run check:content`: **19 × 2**, 90 glossary terms. `SOURCES_DIR=/tmp/lets-play-web3-lab-sources npm run check:facts`: **213** hex occurrences against **16** reviewed source documents; suspected-secret scan passed. This checks literal provenance, not the semantics of every claim.
+- Both `BASE=/ SITE_URL=https://letsplayweb3.liukang.com` and `BASE=/lets-play-web3/ SITE_URL=https://example.github.io` passed `npm run build` and `npm run check:build`: **46 HTML pages, 38 search pages, 4,194 local references** per configuration. Deliberately using a wrong BASE failed as expected. Final `dist/` is the custom-domain root build.
+- Browser plugin was not available; used Playwright plus local Chrome and the existing Puppeteer QA scripts with scratch-only dependencies. Local preview: `http://localhost:4399`. Target flow: each language home → inspect transaction → copy receipt command / Solidity. **197 checks passed**, including axe, overflow at **1280/390/320**, light/dark, exact plain-text copy by keyboard, clipboard denial and no-JavaScript reading; no page script errors. Language checks, **128** contents-alignment cases, full keyboard checks and **16** SVG files (normal + wide-font stress) passed. Bash and zsh hidden-input examples were checked with dummy input only.
+- Root language routing, `x-default`, snapshot constants, dependency lockfile and chapter URLs were preserved. `git diff --check` passed. These are local browser/build checks, not a fresh chain review or a complete accessibility certification.

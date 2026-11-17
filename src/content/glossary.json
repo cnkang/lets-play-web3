@@ -1,8 +1,8 @@
 {
   "blockchain": {
     "chapter": "02-who-needs-blockchain",
-    "zh": { "term": "区块链", "def": "一本由很多台电脑共同保存、共同核对的公开账本。新记录按批次（区块）追加在末尾，每一批都引用前一批，所以谁想偷偷改旧账，大家都会发现。可以想成「全班每人一本、内容永远同步的记账本」。" },
-    "en": { "term": "blockchain", "def": "A public ledger that many computers keep and check together. New records are appended in batches (blocks), each pointing to the one before, so a sneaky edit to old entries is easy to spot. Think of a notebook that every classmate holds an identical, always-synced copy of." }
+    "zh": { "term": "区块链", "def": "由多台电脑按共同规则保存、核对的账本。新记录分批写进区块，每块引用前一块，让历史改动容易被发现。节点可能暂时不同步，要靠共识规则决定接受哪条历史。" },
+    "en": { "term": "blockchain", "def": "A ledger that many computers keep and check under shared rules. Records are added in blocks, each referring to the one before, making historical edits detectable. Copies can temporarily differ; consensus rules decide which history to accept." }
   },
   "web3": {
     "zh": { "term": "Web3", "def": "对「建立在区块链上的应用和服务」的统称。和传统网站最大的区别是：账本和规则不由一家公司单独掌握，用户用自己的钱包登录和签名。它是一个宽泛的说法，不是某个具体产品。" },
@@ -10,8 +10,8 @@
   },
   "shared-ledger": {
     "chapter": "02-who-needs-blockchain",
-    "zh": { "term": "共享账本", "def": "几方共同使用、都能查看和核对的同一本账。区块链就是一种「没有单一管理员」的共享账本；如果大家本来就信任同一个记账者，普通数据库更简单。" },
-    "en": { "term": "shared ledger", "def": "One set of books that several parties use and can all inspect. A blockchain is a shared ledger with no single administrator; if everyone already trusts one bookkeeper, an ordinary database is simpler." }
+    "zh": { "term": "共享账本", "def": "几方共同使用、能够查看和核对的一份记录。区块链可以让多个节点按规则核对它；如果各方已经信任同一个记账者，普通数据库往往更简单。" },
+    "en": { "term": "shared ledger", "def": "A record used and checked by several parties. A blockchain lets multiple nodes validate it under shared rules. If everyone already trusts one record-keeper, an ordinary database is often simpler." }
   },
   "ethereum": {
     "chapter": "03-blocks-hashes-consensus",
@@ -20,8 +20,8 @@
   },
   "testnet": {
     "chapter": "06-gas-nonce-explorer",
-    "zh": { "term": "测试网", "def": "专门用来练习和测试的区块链，规则和「真网」几乎一样，但里面的币是免费领的「玩具钱」，没有市场价值。就像驾校的练车场：车和路都是真的，撞了也不会赔钱。" },
-    "en": { "term": "testnet", "def": "A blockchain meant for practice and testing. It follows almost the same rules as the real network, but its coins are free “play money” with no market value. Like a driving-school practice yard: real car, real road rules, no real losses." }
+    "zh": { "term": "测试网", "def": "专门用来练习和测试的区块链。测试币可以免费领取，没有市场价值；你仍要检查网络和签名内容。它像练习场，能观察操作结果，不需要投入主网资产。" },
+    "en": { "term": "testnet", "def": "A blockchain for practice and testing. Test coins are available free and have no market value, but you still need to check the network and what you sign. It lets you observe results without committing mainnet assets." }
   },
   "mainnet": {
     "zh": { "term": "主网", "def": "正式运行、币有真实价值的那条区块链。在主网上转错账或签错名，损失的是真钱。本书从未使用主网。" },
@@ -144,7 +144,7 @@
   },
   "gas": {
     "chapter": "06-gas-nonce-explorer",
-    "zh": { "term": "Gas（燃料费）", "def": "衡量一次链上操作「工作量」的单位。实际手续费 = 用掉的 gas × 每单位的价格，用 ETH 支付。就像打车：路程（gas）乘以单价（气价）才是车费。" },
+    "zh": { "term": "Gas（执行计量单位）", "def": "衡量一次链上操作「工作量」的单位。实际手续费 = 用掉的 gas × 每单位的价格，用 ETH 支付。就像打车：路程（gas）乘以单价（气价）才是车费。" },
     "en": { "term": "gas", "def": "A unit measuring how much work an on-chain action takes. The fee you pay = gas used × price per unit, paid in ETH. Like a taxi: distance (gas) times the rate (gas price) gives the fare." }
   },
   "base-fee": {
@@ -304,13 +304,13 @@
   },
   "approve": {
     "chapter": "10-approve-vs-payment",
-    "zh": { "term": "授权（approve）", "def": "持有人允许另一个地址在一个额度内动用自己的代币。这一步不扣钱、余额不变，但给了对方「以后可以扣」的权限，就像签了一份代扣协议。" },
-    "en": { "term": "approve", "def": "The holder lets another address use up to a set amount of their tokens. Nothing is paid and the balance does not change, but the other side now may take tokens later, like signing a direct-debit form." }
+    "zh": { "term": "授权（approve）", "def": "持有人允许另一个地址在一个额度内动用自己的代币。这一步不转走代币，但发送交易仍需网络手续费；它给了对方「以后可以扣」的权限，就像签了一份代扣协议。" },
+    "en": { "term": "approve", "def": "The holder lets another address use up to a set amount of their tokens. No tokens move, though sending the transaction still costs a network fee. The other side may take tokens later, like signing a direct-debit form." }
   },
   "allowance": {
     "chapter": "10-approve-vs-payment",
-    "zh": { "term": "额度（allowance）", "def": "被授权者还能代为动用多少代币。每用掉一点就减少；持有人可以随时用新的 approve 覆盖它，设成 0 就是撤销。" },
-    "en": { "term": "allowance", "def": "How many tokens a spender may still move on the holder's behalf. It shrinks as it is used, and the holder can overwrite it at any time with a new approve; setting it to 0 revokes it." }
+    "zh": { "term": "额度（allowance）", "def": "被授权者还能代为动用多少代币。普通限额通常随使用减少；有些合约的无限授权不会递减。持有人可用 approve 修改额度，设成 0 撤销，需交易确认后生效。" },
+    "en": { "term": "allowance", "def": "How many tokens a spender may still use on the holder’s behalf. A limited allowance usually decreases with use; some contracts keep an infinite allowance unchanged. The holder can change it with approve; setting it to 0 revokes it once the transaction is confirmed." }
   },
   "spender": {
     "chapter": "10-approve-vs-payment",
@@ -424,8 +424,8 @@
   },
   "audit": {
     "chapter": "15-evidence-p0",
-    "zh": { "term": "审计", "def": "由独立专业团队对合约代码做的系统安全审查。本书的 P0 复核是项目自己做的，不是第三方审计。" },
-    "en": { "term": "audit", "def": "A systematic security review of contract code by an independent professional team. This book's P0 review was done in-house; it is not a third-party audit." }
+    "zh": { "term": "审计", "def": "由独立专业团队对合约代码做的系统安全审查。本书的 Phase-0 复核是项目自己做的，不是第三方审计。" },
+    "en": { "term": "audit", "def": "A systematic security review of contract code by an independent professional team. This book's Phase-0 review was done in-house; it is not a third-party audit." }
   },
   "api-key": {
     "chapter": "17-credentials-api-keys",
@@ -438,8 +438,8 @@
   },
   "defi": {
     "chapter": "19-next-p1-defi",
-    "zh": { "term": "DeFi（去中心化金融）", "def": "用智能合约实现的金融服务，例如兑换、借贷，没有传统意义上的柜台或银行。本书只在测试网上学习它的原理，不涉及投资。" },
-    "en": { "term": "DeFi (decentralised finance)", "def": "Financial services such as swaps and lending run by smart contracts instead of a bank counter. This book only studies how they work on a testnet; it is not about investing." }
+    "zh": { "term": "DeFi（去中心化金融）", "def": "用智能合约实现的金融服务，例如兑换、借贷，没有传统意义上的柜台或银行。本书计划只在测试网上学习其原理；Phase-1 DeFi 实验尚未开始，不涉及投资。" },
+    "en": { "term": "DeFi (decentralised finance)", "def": "Financial services such as swaps and lending run by smart contracts instead of a bank counter. This guide plans to study how they work on a testnet. Phase-1 DeFi experiments have not started; the guide does not cover investing." }
   },
   "dex-amm": {
     "chapter": "19-next-p1-defi",

@@ -2,7 +2,7 @@
   "name": "lets-play-web3",
   "version": "0.1.0",
   "private": true,
-  "description": "一起玩 Web3 · Let’s Play Web3 — a bilingual (zh-CN / en) beginner textbook built from real Ethereum Sepolia testnet experiments.",
+  "description": "Let’s Play Web3 / 一起玩 Web3 — a free, bilingual guide to blockchains for beginners, with hands-on Sepolia testnet labs.",
   "type": "module",
   "scripts": {
     "dev": "node scripts/binary-assets.mjs && astro dev",

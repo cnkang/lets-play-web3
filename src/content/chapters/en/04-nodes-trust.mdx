@@ -19,7 +19,7 @@ The labs in this book used a **free public <Term id="rpc">RPC</Term> node**:
 https://ethereum-sepolia-rpc.publicnode.com
 ```
 
-It needs no <Term id="api-key">API key</Term>. The trade-offs are limited speed and reliability and **no archive data**: asking for the state at an old block may fail. That is why the P0 review rebuilt the upgrade path locally instead of paying for an archive node (see Chapter 15).
+It needs no <Term id="api-key">API key</Term>. The trade-offs are limited speed and reliability and **no archive data**: asking for the state at an old block may fail. That is why the Phase-0 review rebuilt the upgrade path locally instead of paying for an archive node (see Chapter 15).
 
 ## Everyday analogy: a shared mall checkout
 
@@ -43,4 +43,4 @@ But that does not prove the customer **really** bought anything. Facts that happ
 ## Where this shows up in the labs
 
 - Chapter 9: 1,000 MBox were sent to an <Term id="address">address</Term> that has **no private key**, so they can never be moved: an extreme case of a lost key.
-- Chapters 14–15: the P0 review still found a Medium-severity issue. Putting code on-chain does not make design flaws disappear.
+- Chapters 14–15: the Phase-0 review still found a Medium-severity issue. Putting code on-chain does not make design flaws disappear.

@@ -31,11 +31,11 @@ status: published
 2. A 调用 `approve(B, 500)`：<Term id="allowance">额度</Term> 500，余额不变。
 3. B 调用 `burnFrom(A, 100)`：A 减少 100，供应再降 100 到 **998,900**，额度剩 **400**。
 
-剩下的 400 后来又被第 12 章的两笔 `transferFrom` 用掉 300，**还剩 100**。这 100 的授权在实验之后一直留着，没有清零。
+剩下的 400 后来又被第 12 章的两笔 `transferFrom` 用掉 300，**当时还剩 100**。这笔早期遗留授权随后由下面的 D-01 撤销，快照时已是 0。
 
 ## D-01：撤销遗留的 100 授权
 
-P0 复核把这笔遗留授权记为一个 Low 级发现（F-ALLOW-001）：不是合约被攻破，而是实验残留——B 若<Term id="signature">签名</Term>，仍然可以动用最多 100 枚测试币。决策 **D-01** 批准撤销：重新读取额度、<Term id="nonce">nonce</Term>、余额并<Term id="simulate">模拟</Term>之后，由 A <Term id="broadcast">广播</Term>**仅此一笔** `approve(B, 0)`：
+Phase-0 复核把这笔遗留授权记为一个 Low 级发现（F-ALLOW-001）：不是合约被攻破，而是实验残留——B 若<Term id="signature">签名</Term>，仍然可以动用最多 100 枚测试币。决策 **D-01** 批准撤销：重新读取额度、<Term id="nonce">nonce</Term>、余额并<Term id="simulate">模拟</Term>之后，由 A <Term id="broadcast">广播</Term>**仅此一笔** `approve(B, 0)`：
 
 <Tx h="0x4571e581958308c820ab16da26aa9d1a2622caa7c720ebe164b5d2c29a3747f2" />
 
