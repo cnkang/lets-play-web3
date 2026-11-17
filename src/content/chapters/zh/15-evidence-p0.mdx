@@ -11,9 +11,11 @@ status: published
 
 ## P0 是什么
 
-Phase 0（P0）是对前面所有 Sepolia 实验的**技术复核与收尾**：链上只读核对、源码与存储布局审查、Foundry 测试、源码公开验证的准备，最后列出需要拍板的决策 D-01 到 D-05。它是项目自己做的复核，**不是第三方专业审计证书**。
+Phase 0（P0）是对前面所有 Sepolia 实验的**技术复核与收尾**：链上只读核对、源码与<Term id="storage-layout">存储布局</Term>审查、<Term id="foundry">Foundry</Term> 测试、<Term id="verification">源码公开验证</Term>的准备，最后列出需要拍板的决策 D-01 到 D-05。它是项目自己做的复核，<strong>不是第三方专业<Term id="audit">审计</Term>证书</strong>。
 
 ## 结论：PASS WITH FINDINGS
+
+复核把发现按严重程度分为五级：Critical（严重）、High（高）、Medium（中）、Low（低）和 Info（仅作记录）。PASS WITH FINDINGS 的意思是「通过，但有需要记下来的发现」。
 
 <T label="P0 发现按严重程度汇总">
 
@@ -27,7 +29,7 @@ Phase 0（P0）是对前面所有 Sepolia 实验的**技术复核与收尾**：�
 
 </T>
 
-没有发现会导致当前测试资产被盗、被铸造或权限失控的 Critical / High 问题。
+没有发现会导致当前测试资产被盗、被<Term id="mint">铸造</Term>或权限失控的 Critical / High 问题。
 
 ## 测试分层：每一层回答不同的问题
 
@@ -39,18 +41,18 @@ P0 用了多层测试，但每一层都有边界和盲区。
 
 | 类别 | 实际参数 | 结果 | 正确理解 |
 | --- | --- | --- | --- |
-| 单元测试 | 一次运行 | **49 / 49** 通过（Counter 5、MBox 9、MBox-Burn 9、UBOX V1 6、V2 6、V3 14） | 已经写下的具体用例通过 |
-| Fuzz | 每项 1000 runs，seed `0x5030` | **9 / 9** 通过 | 在大量随机输入下断言成立 |
-| Invariant | 256 runs × 100 calls = 25,600 次调用 | 1 套 **4 条不变量**通过 | 在这套测试策略下，目标性质没有被打破 |
+| <Term id="unit-test">单元测试</Term> | 一次运行 | **49 / 49** 通过（Counter 5、MBox 9、MBox-Burn 9、UBOX V1 6、V2 6、V3 14） | 已经写下的具体用例通过 |
+| <Term id="fuzz">Fuzz</Term> | 每项 1000 runs，seed `0x5030` | **9 / 9** 通过 | 在大量随机输入下断言成立 |
+| <Term id="invariant">Invariant</Term> | 256 runs × 100 calls = 25,600 次调用 | 1 套 **4 条不变量**通过 | 在这套测试策略下，目标性质没有被打破 |
 
 </T>
 
-测试使用 Foundry 1.9.0，账户只用测试框架生成的地址，**没有**使用本地私钥；没有为了让测试变绿去修改生产合约逻辑。
+测试使用 Foundry 1.9.0，账户只用测试框架生成的地址，**没有**使用本地<Term id="private-key">私钥</Term>；没有为了让测试变绿去修改生产合约逻辑。
 
 ### 两个值得讲的小插曲
 
 - **Fuzz 曾失败两次**：原因是**测试预言机**（测试里计算「期望结果」的代码）的断言顺序有问题。修好的是测试，**合约没有改**。这说明：测试失败不一定是合约有 bug，也可能是测试本身写错了。
-- **16 次 Handler 意外回退**：Invariant 测试中，`batchTransferFrom` 被调用 3,166 次，其中 16 次（约 0.5%）出现了 Handler 没有预料到的回退。整笔 Handler 调用回滚，不变量仍然成立。P0 把它判断为**测试脚手架（预言机边界）的残留**，而不是合约漏洞；更稳妥的做法是以后做一个最小复现，确认它属于预期约束。
+- **16 次 Handler 意外回退**：Invariant 测试中（Handler 是测试里替你随机发起各种调用的辅助代码），`batchTransferFrom` 被调用 3,166 次，其中 16 次（约 0.5%）出现了 Handler 没有预料到的<Term id="revert">回退</Term>。整笔 Handler 调用回滚，不变量仍然成立。P0 把它判断为**测试脚手架（预言机边界）的残留**，而不是合约漏洞；更稳妥的做法是以后做一个最小复现，确认它属于预期约束。
 
 <Callout type="warn" title="49/49 通过 ≠ 没有漏洞">
 
@@ -60,11 +62,11 @@ P0 用了多层测试，但每一层都有边界和盲区。
 
 ## 源码匹配：Sourcify 与 Etherscan
 
-部署到链上的是字节码，不是源码。**源码验证**就是用同样的编译参数重新编译你提交的源码，如果得到的字节码与链上一致，就公开源码并标记已验证。（怎样申请 Etherscan API 密钥，见附录 B。）
+部署到链上的是<Term id="bytecode">字节码</Term>，不是源码。**源码验证**就是用同样的编译参数重新编译你提交的源码，如果得到的字节码与链上一致，就公开源码并标记已验证。（怎样申请 Etherscan <Term id="api-key">API 密钥</Term>，见附录 B。）
 
 ### Sourcify：8 个地址全部匹配
 
-Sourcify 有两种常见结果：**exact_match**（完全匹配，连元数据都一致）和 **match**（字节码匹配，但元数据不完全一致）。8 个地址里 **5 个 exact_match、3 个 match**，不能统称「全部完全匹配」。
+<Term id="sourcify">Sourcify</Term> 有两种常见结果：**exact_match**（完全匹配，连元数据——编译器附在字节码末尾的说明信息——都一致）和 **match**（字节码匹配，但元数据不完全一致）。8 个地址里 **5 个 exact_match、3 个 match**，不能统称「全部完全匹配」。
 
 <T label="Sourcify 匹配结果">
 
@@ -85,7 +87,7 @@ Sourcify 有两种常见结果：**exact_match**（完全匹配，连元数据�
 
 ### Etherscan：已提交，快照时仍在排队
 
-8 个合约的源码都通过 Etherscan API V2（`chainid=11155111`）提交，都拿到了提交编号（GUID）。但到 **2026-11-12 15:39（新加坡时间）**，状态查询仍然是 `Pending in queue`，`getsourcecode` 仍显示未验证。**不能把它写成已经验证成功。** 代理关联（`verifyproxycontract`）返回成功，识别出实现是 V3，但注明 implementation saved (unverified - without ABI)。
+8 个合约的源码都通过 <Term id="etherscan">Etherscan</Term> API V2（`chainid=11155111`）提交，都拿到了提交编号（GUID）。但到 **2026-11-12 15:39（新加坡时间）**，状态查询仍然是 `Pending in queue`，`getsourcecode` 仍显示未验证。**不能把它写成已经验证成功。** 代理关联（`verifyproxycontract`）返回成功，识别出实现是 V3，但注明 implementation saved (unverified - without ABI)，意思是实现地址已记下，但还没有经过验证的 <Term id="abi">ABI</Term>（合约的接口说明）。
 
 拿到 GUID 只代表「已经排队」，不代表「已经通过」。
 
@@ -93,17 +95,17 @@ Sourcify 有两种常见结果：**exact_match**（完全匹配，连元数据�
 
 决策 D-04 在本地设计了 UBOX V4，用来修复 F-V3-001 和粉尘问题：
 
-- 存储兼容：`_scale` 仍在 slot 58，新变量 `_v4Initialized` 追加在 **slot 59**，不重排旧槽。
-- `initializeV4()` 只执行一次，不重新铸币；实现合约构造时锁定初始化。
+- <Term id="storage">存储</Term>兼容：`_scale` 仍在 slot 58，新变量 `_v4Initialized` 追加在 **slot 59**，不重排旧槽。
+- `initializeV4()` 只执行一次，不重新铸币；<Term id="implementation">实现合约</Term>构造时锁定初始化。
 - `type(uint256).max` 作为无限授权的哨兵：存储时不缩放，使用时不递减。
 - 新增 `dustOf` 和 `sweepDust`：把不可见的粉尘挪到另一个地址，总供应不变。
-- 测试：单元 **10/10** 通过；Fuzz **3/3 × 1000**（seed `0x5030`）通过；对最新 Sepolia 状态的 fork 模拟通过（部署约 2,777,602 gas，升级约 72,181 gas；升级后供应 100、A 99.99、B 0.01，粉尘为 0）。
+- 测试：单元 **10/10** 通过；Fuzz **3/3 × 1000**（seed `0x5030`）通过；对最新 Sepolia 状态的 <Term id="fork">fork 模拟</Term>通过（部署约 2,777,602 gas，升级约 72,181 gas；升级后供应 100、A 99.99、B 0.01，粉尘为 0）。
 
-**V4 没有部署、没有签名、没有广播。** Fork 模拟不产生真实交易，也没有交易哈希。快照时 UBOX 代理仍然指向 V3。
+<strong>V4 没有部署、没有<Term id="signature">签名</Term>、没有<Term id="broadcast">广播</Term>。</strong> Fork 模拟不产生真实交易，也没有交易哈希。快照时 UBOX 代理仍然指向 V3。
 
 <Callout type="warn" title="修了一个问题，可能多了一个权力">
 
-`sweepDust` 允许持有人本人，**也允许代币 owner**，把某个账户的不可见粉尘转走。前者像用户处理自己的找零；后者像商家管理员能把顾客的零头调到别的账户。这带来维护便利，也引出治理问题：管理员**应不应该**有这个权力？代码能做到，不代表业务上应该允许。
+`sweepDust` 允许持有人本人，<strong>也允许代币 <Term id="owner">owner</Term></strong>，把某个账户的不可见粉尘转走。前者像用户处理自己的找零；后者像商家管理员能把顾客的零头调到别的账户。这带来维护便利，也引出治理问题：管理员**应不应该**有这个权力？代码能做到，不代表业务上应该允许。
 
 </Callout>
 
@@ -123,16 +125,16 @@ Sourcify 有两种常见结果：**exact_match**（完全匹配，连元数据�
 
 ## 一条可重复的证据链
 
-1. 找到地址和部署/升级交易，确认网络是 Sepolia（chainId 11155111）。
+1. 找到地址和部署/升级交易，确认网络是 Sepolia（<Term id="chainid">chainId</Term> 11155111）。
 2. 找到对应的编译参数、源文件和元数据，理解 exact match 和 match 的差别。
 3. 读取代理当前的实现地址，不要把历史实现当成当前版本。
-4. 对需要证明的状态变化，在目标区块附近核对交易、事件和存储读取。
+4. 对需要证明的状态变化，在目标区块附近核对交易、<Term id="event">事件</Term>和存储读取。
 5. 记录来源、时间、区块高度、命令、结果和**不确定的地方**。
 
 这一步就像检查 App 升级：不只看安装包的版本，还要核对线上真正运行的版本、配置，以及迁移后的用户数据。
 
 ## P0 的边界
 
-- 公共 RPC 没有 archive 数据，所以无法对升级前的历史区块做 fork；P0 改为在本地重建升级路径，并如实注明（没有把没做的 fork 写成通过）。
-- 静态分析工具 Slither 没有运行（未安装，属于可选项）。
+- 公共 <Term id="rpc">RPC</Term> 没有 <Term id="archive-node">archive</Term> 数据，所以无法对升级前的历史区块做 fork；P0 改为在本地重建升级路径，并如实注明（没有把没做的 fork 写成通过）。
+- 静态分析工具（不运行代码、直接扫描源码找常见问题的工具）Slither 没有运行（未安装，属于可选项）。
 - 下一轮只需追踪 D-02 的最终结果，并复现那 16 次 Handler 回退，不必无限延长 P0。
