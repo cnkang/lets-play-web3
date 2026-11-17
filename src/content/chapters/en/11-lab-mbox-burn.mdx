@@ -7,13 +7,13 @@ order: 110
 status: published
 ---
 
-<p class="lead">Burning really lowers total supply; revoking an allowance changes only the allowance, never balances.</p>
+<p class="lead"><Term id="burn">Burning</Term> really lowers <Term id="total-supply">total supply</Term>; revoking an allowance changes only the allowance, never balances.</p>
 
 ## Deploying a burnable token
 
-The deployed MBox has no burn function and cannot get one later, so a separate token with `burn` / `burnFrom` was deployed:
+The deployed MBox has no burn function and cannot get one later, so a separate <Term id="token">token</Term> with `burn` / `burnFrom` was deployed:
 
-- Contract address: <Addr a="0x2AE6BbE8b524381535D1f443fe95018b1f64e3F2" />
+- Contract <Term id="address">address</Term>: <Addr a="0x2AE6BbE8b524381535D1f443fe95018b1f64e3F2" />
 - Name: `超级无敌宇宙第一老马斯克看了都不知道该叫什么的焚烧Token` (the MBox name with "焚烧", "burn", added), symbol `MBox-Burn`, initial supply 1,000,000, all to account A
 
 Right after deployment, A burned 1,000 of its own tokens: `totalSupply` fell from 1,000,000 to **999,000**. The old MBox contract was not touched.
@@ -21,25 +21,25 @@ Right after deployment, A burned 1,000 of its own tokens: `totalSupply` fell fro
 ## burn is not "transfer to 0x0"
 
 - **`burn`** lowers **both** the holder's balance and `totalSupply`, and emits `Transfer(holder → 0x0, amount)`.
-- **A plain `transfer` to the zero address** (if a contract allows it) changes balances only and does **not** lower `totalSupply`.
+- **A plain `transfer` to the <Term id="zero-address">zero address</Term>** (if a contract allows it) changes balances only and does **not** lower `totalSupply`.
 
-Both can show a "transfer to 0x0" event in an explorer. Whether supply actually fell must be read from `totalSupply()`, not inferred from the event. This lab used a dedicated `burn`, so supply really went down.
+Both can show a "transfer to 0x0" <Term id="event">event</Term> in an <Term id="block-explorer">explorer</Term>. Whether supply actually fell must be read from `totalSupply()`, not inferred from the event. This lab used a dedicated `burn`, so supply really went down.
 
 ## approve 500, burnFrom 100
 
-1. A first sent B **0.0001 SepETH** to pay for test gas (B never used a faucet).
-2. A called `approve(B, 500)`: allowance 500, balances unchanged.
+1. A first sent B **0.0001 <Term id="sepeth">SepETH</Term>** to pay for test <Term id="gas">gas</Term> (B never used a <Term id="faucet">faucet</Term>).
+2. A called `approve(B, 500)`: <Term id="allowance">allowance</Term> 500, balances unchanged.
 3. B called `burnFrom(A, 100)`: A lost 100, supply fell another 100 to **998,900**, and **400** of the allowance remained.
 
 Two `transferFrom` calls in Chapter 12 later used 300 of those 400, **leaving 100**. That 100 allowance stayed in place after the lab; nobody cleared it.
 
 ## D-01: revoking the leftover 100
 
-The P0 review recorded this leftover allowance as a Low finding (F-ALLOW-001): not a compromised contract but a leftover from the experiment. If B signed, it could still move up to 100 test tokens. Decision **D-01** approved revoking it. After re-reading the allowance, nonce and balances and simulating again, A broadcast **exactly one** `approve(B, 0)`:
+The P0 review recorded this leftover allowance as a Low finding (F-ALLOW-001): not a compromised contract but a leftover from the experiment. If B <Term id="signature">signed</Term>, it could still move up to 100 test tokens. Decision **D-01** approved revoking it. After re-reading the allowance, <Term id="nonce">nonce</Term> and balances and <Term id="simulate">simulating</Term> again, A <Term id="broadcast">broadcast</Term> **exactly one** `approve(B, 0)`:
 
 <Tx h="0x4571e581958308c820ab16da26aa9d1a2622caa7c720ebe164b5d2c29a3747f2" />
 
-- Block **12117312**, status success; gasUsed 24,538, effective gas price 69 wei, fee 1,693,122 wei
+- Block **12117312**, status success; gasUsed 24,538, effective gas price 69 <Term id="wei">wei</Term>, fee 1,693,122 wei
 - `allowance(A, B)`: **100 → 0**
 - Balances and supply **unchanged**: A 998,800, B 100, `totalSupply` 998,900
 - A's nonce 19 → **20**
@@ -78,9 +78,9 @@ B's two `transferFrom` calls are in Chapter 12.
 
 ## Three things you can check yourself
 
-- **Transaction details**: the network is Sepolia, the sender is A, the target is the MBox-Burn contract, the status is success.
+- **Transaction details**: the network is <Term id="sepolia">Sepolia</Term>, the sender is A, the target is the MBox-Burn contract, the status is success.
 - **Event or contract read**: the `Approval` event, or read `allowance(A, B)` directly and see that it is 0.
-- **Balances and supply**: changing an allowance **should not** change the holder's assets.
+- **Balances and supply**: an <Term id="approve">approval</Term> changes only the allowance and **should not** change the holder's assets.
 
 <Callout type="note" title="Least privilege">
 

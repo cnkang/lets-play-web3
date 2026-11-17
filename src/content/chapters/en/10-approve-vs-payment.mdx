@@ -7,15 +7,15 @@ order: 100
 status: published
 ---
 
-<p class="lead">Three roles: holder, spender, recipient. Approving and spending are two separate actions.</p>
+<p class="lead">Three roles: holder, <Term id="spender">spender</Term>, recipient. Approving and spending are two separate actions.</p>
 
 ## Why do wallets keep asking you to "approve" rather than "pay"?
 
-Many decentralised exchanges and services first ask the holder to **approve** a smart contract to use up to some amount of a token (`approve`), and only later, when you act, does that contract call `transferFrom`.
+Many <Term id="dex-amm">decentralised exchanges</Term> and services first ask the holder to **approve** a <Term id="smart-contract">smart contract</Term> to use up to some amount of a token (`approve`), and only later, when you act, does that contract call `transferFrom`.
 
 - **`approve` is not a payment**: it only writes into the token contract "B may move up to this much of A's tokens". **Balances do not change at all.**
-- What actually moves balances is a later `transferFrom` (move) or `burnFrom` (destroy) sent by the spender.
-- An approval **stays valid** until the allowance is used up or the holder sends another `approve` to change it.
+- What actually moves balances is a later `transferFrom` (move) or `burnFrom` (<Term id="burn">destroy</Term>) sent by the spender.
+- An <Term id="approve">approval</Term> **stays valid** until the <Term id="allowance">allowance</Term> is used up or the holder sends another `approve` to change it.
 
 So although an approval is not "money already gone", a long-lived approval is a standing permission for future deductions.
 
@@ -39,7 +39,7 @@ The real history of allowance(A, B) on MBox-Burn in the lab. Approving and spend
 
 <Callout type="warn" title="Revoking has a time window too">
 
-A revocation must be sent by the **holder**, and takes effect only once it is mined. Until then, the old allowance can still be used.
+A revocation <Term id="transaction">transaction</Term> must be sent by the **holder**, and takes effect only once it is mined. Until then, the old allowance can still be used.
 
 </Callout>
 

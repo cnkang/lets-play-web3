@@ -7,16 +7,16 @@ order: 90
 status: published
 ---
 
-<p class="lead">A "token" is first of all a set of account balances and rules maintained by a contract, not an asset that must rise in value.</p>
+<p class="lead">A "<Term id="token">token</Term>" is first of all a set of account balances and rules maintained by a contract, not an asset that must rise in value.</p>
 
 ## What ERC-20 is
 
-**ERC-20** is the most common interface standard for fungible tokens on Ethereum. It defines a set of functions such as:
+**ERC-20** is the most common interface standard for fungible tokens on <Term id="ethereum">Ethereum</Term>. It defines a set of functions such as:
 
 - `balanceOf(account)`: an account's balance (read-only)
 - `transfer(to, amount)`: the holder sends tokens
 - `approve(spender, amount)` and `allowance(owner, spender)`: grant and look up an allowance (Chapter 10)
-- `transferFrom(owner, to, amount)`: an approved spender moves tokens within the allowance
+- `transferFrom(owner, to, amount)`: an approved <Term id="spender">spender</Term> moves tokens within the allowance
 
 For beginners it is more useful to picture a token as "points shared by a group of partner shops" than as "an asset that goes up". A standard interface is only an agreement about how to interact: a token can still have special restrictions, fees or admin powers. Being "ERC-20 compliant" does not mean the economics are the same.
 
@@ -34,9 +34,9 @@ For beginners it is more useful to picture a token as "points shared by a group 
 
 ## Lab: deploying MBox
 
-- Contract address (matching the prediction from A's nonce 5): <Addr a="0xc4B187783f074111EbeFC50B9a1901f2a4F94630" />
-- Name: `超级无敌宇宙第一老马斯克看了都不知道该叫什么的Token` (a deliberately long Chinese joke name; in Solidity it must be written as a `unicode"..."` string, otherwise compilation fails with "Invalid character")
-- Symbol: `MBox`; `decimals`: 18; initial supply **1,000,000**, all minted to account A
+- Contract <Term id="address">address</Term> (matching the prediction from A's <Term id="nonce">nonce</Term> 5): <Addr a="0xc4B187783f074111EbeFC50B9a1901f2a4F94630" />
+- Name: `超级无敌宇宙第一老马斯克看了都不知道该叫什么的Token` (a deliberately long Chinese joke name; in <Term id="solidity">Solidity</Term> it must be written as a `unicode"..."` string, otherwise compilation fails with "Invalid character")
+- Symbol: `MBox`; <Term id="decimals">decimals</Term>: 18; initial supply **1,000,000**, all <Term id="mint">minted</Term> (newly issued) to account A
 
 <T label="The two MBox transactions">
 
@@ -47,7 +47,7 @@ For beginners it is more useful to picture a token as "points shared by a group 
 
 </T>
 
-Balances after the transfer (unchanged at the snapshot): A holds **999,000**, the demo address holds **1,000**, and `totalSupply` is still **1,000,000**. Transfers do not change total supply.
+Balances after the transfer (unchanged at the snapshot): A holds **999,000**, the demo address holds **1,000**, and `totalSupply` is still **1,000,000**. Transfers do not change <Term id="total-supply">total supply</Term>.
 
 ## Sent to a keyless address: gone for good
 
@@ -55,7 +55,7 @@ The 1,000 MBox went to this demo address:
 
 <Addr a="0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E" />
 
-**No private key for this address was ever stored**, and it holds no SepETH. Without a private key nobody can sign a transfer out, and confirmed transactions cannot be reversed. So these 1,000 MBox are **locked forever and cannot be recovered**.
+**No <Term id="private-key">private key</Term> for this address was ever stored**, and it holds no <Term id="sepeth">SepETH</Term>. Without a private key nobody can sign a transfer out, and confirmed <Term id="transaction">transactions</Term> cannot be reversed. So these 1,000 MBox are **locked forever and cannot be recovered**.
 
 <Callout type="danger" title="Do not send anything else to this address">
 
@@ -65,11 +65,11 @@ This was a deliberate teaching point, not an accident. Please **do not** send an
 
 ## Names and symbols are not unique: trust the address, not the name
 
-`name()` and `symbol()` are just **unregistered strings** returned by the contract. There is no on-chain registry of token names. Anyone can deploy another contract with exactly the same name and symbol, and wallets will display it the same way.
+`name()` and `symbol()` are just **unregistered strings** returned by the contract. There is no on-chain registry of token names. Anyone can deploy another contract with exactly the same name and symbol, and <Term id="wallet">wallets</Term> will display it the same way.
 
 **The only way to identify a token is its contract address.** Seeing "MBox" does not mean it is this book's contract; only the address `0xc4B187783f074111EbeFC50B9a1901f2a4F94630` does.
 
 ## Other observations
 
-- Deployment gas (6,212,065) is again far above a transfer (141,540): there is more code to store, including that very long Chinese name.
-- The deployed MBox cannot gain a `burn` function later. To demonstrate burning, a new contract had to be deployed: MBox-Burn in Chapter 11.
+- <Term id="deploy">Deployment</Term> <Term id="gas">gas</Term> (6,212,065) is again far above a transfer (141,540): there is more code to store, including that very long Chinese name.
+- The deployed MBox cannot gain a `burn` function later. To demonstrate <Term id="burn">burning</Term>, a new contract had to be deployed: MBox-Burn in Chapter 11.

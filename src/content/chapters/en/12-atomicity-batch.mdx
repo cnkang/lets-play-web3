@@ -7,11 +7,11 @@ order: 120
 status: published
 ---
 
-<p class="lead">"Two calls" are not "one transaction". All-or-nothing behaviour is called atomicity.</p>
+<p class="lead">"Two calls" are not "one transaction". All-or-nothing behaviour is called <Term id="atomicity">atomicity</Term>.</p>
 
 ## Lab 1: two separate transferFrom calls (not atomic)
 
-Using the 400 still approved on MBox-Burn, B moved tokens out of A's balance in **two ordinary transactions**:
+Using the 400 still <Term id="allowance">approved</Term> on MBox-Burn, B moved tokens out of A's balance in **two ordinary <Term id="transaction">transactions</Term>**:
 
 <T label="Two separate transferFrom calls (MBox-Burn)">
 
@@ -22,37 +22,37 @@ Using the 400 still approved on MBox-Burn, B moved tokens out of A's balance in 
 
 </T>
 
-Both succeeded. Result: A held 998,800, B held 100, 100 of the allowance remained, and total supply stayed 998,900. A's nonce did not change, because B signed both.
+Both succeeded. Result: A held 998,800, B held 100, 100 of the allowance remained, and total supply stayed 998,900. A's <Term id="nonce">nonce</Term> did not change, because B <Term id="signature">signed</Term> both.
 
-**The key point**: these are two independent transactions. Once the first is mined, the 100 it moved is **not returned automatically** even if the second one fails (allowance too low, not enough gas, a node problem…).
+**The key point**: these are two independent transactions. Once the first is mined, the 100 it moved is **not returned automatically** even if the second one fails (allowance too low, not enough <Term id="gas">gas</Term>, a <Term id="node">node</Term> problem…).
 
 <Callout type="note" title="Self-transfer: an event, but zero net change">
 
-The second call moved 200 from A to A. Balances did not change, yet the chain still recorded a `Transfer(A, A, 200)` event. Do not equate "there is an event" with "assets changed".
+The second call moved 200 from A to A. Balances did not change, yet the chain still recorded a `Transfer(A, A, 200)` <Term id="event">event</Term>. Do not equate "there is an event" with "assets changed".
 
 </Callout>
 
 ## Lab 2: an intentionally failing batchTransfer (atomic)
 
-After the upgrade to V2 (Chapter 13), the UBOX token gained `batchTransfer`: it pays several recipients **inside one transaction**, and if any item fails the whole call reverts.
+After the upgrade to V2 (Chapter 13), the UBOX <Term id="token">token</Term> gained `batchTransfer`: it pays several recipients **inside one transaction**, and if any item fails the whole call <Term id="revert">reverts</Term>.
 
 A sent a batch whose second item could not possibly succeed:
 
 - **100** to B
-- **2,000,000** to a temporary address C (more than the total supply of 1,000,000)
+- **2,000,000** to a temporary address C (more than the <Term id="total-supply">total supply</Term> of 1,000,000)
 
 <Tx h="0x7dd2f8636c730acd9b1dbe095a1d6ebd6f9b327f5090042bcd448a80f60c1243" />
 
-- 2026-11-12 12:32:12 Singapore time, block **12116493**, status **reverted (failed)**, which is exactly what the experiment wanted
+- 2026-11-12 12:32:12 Singapore time, <Term id="block">block</Term> **12116493**, status **reverted (failed)**, which is exactly what the experiment wanted
 - Revert reason (confirmed by an `eth_call` before sending): `insufficient balance`
-- Gas used **51,719**, fee **3,516,892 wei**; A's nonce 15 → 16
+- Gas used **51,719**, fee **3,516,892 <Term id="wei">wei</Term>**; A's nonce 15 → 16
 - Afterwards A still had 1,000,000, B still 0, C still 0: the first item's 100 **did not** reach B either
 
 Demo address C (generated in memory, key never stored, received nothing): <Addr a="0x6E7F8eF4353DB8012Dea3F70eb523aB1A3051711" />
 
 <Callout type="warn" title="A failed transaction is still a transaction">
 
-It used nonce 15, paid for gas and is visible in the explorer; only its state changes were rolled back. Also, `estimateGas` itself fails for a call that is certain to fail, so the gas limit here (322,418) was set from the success-path estimate × 1.2. Unused gas limit is not charged.
+It used nonce 15, paid for gas and is visible in the <Term id="block-explorer">explorer</Term>; only its state changes were rolled back. Also, `estimateGas` itself fails for a call that is certain to fail, so the <Term id="gas-limit">gas limit</Term> here (322,418) was set from the success-path estimate × 1.2. Unused gas limit is not charged.
 
 </Callout>
 
