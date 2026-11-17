@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core'
-const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', args: ['--no-sandbox'] })
 const p2 = await browser.newPage()
 await p2.setViewport({ width: Number(process.env.W||1024), height: 700 })
 await p2.goto('http://localhost:4399' + (process.argv[2]||'/zh/chapters/16-appendix-addresses-txs/'), { waitUntil: 'networkidle0' })

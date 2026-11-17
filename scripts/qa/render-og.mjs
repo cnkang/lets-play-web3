@@ -8,7 +8,7 @@ const repo = process.argv[2] || '/workspace/web3-sandbox-guide'
 const fsrc = (pkg) => `file://${join(repo, 'node_modules/@fontsource-variable', pkg, 'wght.css')}`
 const head = `<link rel="stylesheet" href="${fsrc('plus-jakarta-sans')}"><link rel="stylesheet" href="${fsrc('noto-sans-sc')}">
 <style>html,body{margin:0;padding:0}svg{display:block}</style>`
-const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--allow-file-access-from-files'] })
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', args: ['--no-sandbox', '--allow-file-access-from-files'] })
 for (const lang of ['zh', 'en']) {
   const svg = readFileSync(join(repo, 'public/og', `${lang}.svg`), 'utf8')
   const page = await browser.newPage()

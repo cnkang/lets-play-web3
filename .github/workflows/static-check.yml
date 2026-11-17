@@ -1,0 +1,35 @@
+# Read-only static acceptance for pull requests. No deploy, no secrets,
+# no external site and no temporary browser environment as a required gate.
+name: "Static acceptance (PR)"
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    env:
+      SITE_URL: "https://letsplayweb3.liukang.com"
+      BASE: "/"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: "Content pairs and glossary references"
+        run: npm run check:content
+      - name: "Secret scan (provenance skipped: sources are not in this repo)"
+        run: npm run check:facts
+      - name: "Build and check the root deployment"
+        run: npm run build && npm run check:build
+      - name: "Build and check the subpath deployment"
+        env:
+          SITE_URL: "https://example.github.io"
+          BASE: "/lets-play-web3/"
+        run: npm run build && npm run check:build

@@ -23,7 +23,7 @@ const pages = []
 })(DIST, '')
 pages.sort()
 
-const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', args: ['--no-sandbox'] })
 const results = {}
 const all = []
 for (const width of widths) {

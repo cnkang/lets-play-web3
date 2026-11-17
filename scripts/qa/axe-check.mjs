@@ -6,7 +6,7 @@ const pages = ['', 'chapters/01-how-to-read/', 'chapters/08-lab-counter/', 'chap
 const urls = []
 for (const l of ['zh', 'en']) for (const p of pages) urls.push(`${B}/${l}/${p}`)
 urls.push(`${B}/404.html`, `${B}/`)
-const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', args: ['--no-sandbox'] })
 const summary = {}
 for (const theme of ['light', 'dark']) for (const width of [1280, 375]) {
   for (const u of urls) {
