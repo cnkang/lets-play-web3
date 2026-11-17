@@ -14,7 +14,7 @@ status: draft          # draft = only in `npm run dev`; upcoming = listed as "Co
 
 ## Start with an everyday analogy
 
-Intuition first, vocabulary second.
+Intuition first, vocabulary second. Give the first use of any jargon a "?" explanation like this: <Term id="testnet">testnet</Term> (the text lives in src/content/glossary.json).
 
 ## How it works
 
@@ -46,6 +46,11 @@ Components (no import needed, available in every chapter):
   <Callout type="warn" title="Title">…</Callout>
   <Lab title="…" goal="…" network="Sepolia" status="done|planned">…</Lab>
   <SafetyNotice lang="en" />  <Snapshot lang="en" />
+  <Term id="term-id">word shown in the text</Term>
+                                              glossary term: adds a "?" button that opens the explanation
+                                              from glossary.json. Mark only the first use per chapter; never
+                                              inside headings, links or code. Add new terms (zh + en) to
+                                              src/content/glossary.json first.
 
 Every 0x address / hash must exist in the lab notebook, or `npm run check:facts` fails.
 */}

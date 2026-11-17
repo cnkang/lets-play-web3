@@ -14,7 +14,7 @@ status: draft          # draft = 只在 npm run dev 可见；upcoming = 目录�
 
 ## 先用生活打个比方
 
-先讲直觉，再讲术语。
+先讲直觉，再讲术语。第一次出现的专有名词，用 <Term id="testnet">测试网</Term> 这样的写法加一个「?」解释（解释写在 src/content/glossary.json）。
 
 ## 原理
 
@@ -46,6 +46,10 @@ Callout 有三种：`note`（提示）、`warn`（注意）、`danger`（危险�
   <Callout type="warn" title="标题">…</Callout>
   <Lab title="…" goal="…" network="Sepolia" status="done|planned">…</Lab>
   <SafetyNotice lang="zh" />  <Snapshot lang="zh" />
+  <Term id="术语id">正文里显示的词</Term>
+                                              术语：后面带「?」按钮，点开是 glossary.json 里的解释。
+                                              每个 id 每章只标第一次出现；不要放进标题、链接、代码里。
+                                              新术语先在 src/content/glossary.json 加中英两种解释。
 
 注意：每个 0x 地址 / 哈希都必须能在实验记录里找到，否则 npm run check:facts 会失败。
 */}
