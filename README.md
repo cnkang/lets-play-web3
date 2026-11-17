@@ -59,7 +59,7 @@ npm run preview   # 预览 dist/ → http://localhost:4321/zh/
 3. 仓库 **Settings → Pages → Build and deployment → Source** 选 **GitHub Actions**。
 4. 推送到 `main` 后，`.github/workflows/deploy.yml` 会自动：安装依赖 → 密钥扫描 → 构建 → 发布。它自动设置
    `SITE_URL=https://<所有者>.github.io`、`BASE=/<仓库名>/`、`REPO_URL=<仓库地址>`。
-5. 网址：**https://cnkang.github.io/lets-play-web3/**（中文版 `/zh/`，英文版 `/en/`）
+5. 网址：**https://letsplayweb3.liukang.com/**（自定义域名，见 `public/CNAME`）（中文版 `/zh/`，英文版 `/en/`）
 
 使用自定义域名时：在 Pages 设置里填域名，并把工作流里的 `SITE_URL` 改成该域名、`BASE` 改成 `/`。
 注意：GitHub **项目页**的 `robots.txt` 位于子路径下，搜索引擎只读取域名根目录的 robots.txt；sitemap 仍可在 Search Console 手动提交。用自定义域名或 Cloudflare 可避免这个限制。
@@ -126,7 +126,7 @@ Cloudflare Pages 会自动使用 `dist/404.html` 作为真正的 404 页面（�
 - **Testnet only · $0 budget · test ETH has no value · not financial advice · never import a real seed phrase.** On-chain figures are a snapshot as of 2026-11-12 15:39:55 Singapore time (UTC+8), Sepolia block 12117419. Unofficial personal study notes.
 - **Develop:** `npm ci`, `npm run dev` (http://localhost:4321/zh/), `npm run build` → `dist/`, `npm run preview`.
 - **URLs:** every absolute URL comes from `SITE_URL` + `BASE` (see `.env.example`; public values only). A wrong `BASE` or stale canonical breaks assets and SEO.
-- **Source:** https://github.com/cnkang/lets-play-web3 · **Site (once Pages is enabled):** https://cnkang.github.io/lets-play-web3/ · Compiled by Kang.
+- **Source:** https://github.com/cnkang/lets-play-web3 · **Site:** https://letsplayweb3.liukang.com/ · Compiled by Kang.
 - **GitHub Pages:** in the repo, set Settings → Pages → Source to "GitHub Actions", then re-run the workflow. The workflow sets `SITE_URL`/`BASE`/`REPO_URL` automatically.
 - **Cloudflare Pages:** build `npm run build`, output `dist`, `NODE_VERSION=24`, `SITE_URL=https://<project>.pages.dev`, `BASE=/`. No adapter; Wrangler is optional (`wrangler.toml` for direct upload).
 - **Migration checklist:** change `SITE_URL`/`BASE` → rebuild → point DNS → verify canonical, hreflang, sitemap, robots and assets.

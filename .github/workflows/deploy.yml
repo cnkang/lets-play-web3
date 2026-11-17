@@ -1,7 +1,7 @@
 # Build the static site and deploy it to GitHub Pages.
 # Settings → Pages → Build and deployment → Source: "GitHub Actions".
 # Free GitHub Pages requires the repository to be public.
-# Suggested repository name: lets-play-web3  →  https://<owner>.github.io/lets-play-web3/
+# Custom domain: letsplayweb3.liukang.com (see public/CNAME).
 name: Deploy to GitHub Pages
 
 on:
@@ -22,9 +22,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Public URLs only — no secrets. For a custom domain, set SITE_URL to it and BASE to '/'.
-      SITE_URL: https://${{ github.repository_owner }}.github.io
-      BASE: /${{ github.event.repository.name }}/
+      # Public URLs only — no secrets. Override with repository variables SITE_URL / BASE
+      # (Settings → Secrets and variables → Actions → Variables). Without a custom domain use
+      # SITE_URL=https://<owner>.github.io and BASE=/<repo>/ (and delete public/CNAME).
+      SITE_URL: ${{ vars.SITE_URL || 'https://letsplayweb3.liukang.com' }}
+      BASE: ${{ vars.BASE || '/' }}
       REPO_URL: ${{ github.server_url }}/${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
