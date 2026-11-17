@@ -1,7 +1,9 @@
 import { getBook } from './chapters'
-import { absolute, PUBLISHED } from './site'
+import { absolute, PUBLISHED, REPO_URL } from './site'
 
-const HEADER = (full: boolean) => `# Let’s Play Web3 / 一起玩 Web3
+const HEADER = (full: boolean) => `License / 授权: Kang’s original English and Chinese teaching text, term explanations, self-check questions and original teaching diagrams are shared under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/); this does not cover the whole repository. Full scope and contact / 完整范围与联系: [LICENSING.md](${REPO_URL}/blob/main/LICENSING.md).
+
+# Let’s Play Web3 / 一起玩 Web3
 
 > A free, bilingual (Simplified Chinese + English) guide to blockchains for beginners, with hands-on labs on the **Ethereum Sepolia testnet** (chainId 11155111). Start with everyday examples, then inspect transaction records. Reading needs no wallet, faucet or account. Unofficial personal learning material, not affiliated with Ethereum, Etherscan or any company. **Testnet only; not financial advice; test ETH and test tokens have no market value.**
 

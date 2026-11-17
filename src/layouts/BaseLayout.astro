@@ -169,6 +169,7 @@ const a11yHref = href(`${lang}/accessibility/`)
         <p><Nw text={t.snapshot} /></p>
         <p><Nw text={lang === 'zh' ? `整理：${author}（个人学习项目）· 页面发布于 2026-11-13` : `Compiled by ${author} (a personal study project) · Pages published 2026-11-13`} /></p>
         <ul class="footer-links" aria-label={lang === 'zh' ? '页脚链接' : 'Footer links'}>
+          {REPO_URL && <li><a href={`${REPO_URL}/blob/main/LICENSING.md`}>{lang === 'zh' ? '教材授权说明' : 'Content licensing'}</a></li>}
           <li><a href={a11yHref} aria-current={navKey === 'a11y' ? 'page' : undefined}>{lang === 'zh' ? '无障碍声明与问题反馈' : 'Accessibility statement & feedback'}</a></li>
           {REPO_URL && <li><a href={`${REPO_URL}/issues`}>{lang === 'zh' ? '报告问题（GitHub Issues）' : 'Report a problem (GitHub Issues)'}</a></li>}
           <li><a href={href('llms.txt')}>llms.txt</a></li>

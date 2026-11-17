@@ -21,6 +21,10 @@ Prefer to look first? [Inspect a testnet transaction in Chapter 8](https://letsp
 
 GitHub’s English entry does not set the website language. At `/`, JavaScript uses a saved language choice first, then the first supported `zh`/`en` browser preference, then English. Without JavaScript it falls back to Chinese, with links to both editions. `/zh/` and `/en/` never redirect automatically.
 
+## Licensing / 教材授权
+
+The original bilingual teaching material, term explanations, self-check questions and original teaching diagrams are licensed under CC BY-NC 4.0; this does not license the repository as a whole. See [LICENSING.md](LICENSING.md) for the scope, attribution and commercial contact.
+
 ## Local development
 
 Use Node 24 from [`.nvmrc`](.nvmrc) and the committed npm lockfile (minimum supported Node: 22.23.4).
