@@ -21,6 +21,12 @@ Settings → Pages → Build and deployment 选 **GitHub Actions**。推送 `mai
 
 工作流优先使用仓库变量 `SITE_URL`、`BASE`，否则使用**自定义域名和 `/`**，并非一律使用 `github.io` 子路径。`public/CNAME` 记录 `letsplayweb3.liukang.com`。在 Pages 配置自定义域名，DNS CNAME 指向所有者的 `github.io` 域名。改为项目子路径时，设置相应的两个变量，同时移除或调整 `public/CNAME`。
 
+### 可选的 Google Analytics 4
+
+打开 **Settings → Secrets and variables → Actions → Secrets → New repository secret**，名称填写 `GA4_MEASUREMENT_ID`，值填写 GA4 网站数据流的 `G-…` 衡量 ID。保存后，在 Actions 中运行 **Deploy to GitHub Pages**，或推送到 `main` 重新构建并发布。
+
+启用后，标签会统计中英文内容页的浏览量，衡量 ID 会出现在生成的 HTML 中。未设置、留空或格式有误时，页面不会包含 GA4 标签。要关闭统计，删除该 secret 并重新部署。
+
 ## Cloudflare Pages
 
 在 Workers & Pages → Pages 连接 Git 仓库。构建命令 `npm run build`，输出目录 `dist`，`NODE_VERSION=24`，`SITE_URL=https://<项目名>.pages.dev`（或自定义域名），`BASE=/`，可选 `REPO_URL`。自定义域名在 Pages 设置中添加。

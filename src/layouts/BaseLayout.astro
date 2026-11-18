@@ -36,12 +36,25 @@ const nav = [
   { key: 'search', text: t.search, href: href(`${lang}/search/`) }
 ]
 const a11yHref = href(`${lang}/accessibility/`)
+const ga4MeasurementId = process.env.GA4_MEASUREMENT_ID?.trim() || ''
+const ga4Enabled = /^G-[A-Z0-9]+$/.test(ga4MeasurementId)
 ---
 <!doctype html>
 <html lang={htmlLang[lang]} dir="ltr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    {ga4Enabled && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4MeasurementId}`}></script>
+        <script is:inline define:vars={{ ga4MeasurementId }}>
+          window.dataLayer = window.dataLayer || []
+          window.gtag = function () { window.dataLayer.push(arguments) }
+          window.gtag('js', new Date())
+          window.gtag('config', ga4MeasurementId)
+        </script>
+      </>
+    )}
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <meta name="author" content={author} />

@@ -21,6 +21,12 @@ In Settings → Pages → Build and deployment, choose **GitHub Actions**. Pushe
 
 The workflow uses repository variables `SITE_URL` and `BASE` when set, otherwise **the custom domain and `/`**, not a `github.io` subpath. `public/CNAME` records `letsplayweb3.liukang.com`. Configure the Pages custom domain and its DNS CNAME to the owner’s `github.io` hostname. For project-path hosting, set both variables appropriately and remove/update `public/CNAME` as part of the migration.
 
+### Optional Google Analytics 4
+
+Go to **Settings → Secrets and variables → Actions → Secrets → New repository secret**. Name it `GA4_MEASUREMENT_ID` and enter the `G-…` Measurement ID from your GA4 web stream. Then run **Deploy to GitHub Pages** from the Actions tab or push to `main` to rebuild and publish the site.
+
+The tag records page views on the Chinese and English content pages. The Measurement ID appears in the generated HTML when analytics is enabled. An unset, blank, or invalid value omits the tag. To disable analytics, delete the secret and run the deployment again.
+
 ## Cloudflare Pages
 
 Connect the Git repository under Workers & Pages → Pages. Set build command `npm run build`, output directory `dist`, `NODE_VERSION=24`, `SITE_URL=https://<project>.pages.dev` (or the custom domain), `BASE=/`, and optionally `REPO_URL`. Add custom domains in Pages settings.

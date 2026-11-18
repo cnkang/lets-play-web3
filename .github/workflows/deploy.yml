@@ -38,6 +38,8 @@ jobs:
       - name: "Secret scan (fact check is skipped in CI: sources are not in this repo)"
         run: node scripts/check-facts.mjs
       - name: Decode OG images (assets/og/*.png.b64), content check (zh + en pairs) and build
+        env:
+          GA4_MEASUREMENT_ID: ${{ secrets.GA4_MEASUREMENT_ID }}
         run: npm run build
       - name: Check built links, assets and language URLs
         run: npm run check:build
