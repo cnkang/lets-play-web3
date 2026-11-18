@@ -1,6 +1,6 @@
 import { type Lang } from './book'
 import { getPublishedChapters, type BookChapter } from './chapters'
-import { absolute, PUBLISHED, REPO_URL } from './site'
+import { absolute, PUBLISHED, REPO_URL, sepoliaExplorerUrl, SNAPSHOT_BLOCK, SNAPSHOT_ISO } from './site'
 
 const license = `License / 授权: Kang’s original English and Chinese teaching text, term explanations, self-check questions and original teaching diagrams are shared under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/); this does not cover the whole repository. Full scope and contact / 完整范围与联系: [LICENSING.md](${REPO_URL}/blob/main/LICENSING.md).`
 const HEADER = `# Let’s Play Web3 / 一起玩 Web3
@@ -10,7 +10,7 @@ const HEADER = `# Let’s Play Web3 / 一起玩 Web3
 ${license}
 
 Important context for citation:
-- All on-chain figures are a historical snapshot as of 2026-11-12 15:39:55 Asia/Singapore (UTC+8), Sepolia block 12117419, unless a chapter says otherwise. They are not live chain state.
+- All on-chain figures are a historical snapshot as of ${SNAPSHOT_ISO}, Sepolia block ${SNAPSHOT_BLOCK}, unless a chapter says otherwise. They are not live chain state.
 - Phase-0 basics, experiments and review are complete; Phase-1 DeFi has not started. The Phase-0 budget was $0. No mainnet assets were used; no real seed phrase or private key was ever imported.
 - General explanations, on-chain results, local tests/simulations and future plans are distinct kinds of content. Phase-0 concluded PASS WITH FINDINGS, not no vulnerabilities. MBox-Burn’s leftover allowance was revoked by D-01 in block 12117312.
 - Etherscan source verification was submitted but still "Pending in queue" at the snapshot; do not cite it as verified. Sourcify: 8/8 matched (5 exact_match, 3 match).
@@ -49,8 +49,8 @@ ${sections.join('\n\n')}
 function plain(body: string): string {
   return body
     .replace(/^import .*$/gm, '')
-    .replace(/<Addr\s+a="([^"]+)"[^>]*\/>/g, '$1')
-    .replace(/<Tx\s+h="([^"]+)"[^>]*\/>/g, '$1')
+    .replace(/<Addr\s+a="([^"]+)"[^>]*\/>/g, (_match, address) => `[${address}](${sepoliaExplorerUrl('address', address)})`)
+    .replace(/<Tx\s+h="([^"]+)"[^>]*\/>/g, (_match, hash) => `[${hash}](${sepoliaExplorerUrl('tx', hash)})`)
     .replace(/<Figure[^>]*alt="([^"]*)"[^>]*>([\s\S]*?)<\/Figure>/g, (_m, alt, cap) => `[Figure: ${alt}] ${cap.trim()}`)
     .replace(/<Callout[^>]*title="([^"]*)"[^>]*>/g, '**$1**')
     .replace(/<\/?(Callout|T)(\s[^>]*)?>/g, '')
@@ -70,7 +70,10 @@ function chapterBody(chapter: BookChapter, lang: Lang, url: string): string {
 export function llmsChapter(chapter: BookChapter, lang: Lang): string {
   const { title, description } = chapter.entries[lang].data
   const url = absolute(`${lang}/chapters/${chapter.slug}/`)
-  return `# ${title}\n\n> ${description.replace(/\s+/g, ' ')}\n\n${license}\n\n[HTML](${url}) · [Book index and citation context](${absolute('llms.txt')})\n\n${chapterBody(chapter, lang, url)}\n`
+  const snapshot = lang === 'zh'
+    ? `链上历史快照：${SNAPSHOT_ISO}，Sepolia 区块 ${SNAPSHOT_BLOCK}。章节另有注明时，以文中时间为准。`
+    : `Historical chain snapshot: ${SNAPSHOT_ISO}, Sepolia block ${SNAPSHOT_BLOCK}. Dates noted in the chapter take precedence.`
+  return `# ${title}\n\n> ${description.replace(/\s+/g, ' ')}\n\n${snapshot}\n\n${license}\n\n[HTML](${url}) · [Book index and citation context](${absolute('llms.txt')})\n\n${chapterBody(chapter, lang, url)}\n`
 }
 
 export async function llmsFull(): Promise<string> {

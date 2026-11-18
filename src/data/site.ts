@@ -32,5 +32,9 @@ export const SNAPSHOT_ISO = '2026-11-12T15:39:55+08:00'
 export const SNAPSHOT_BLOCK = 12117419
 export const PUBLISHED = '2026-11-13'
 
+export function sepoliaExplorerUrl(kind: 'address' | 'tx', value: string): string {
+  return `https://sepolia.etherscan.io/${kind}/${value}`
+}
+
 export const htmlLang: Record<Lang, string> = { zh: 'zh-CN', en: 'en' }
 export const ogLocale: Record<Lang, string> = { zh: 'zh_CN', en: 'en_US' }

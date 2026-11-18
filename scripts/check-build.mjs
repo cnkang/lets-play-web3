@@ -90,7 +90,25 @@ for (const file of html) {
       const links = tags.filter(({ tag, a }) => tag === 'link' && a.rel === 'alternate' && a.type === 'text/markdown')
       if (links.length !== 1 || links[0].a.href !== base + path + 'index.md') fail(rel, 'missing or incorrect chapter Markdown alternate')
       const markdownFile = join(dist, path, 'index.md')
-      if (!existsSync(markdownFile) || !read(markdownFile).includes(`[HTML](${page})`)) fail(rel, 'chapter Markdown must link back to its HTML page')
+      if (!existsSync(markdownFile)) {
+        fail(rel, 'missing chapter Markdown')
+      } else {
+        const markdown = read(markdownFile)
+        if (!markdown.includes(`[HTML](${page})`)) fail(rel, 'chapter Markdown must link back to its HTML page')
+        const snapshot = markdown.split('\n').find((line) => /^(Historical chain snapshot:|链上历史快照：)/.test(line))
+        const snapshotTime = source.match(/<time datetime="([^"]+)"[^>]*>[^<]+\(UTC\+8\)<\/time>/)?.[1]
+        if (!snapshotTime || !snapshot?.includes(snapshotTime) || !/Sepolia (?:block|区块) \d+/.test(snapshot)) {
+          fail(rel, 'chapter Markdown must include the historical snapshot time and Sepolia block')
+        }
+        const explorerLinks = new Set(tags
+          .map(({ a }) => a.href)
+          .filter((href) => /^https:\/\/sepolia\.etherscan\.io\/(tx|address)\/0x[\da-f]+$/i.test(href ?? '')))
+        for (const url of explorerLinks) {
+          if (!markdown.includes(`](${url})`) && !markdown.includes(`<${url}>`)) {
+            fail(rel, `chapter Markdown missing evidence link ${url}`)
+          }
+        }
+      }
     }
   }
   for (const m of source.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {

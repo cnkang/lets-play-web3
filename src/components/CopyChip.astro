@@ -1,8 +1,10 @@
 ---
+import { sepoliaExplorerUrl } from '../data/site'
+
 interface Props { value: string; kind: 'address' | 'tx'; short?: boolean }
 const { value, kind, short = false } = Astro.props
 const lang = Astro.url.pathname.includes('/en/') ? 'en' : 'zh'
-const href = `https://sepolia.etherscan.io/${kind === 'tx' ? 'tx' : 'address'}/${value}`
+const href = sepoliaExplorerUrl(kind, value)
 const shown = short ? `${value.slice(0, 8)}…${value.slice(-6)}` : value
 const t = lang === 'zh'
   ? { copy: '复制', what: kind === 'tx' ? '交易哈希' : '地址', view: kind === 'tx' ? '在 Sepolia Etherscan 查看交易' : '在 Sepolia Etherscan 查看地址', newtab: '（新窗口打开）' }
