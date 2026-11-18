@@ -1,13 +1,16 @@
 ---
-title: "Approval is not payment"
-description: "An approval lets a spender use a limited amount of tokens; it does not transfer them. Follow MBox-Burn approvals, spending and revocation. Approval still costs a network fee; D-01 cleared the leftover allowance."
+title: "ERC-20 approve and allowance explained"
+description: "Learn what ERC-20 approve changes, how allowance limits later spending, and how revocation works. Follow an actual approval and revocation on Sepolia."
 navTitle: "10 · Approval is not payment"
 part: tokens
 order: 100
 status: published
+updated: "2026-11-18"
 ---
 
-<p class="lead">Three roles: holder, <Term id="spender">spender</Term>, recipient. Approving and spending are two separate actions.</p>
+<p class="lead">ERC-20 <code>approve</code> sets how many tokens a <Term id="spender">spender</Term> may use later. That limit is the allowance. The approval leaves token balances unchanged, and submitting it still costs a network fee.</p>
+
+Follow the [MBox-Burn spending and revocation records](../11-lab-mbox-burn/) to see each action on Sepolia.
 
 ## Why do wallets keep asking you to "approve" rather than "pay"?
 
