@@ -44,6 +44,10 @@ export function getBook(): Promise<Book> {
   return cached
 }
 
+export async function getPublishedChapters(): Promise<BookChapter[]> {
+  return (await getBook()).pages.filter((chapter) => chapter.status === 'published')
+}
+
 async function load(): Promise<Book> {
   const [phaseEntries, partEntries, all] = await Promise.all([
     getCollection('phases'),

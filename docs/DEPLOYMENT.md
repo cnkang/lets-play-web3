@@ -15,6 +15,8 @@ The site is static Astro output in `dist/`; no server adapter or wallet service 
 
 See `.env.example`; local public overrides can go in an ignored `.env`. Absolute metadata URLs use `SITE_URL` + `BASE`: canonical, hreflang, sitemap, robots, OG, JSON-LD and llms links. Internal links/assets use `BASE`. Build again after changing these settings.
 
+Every `npm run build` regenerates `sitemap.xml`, `robots.txt`, `llms.txt`, `llms-full.txt`, and each published chapter's `index.md` from the current content. Adding or editing published chapters requires no manual index update. Set `updated: "YYYY-MM-DD"` in the frontmatter of each translation you materially edit to publish its sitemap `lastmod`. Omit it if the date is unknown. `npm run check:build` verifies that the generated indexes match the built pages.
+
 ## GitHub Pages
 
 In Settings → Pages → Build and deployment, choose **GitHub Actions**. Pushes to `main` or manual runs of `.github/workflows/deploy.yml` install dependencies, scan for secrets, check content, build and deploy. External lab provenance is normally skipped in CI because the lab sources are not in this repository.
@@ -26,6 +28,12 @@ The workflow uses repository variables `SITE_URL` and `BASE` when set, otherwise
 Go to **Settings → Secrets and variables → Actions → Secrets → New repository secret**. Name it `GA4_MEASUREMENT_ID` and enter the `G-…` Measurement ID from your GA4 web stream. Then run **Deploy to GitHub Pages** from the Actions tab or push to `main` to rebuild and publish the site.
 
 The tag records page views on the Chinese and English content pages. The Measurement ID appears in the generated HTML when analytics is enabled. An unset, blank, or invalid value omits the tag. To disable analytics, delete the secret and run the deployment again.
+
+### Optional IndexNow notifications
+
+Generate a random verification key with `openssl rand -hex 16` and save it as the `INDEXNOW_KEY` repository secret under **Settings → Secrets and variables → Actions → Secrets**. The build publishes the verification file at `BASE/<key>.txt` for participating search engines to read. Keep the key value out of Git and Actions logs. Delete the secret and redeploy to disable IndexNow and remove the key file.
+
+After deployment succeeds, the workflow compares sitemap page URLs and their main-content fingerprints with the last successful submission. It sends new, modified and removed URLs in a batch and skips submissions when there are no changes. With no cached submission history, it sends the current sitemap URLs to establish a baseline.
 
 ## Cloudflare Pages
 

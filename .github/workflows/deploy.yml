@@ -18,15 +18,18 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  # Override via repository Actions variables. For project Pages use
+  # SITE_URL=https://<owner>.github.io and BASE=/<repo>/ (and delete public/CNAME).
+  SITE_URL: ${{ vars.SITE_URL || 'https://letsplayweb3.liukang.com' }}
+  BASE: ${{ vars.BASE || '/' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      indexnow_scope: ${{ steps.indexnow.outputs.scope }}
     env:
-      # Public URLs only — no secrets. Override with repository variables SITE_URL / BASE
-      # (Settings → Secrets and variables → Actions → Variables). Without a custom domain use
-      # SITE_URL=https://<owner>.github.io and BASE=/<repo>/ (and delete public/CNAME).
-      SITE_URL: ${{ vars.SITE_URL || 'https://letsplayweb3.liukang.com' }}
-      BASE: ${{ vars.BASE || '/' }}
       REPO_URL: ${{ github.server_url }}/${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +46,19 @@ jobs:
         run: npm run build
       - name: Check built links, assets and language URLs
         run: npm run check:build
+      - name: Prepare optional IndexNow verification and content fingerprints
+        id: indexnow
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+        run: node scripts/indexnow.mjs prepare
+      - uses: actions/upload-artifact@v4
+        if: steps.indexnow.outputs.scope != ''
+        with:
+          name: indexnow-content
+          path: .indexnow/current.json
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -57,3 +73,37 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  indexnow:
+    name: Notify IndexNow
+    needs: [build, deploy]
+    if: needs.build.outputs.indexnow_scope != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      INDEXNOW_CACHE: indexnow-v1-${{ needs.build.outputs.indexnow_scope }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: indexnow-content
+          path: .indexnow
+      - uses: actions/cache/restore@v4
+        with:
+          path: .indexnow/submitted.json
+          key: ${{ env.INDEXNOW_CACHE }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: ${{ env.INDEXNOW_CACHE }}-
+      - name: Submit changed URLs after a successful deployment
+        id: notify
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+        run: node scripts/indexnow.mjs notify
+      - uses: actions/cache/save@v4
+        if: steps.notify.outputs.submitted == 'true'
+        with:
+          path: .indexnow/submitted.json
+          key: ${{ env.INDEXNOW_CACHE }}-${{ github.run_id }}-${{ github.run_attempt }}

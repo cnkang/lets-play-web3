@@ -36,8 +36,8 @@ const chapterSchema = z.object({
    * draft     — excluded from production builds entirely (visible in `npm run dev`).
    */
   status: z.enum(['published', 'upcoming', 'draft']).default('published'),
-  /** Optional last-updated date (YYYY-MM-DD); defaults to the site publish date. */
-  updated: z.string().optional()
+  /** Optional date of the last significant edit to this translation. */
+  updated: z.iso.date().optional()
 })
 
 // One file per chapter per language: src/content/chapters/<lang>/<slug>.mdx
@@ -49,7 +49,7 @@ const chapters = defineCollection({
 // Stand-alone (non-book) pages such as the accessibility statement.
 const pages = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/pages' }),
-  schema: z.object({ title: z.string(), description: z.string() })
+  schema: z.object({ title: z.string(), description: z.string(), updated: z.iso.date().optional() })
 })
 
 export const collections = { phases, parts, chapters, pages }

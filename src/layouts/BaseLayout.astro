@@ -65,7 +65,8 @@ const ga4Enabled = /^G-[A-Z0-9]+$/.test(ga4MeasurementId)
     {!noindex && <link rel="alternate" hreflang="x-default" href={zhUrl} />}
     <link rel="icon" type="image/svg+xml" href={href('favicon.svg')} />
     <link rel="sitemap" href={href('sitemap.xml')} />
-    <link rel="alternate" type="text/plain" title="llms.txt" href={href('llms.txt')} />
+    <link rel="describedby" href={href('llms.txt')} />
+    {currentSlug && !noindex && <link rel="alternate" type="text/markdown" href={href(`${lang}/${path}index.md`)} />}
     <meta name="theme-color" content="#f6f5fe" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#100d22" media="(prefers-color-scheme: dark)" />
     <meta name="color-scheme" content="light dark" />

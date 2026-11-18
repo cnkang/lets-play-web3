@@ -1,11 +1,13 @@
-import { getBook } from './chapters'
+import { type Lang } from './book'
+import { getPublishedChapters, type BookChapter } from './chapters'
 import { absolute, PUBLISHED, REPO_URL } from './site'
 
-const HEADER = (full: boolean) => `License / 授权: Kang’s original English and Chinese teaching text, term explanations, self-check questions and original teaching diagrams are shared under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/); this does not cover the whole repository. Full scope and contact / 完整范围与联系: [LICENSING.md](${REPO_URL}/blob/main/LICENSING.md).
-
-# Let’s Play Web3 / 一起玩 Web3
+const license = `License / 授权: Kang’s original English and Chinese teaching text, term explanations, self-check questions and original teaching diagrams are shared under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/); this does not cover the whole repository. Full scope and contact / 完整范围与联系: [LICENSING.md](${REPO_URL}/blob/main/LICENSING.md).`
+const HEADER = `# Let’s Play Web3 / 一起玩 Web3
 
 > A free, bilingual (Simplified Chinese + English) guide to blockchains for beginners, with hands-on labs on the **Ethereum Sepolia testnet** (chainId 11155111). Start with everyday examples, then inspect transaction records. Reading needs no wallet, faucet or account. Unofficial personal learning material, not affiliated with Ethereum, Etherscan or any company. **Testnet only; not financial advice; test ETH and test tokens have no market value.**
+
+${license}
 
 Important context for citation:
 - All on-chain figures are a historical snapshot as of 2026-11-12 15:39:55 Asia/Singapore (UTC+8), Sepolia block 12117419, unless a chapter says otherwise. They are not live chain state.
@@ -14,25 +16,31 @@ Important context for citation:
 - Etherscan source verification was submitted but still "Pending in queue" at the snapshot; do not cite it as verified. Sourcify: 8/8 matched (5 exact_match, 3 match).
 - UBOX V4 exists only locally (tests + fork simulation); it was never deployed on Sepolia.
 - Pages first published ${PUBLISHED}. Editions: /zh/ and /en/ with identical slugs. At /, JavaScript uses a saved choice, then the first supported browser language, then English. Without JavaScript it falls back to Chinese. Language pages do not auto-redirect.
-${full ? '' : `- Full plain-text version of every chapter: ${absolute('llms-full.txt')}`}
 `
 
+const editions = { en: 'English edition', zh: '中文版' }
+
 export async function llmsIndex(): Promise<string> {
-  const book = await getBook()
-  const lines = book.pages.filter((c) => c.status === 'published').map((c) => {
-    const { en, zh } = c.entries
-    return `- [${en?.data.title}](${absolute(`en/chapters/${c.slug}/`)}) / [${zh?.data.title}](${absolute(`zh/chapters/${c.slug}/`)}): ${en?.data.description}`
+  const chapters = await getPublishedChapters()
+  const sections = (['en', 'zh'] as const).map((lang) => {
+    const lines = chapters.map(({ slug, entries }) => {
+      const { title, description } = entries[lang].data
+      const label = title.replace(/[\\\[\]]/g, '\\$&').replace(/\s+/g, ' ')
+      return `- [${label}](${absolute(`${lang}/chapters/${slug}/index.md`)}): ${description.replace(/\s+/g, ' ')}`
+    })
+    return `## ${editions[lang]}\n\n${lines.join('\n')}`
   })
-  const soon = book.listed.filter((c) => c.status === 'upcoming').map((c) => `- ${c.title.en} / ${c.title.zh} (not published yet)`)
-  return `${HEADER(false)}
-## Chapters (reading order)
 
-${lines.join('\n')}
-${soon.length ? `\n## Coming soon\n\n${soon.join('\n')}\n` : ''}
-## Other pages
+  return `${HEADER}
+${sections.join('\n\n')}
 
-- [Home (中文)](${absolute('zh/')}) · [Home (English)](${absolute('en/')})
-- [Accessibility statement](${absolute('en/accessibility/')}) · [无障碍声明](${absolute('zh/accessibility/')})
+## Optional
+
+- [Full bilingual text](${absolute('llms-full.txt')}): All published chapters in one file.
+- [English homepage](${absolute('en/')})
+- [中文首页](${absolute('zh/')})
+- [Accessibility statement](${absolute('en/accessibility/')})
+- [无障碍声明](${absolute('zh/accessibility/')})
 - [Sitemap](${absolute('sitemap.xml')})
 `
 }
@@ -49,19 +57,30 @@ function plain(body: string): string {
     .replace(/<Lab[^>]*title="([^"]*)"[^>]*>/g, '**$1**')
     .replace(/<\/Lab>/g, '')
     .replace(/<(SafetyNotice|Snapshot|Quiz)[^>]*\/>/g, '')
+    .replace(/<h([1-6])\b[^>]*>([^\n]*?)<\/h\1>/g, (_match, level, heading) => `${'#'.repeat(Number(level))} ${heading}`)
     .replace(/<[^>]+>/g, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }
 
+function chapterBody(chapter: BookChapter, lang: Lang, url: string): string {
+  return plain(chapter.entries[lang].body ?? '').replace(/\]\(((?:\.{1,2}\/|#)[^\s)]+)\)/g, (_match, href) => `](${new URL(href, url)})`)
+}
+
+export function llmsChapter(chapter: BookChapter, lang: Lang): string {
+  const { title, description } = chapter.entries[lang].data
+  const url = absolute(`${lang}/chapters/${chapter.slug}/`)
+  return `# ${title}\n\n> ${description.replace(/\s+/g, ' ')}\n\n${license}\n\n[HTML](${url}) · [Book index and citation context](${absolute('llms.txt')})\n\n${chapterBody(chapter, lang, url)}\n`
+}
+
 export async function llmsFull(): Promise<string> {
-  const book = await getBook()
-  const parts: string[] = [HEADER(true)]
+  const chapters = await getPublishedChapters()
+  const parts: string[] = [HEADER]
   for (const lang of ['en', 'zh'] as const) {
-    parts.push(`\n\n# ${lang === 'en' ? 'English edition' : '中文版'}\n`)
-    for (const c of book.pages.filter((x) => x.status === 'published')) {
-      const e = c.entries[lang]
-      parts.push(`\n---\n\n## ${e.data.title}\n\nURL: ${absolute(`${lang}/chapters/${c.slug}/`)}\n\n${plain(e.body ?? '')}\n`)
+    parts.push(`\n\n# ${editions[lang]}\n`)
+    for (const chapter of chapters) {
+      const url = absolute(`${lang}/chapters/${chapter.slug}/`)
+      parts.push(`\n---\n\n## ${chapter.title[lang]}\n\nURL: ${url}\n\n${chapterBody(chapter, lang, url)}\n`)
     }
   }
   return parts.join('')

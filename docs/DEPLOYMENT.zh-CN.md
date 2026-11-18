@@ -15,6 +15,8 @@ Astro 构建结果是 `dist/` 中的静态文件，不需要服务端适配器�
 
 见 `.env.example`；本地公开配置可以放在被忽略的 `.env`。canonical、hreflang、sitemap、robots、OG、JSON-LD 和 llms 绝对网址由 `SITE_URL` + `BASE` 生成；站内链接与资源使用 `BASE`。配置变动后必须重新构建。
 
+每次运行 `npm run build` 都会根据当前内容重新生成 `sitemap.xml`、`robots.txt`、`llms.txt`、`llms-full.txt` 和已发布章节的 `index.md`。新增或修改已发布章节后，无需手动维护索引。内容有实质修改时，在对应语言的 frontmatter 中填写 `updated: "YYYY-MM-DD"`，该日期会写入 sitemap 的 `lastmod`。日期未知时可省略。`npm run check:build` 会校验这些索引与构建产物是否一致。
+
 ## GitHub Pages
 
 Settings → Pages → Build and deployment 选 **GitHub Actions**。推送 `main` 或手动运行 `.github/workflows/deploy.yml`，会安装依赖、扫描疑似密钥、检查内容、构建并部署。CI 没有外部实验来源，通常会跳过地址/哈希出处核对。
@@ -26,6 +28,12 @@ Settings → Pages → Build and deployment 选 **GitHub Actions**。推送 `mai
 打开 **Settings → Secrets and variables → Actions → Secrets → New repository secret**，名称填写 `GA4_MEASUREMENT_ID`，值填写 GA4 网站数据流的 `G-…` 衡量 ID。保存后，在 Actions 中运行 **Deploy to GitHub Pages**，或推送到 `main` 重新构建并发布。
 
 启用后，标签会统计中英文内容页的浏览量，衡量 ID 会出现在生成的 HTML 中。未设置、留空或格式有误时，页面不会包含 GA4 标签。要关闭统计，删除该 secret 并重新部署。
+
+### 可选的 IndexNow 通知
+
+用 `openssl rand -hex 16` 生成随机验证密钥，在 **Settings → Secrets and variables → Actions → Secrets** 中保存为仓库 secret `INDEXNOW_KEY`。构建会在站点的 `BASE/<key>.txt` 发布验证文件，供参与 IndexNow 的搜索引擎读取。密钥值保存在 GitHub Secrets 中。要关闭，删除 secret 并重新部署，验证文件也会随之移除。
+
+部署成功后，工作流会用 sitemap 中的页面网址和正文指纹与上一次成功提交对比，批量通知新增、修改和删除的网址。正文和网址都没有变化时跳过通知。没有已提交的缓存记录时，会提交当前 sitemap 中的网址，建立比较基准。
 
 ## Cloudflare Pages
 

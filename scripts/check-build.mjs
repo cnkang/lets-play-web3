@@ -16,7 +16,7 @@ const absolute = (path = '') => origin + base + path
 const errors = new Set()
 const fail = (where, message) => errors.add(`${where}: ${message}`)
 const read = (file) => readFileSync(file, 'utf8')
-const decode = (s) => s.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+const decode = (s) => s.replace(/&quot;/g, '"').replace(/&apos;|&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
 const cache = new Map()
 let references = 0
 
@@ -56,6 +56,9 @@ if (!existsSync(join(dist, 'index.html'))) {
 }
 const files = walk(dist)
 const html = files.filter((f) => f.endsWith('.html'))
+const indexablePages = new Map()
+const chapterPages = new Set()
+const chapterMarkdown = new Set()
 for (const file of html) {
   const rel = relative(dist, file).split('\\').join('/')
   const path = rel.replace(/index\.html$/, '')
@@ -73,9 +76,21 @@ for (const file of html) {
     const canonical = tags.filter(({ a }) => a.rel === 'canonical')
     if (canonical.length !== 1 || canonical[0].a.href !== wantCanonical) fail(rel, `canonical must be ${wantCanonical}`)
     const noindex = tags.some(({ a }) => a.name === 'robots' && a.content?.includes('noindex'))
+    const alternates = new Map()
     for (const [lang, target] of [['zh-CN', 'zh/'], ['en', 'en/'], ['x-default', 'zh/']]) {
       const links = tags.filter(({ tag, a }) => tag === 'link' && a.rel === 'alternate' && a.hreflang === lang)
       if (noindex ? links.length !== 0 : links.length !== 1 || links[0].a.href !== absolute(target + route)) fail(rel, `incorrect ${lang} alternate`)
+      if (links.length === 1) alternates.set(lang, links[0].a.href)
+    }
+    if (path && !noindex) indexablePages.set(page, alternates)
+    if (route.startsWith('chapters/') && !noindex) {
+      const markdownUrl = `${page}index.md`
+      chapterPages.add(page)
+      chapterMarkdown.add(markdownUrl)
+      const links = tags.filter(({ tag, a }) => tag === 'link' && a.rel === 'alternate' && a.type === 'text/markdown')
+      if (links.length !== 1 || links[0].a.href !== base + path + 'index.md') fail(rel, 'missing or incorrect chapter Markdown alternate')
+      const markdownFile = join(dist, path, 'index.md')
+      if (!existsSync(markdownFile) || !read(markdownFile).includes(`[HTML](${page})`)) fail(rel, 'chapter Markdown must link back to its HTML page')
     }
   }
   for (const m of source.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
@@ -92,13 +107,41 @@ for (const file of files.filter((f) => f.endsWith('.css'))) {
   const from = absolute(relative(dist, file).split('\\').join('/'))
   for (const m of read(file).matchAll(/url\(\s*["']?([^\s"')]+)["']?\s*\)/g)) checkRef(m[1], from, relative(dist, file))
 }
+
+function checkCoverage(name, urls, expected) {
+  const seen = new Set()
+  for (const url of urls) {
+    if (seen.has(url)) fail(name, `duplicate entry ${url}`)
+    if (!expected.has(url)) fail(name, `unexpected entry ${url}`)
+    seen.add(url)
+  }
+  for (const url of expected.keys()) if (!seen.has(url)) fail(name, `missing entry ${url}`)
+}
+
 for (const name of ['sitemap.xml', 'robots.txt', 'llms.txt', 'llms-full.txt']) {
   const file = join(dist, name)
   if (!existsSync(file)) { fail(name, 'missing generated file'); continue }
   const source = read(file)
-  if (name === 'sitemap.xml') for (const m of source.matchAll(/<loc>(.*?)<\/loc>/g)) checkRef(decode(m[1]), absolute(name), name)
+  if (name === 'sitemap.xml') {
+    const locations = []
+    for (const [, entry] of source.matchAll(/<url>([\s\S]*?)<\/url>/g)) {
+      const location = decode(entry.match(/<loc>(.*?)<\/loc>/)?.[1] ?? '')
+      locations.push(location)
+      const alternates = [...entry.matchAll(/<xhtml:link\b[^>]*>/g)].map(([link]) => attrs(link))
+      const expected = indexablePages.get(location)
+      if (expected && (alternates.length !== expected.size || [...expected].some(([lang, href]) =>
+        alternates.filter((link) => link.rel === 'alternate' && link.hreflang === lang && link.href === href).length !== 1
+      ))) fail(name, `incorrect hreflang for ${location}`)
+    }
+    checkCoverage(name, locations, indexablePages)
+  }
   if (name === 'robots.txt' && !source.split(/\r?\n/).includes(`Sitemap: ${absolute('sitemap.xml')}`)) fail(name, 'incorrect Sitemap URL')
   if (name.startsWith('llms')) for (const m of source.matchAll(/https?:\/\/[^\s)<>"`]+/g)) checkRef(m[0], absolute(name), name)
+  if (name === 'llms.txt') {
+    if (!source.startsWith('# ')) fail(name, 'must begin with a Markdown H1')
+    checkCoverage(name, [...source.matchAll(/\]\(([^)]+\/index\.md)\)/g)].map((m) => m[1]), chapterMarkdown)
+  }
+  if (name === 'llms-full.txt') checkCoverage(name, [...source.matchAll(/^URL: (\S+)$/gm)].map((m) => m[1]), chapterPages)
 }
 if (errors.size) {
   console.error(`✗ build check failed (${errors.size}):\n- ${[...errors].join('\n- ')}`)
