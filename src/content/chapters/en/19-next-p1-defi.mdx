@@ -1,61 +1,423 @@
 ---
-title: "Next stop: Phase-1 DeFi (not started yet)"
-description: "Phase-0 basics, experiments and review are complete; Phase-1 DeFi has not started. Plans cover swaps, price impact, slippage, liquidity, impermanent loss and revoking allowances. No DeFi results yet."
-navTitle: "Next stop: Phase-1 DeFi (not started yet)"
+title: "DeFi labs: swaps, arbitrage and liquidity"
+description: "Phase-1 on the Sepolia testnet: a first swap, exact approvals, an odd-priced pool and arbitrage, two plans to win back the starting tokens, a paper model of impermanent loss, a v2 liquidity position and a v3 concentrated-liquidity NFT position. Every figure matches an on-chain transaction. Test tokens have no real value."
+navTitle: "19 · DeFi labs: swaps, arbitrage and liquidity"
 part: p1-defi
 order: 190
 status: published
+updated: "2026-11-19"
 ---
 
-<p class="lead">This chapter is reserved for later. The Phase-1 <Term id="defi">DeFi</Term> experiments <strong>have not started yet</strong>, and nothing below is an on-chain result.</p>
+<p class="lead">This chapter records the Phase-1 <Term id="defi">DeFi</Term> labs from start to finish. Everything ran on the Sepolia testnet with free test tokens. You will see what one swap really does, why a price that looks too good deserves suspicion, and what you earn and lose when you put money into a pool.</p>
 
-<Callout type="warn" title="Status: not started">
+<Callout type="note" title="Snapshot and scope of this chapter">
 
-This chapter has no deployments, no transactions and no addresses. When Phase-1 is actually done, its experiments will be added to this book as new chapters, with verifiable transactions and block numbers like the ones before.
+- On-chain figures in this chapter are as of **2026-11-19 11:58:12 Singapore time (UTC+8)**, Sepolia block **12165973**. They are separate from the "2026-11-12 / block 12117419" snapshot used in earlier chapters.
+- Account A is the same test account as before: <Addr a="0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC" short />. This chapter sent **23 transactions** in total (nonce 20 → 42). Kang approved each one explicitly in advance.
+- **Test tokens have no real value.** "Earning over a thousand USDC" below is a learning number. It is not income and not investment advice.
+- "Fork rehearsal" means a simulation on a local copy of the chain. It is labelled separately and is never presented as an on-chain result.
 
 </Callout>
 
-## What Phase-0 gave you
+## Start with an everyday picture
 
-The records so far show deployments, state reads, transfers and <Term id="approve">approvals</Term>, <Term id="proxy">proxy</Term> upgrades, tests and source checks. You can inspect them even if you have not sent a transaction yourself. The next phase plans **one minimal, observable swap workflow**:
+Picture an **automatic currency exchange machine** at an airport. It holds two currencies, say dollars and euros. You put in dollars, and a formula decides how many euros come out. There is no clerk, and no other customer has to match your order.
 
-1. understand how a <Term id="dex-amm">DEX / AMM</Term> works;
-2. prepare <Term id="test-token">test tokens</Term>;
-3. approve a **limited** amount (never infinite);
-4. <Term id="simulate">simulate</Term> a swap first;
-5. observe inputs, outputs and the change in reserves;
-6. **revoke the allowance**;
-7. review the fees and slippage.
+- The more money the machine holds, the less one exchange moves its rate. If it holds little, one big exchange pushes the rate far off.
+- Each exchange pays a small fee. The fees go to **the people who put money into the machine**.
+- The machine only follows its formula. It never checks the rate outside. If someone set the rate wrong at the start, it keeps trading at that rate until someone "takes the bargain" and pushes it back.
 
-## Planned topics
+This machine is a <Term id="liquidity-pool">liquidity pool</Term> on a <Term id="dex-amm">DEX / AMM</Term>. Every lab below works with machines like this.
 
-<T label="Planned Phase-1 topics">
+## Basic ideas
 
-| Topic | Everyday analogy | Suggested order |
+### Swaps, pools and fee tiers
+
+- **<Term id="swap">Swap</Term>**: exchange one token for another. On a DEX the other side is a pool contract, not a person.
+- **Pools and <Term id="fee-tier">fee tiers</Term>**: one token pair can have several pools with different fees. Uniswap v3 commonly uses 0.01%, 0.05%, 0.3% and 1%. Pools can show very different prices. In this chapter two pools differed by almost ten thousand times.
+- Tokens used here: the <Term id="stablecoin">stablecoins</Term> USDC (<Addr a="0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238" short />) and EURC (<Addr a="0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4" short />), plus <Term id="weth">WETH</Term> (<Addr a="0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14" short />). The addresses come from the official Circle and Uniswap docs and were checked on-chain.
+
+### v2 and v3: two kinds of machine
+
+<T label="Differences between Uniswap v2 and v3">
+
+| Item | Uniswap v2 | Uniswap v3 |
 | --- | --- | --- |
-| DEX / AMM | A currency exchange machine with no counter staff | Understand the AMM model locally first |
-| Swaps and price impact | Changing a little money vs a big order that moves the rate | Record reserves before and after |
-| Slippage | The gap between the quoted and the final price | Set an acceptable range |
-| Liquidity | The float an exchange counter keeps on hand | Watch deposits and withdrawals first |
-| Impermanent loss | Two kinds of stock whose values move with prices | Work it out on paper, then experiment |
-| Cleaning up allowances | Cancelling automatic deductions | **Required at the end of every round** |
+| Pricing | Constant product `x·y=k`: the two token amounts multiplied stay constant | <Term id="concentrated-liquidity">Concentrated liquidity</Term>: each provider puts money only inside a price range they choose |
+| Price from balances? | Yes: price ≈ the ratio of the two balances | **No**: total balances do not show how much sits near the current price |
+| Receipt | An <Term id="lp-token">LP token</Term> (the same for everyone) | An <Term id="nft">NFT</Term> (every position has its own range) |
 
 </T>
 
-## Principles to keep
+A real counter-example: the WETH/USDC 0.05% pool address held 121.46 WETH and 53,413,101 USDC. Applying `x·y=k` gives about 439,770 USDC/WETH, but the pool's real price was about 30,000. That is more than ten times off. **To read a v3 price, read the pool's current price or ask the quoter contract. Do not divide the balances.**
 
-- **Low cost**: <Term id="testnet">testnet</Term> only, budget still $0.
-- **Verifiable**: number every new experiment and record its goal, steps, <Term id="tx-hash">transaction hashes</Term>, blocks, outputs and risks.
-- **Few approvals**: approve limited amounts and `approve(spender, 0)` right after use.
-- **Simulate locally first**: a passing simulation is not an on-chain result; write the two up separately.
-- Preserve Phase-0’s "2026-11-12 historical snapshot" and date later evidence separately with its block number. **Never overwrite old evidence**; distinguish principles, on-chain results, local tests and future plans.
-- Never present testnet amounts, passing tests or source verification as earnings or an <Term id="audit">audit</Term> guarantee.
+### Price impact, slippage, minimum received and deadline
+
+- **<Term id="price-impact">Price impact</Term>**: how much your own order moves the price. The odd pool in this chapter held only about 1,630 USDC. Selling a single EURC moved its price from about 152.75 to about 123.9.
+- **<Term id="slippage">Slippage</Term>**: the gap between the quote and the final result. Your own order may have moved the price, or someone else traded first.
+- **<Term id="min-received">Minimum received</Term>**: the floor you set. If the swap would pay less when it runs, the whole transaction reverts and you lose only the fee. It is a floor, not a forecast, and not a limit order. Setting it to 0 removes the protection.
+- **<Term id="deadline">Deadline</Term>**: after this time the transaction is void. Every swap here used a deadline of about 20 minutes.
+
+## Approvals: give exactly what is needed
+
+To swap an ERC-20 token such as USDC, you first <Term id="approve">approve</Term> the router to pull a set amount from you. An approval is only a standing permission. The amount still available is the <Term id="allowance">allowance</Term>.
+
+- **Exact approval**: every approval here covered exactly the amount being spent. For 1 USDC the approval was `1000000`, because USDC has 6 decimals. After the swap, the allowance was back to 0.
+- **<Term id="infinite-approval">Infinite approval</Term>**: many sites ask you to approve the maximum so you never approve again. If that contract is buggy or fake, it can drain all of that token from your wallet. **This chapter never used an infinite approval.**
+- **<Term id="permit2">Permit / Permit2 signatures</Term>**: these grant an allowance with a signature instead of a transaction. Phishing sites love them because they look free. **This chapter never signed any Permit or Permit2.** If your wallet asks you to sign a message with a token name, an amount and an expiry, treat it like an approval.
+- **Revoke**: set allowances you no longer need back to 0 with `approve(spender, 0)`. After every round, the labs checked USDC, EURC and WETH allowances to every router and to Permit2. All were 0.
+
+<Callout type="danger" title="⚠️ Only use contracts with verified source code">
+
+The chain only guarantees that **bytecode** is public. Only <Term id="verification">source verification</Term> ties readable source to that bytecode. Open the contract on <Term id="etherscan">Etherscan</Term> and look for the **green check** next to the Contract tab ("Source Code Verified").
+
+- **Treat any contract without verified source as a black box. Do not approve it and do not send it funds.**
+- Check addresses against the project's official docs. Here, USDC and EURC came from Circle's docs and Uniswap addresses from docs.uniswap.org. Their code and settings were also checked on-chain.
+- "Can be audited" is not "has been audited". An upgradeable contract can still change later.
+
+</Callout>
+
+## Free test funds
+
+- **Testnet ETH (SepETH)**: A received 0.05 SepETH twice (<Tx h="0xc8b5c548e4e42c69c9f0b9cd8a9a8c4381d7cb2a1e0823b1ef22f539d344d92b" short /> on 2026-11-11 and <Tx h="0xa55403ec9895345236f3ef2257f650974d399c666a02f7046081be8f9f90ba0d" short /> on 2026-11-18). The senders are busy addresses with no public label. Their pattern fits Google Cloud's Sepolia <Term id="faucet">faucet</Term>, but **the chain cannot prove** which faucet sent them.
+- **Circle faucet** (faucet.circle.com): on Ethereum Sepolia it gives USDC, EURC and cirBTC, once per hour per token. On 2026-11-19, A received **20 USDC** (<Tx h="0x137f113fbd8dbc8115267f6f41fa6bbc8a28bf8c26ccc1831dbc5c152e8d8805" short />), **20 EURC** (<Tx h="0xeb0b3f917444acdfe4793ada59d2519a91c8a0cc661162c50d9f2b17b829f9ec" short />) and **0.0001 cirBTC** (<Tx h="0xc08bedc5c1054320ca5a947384b8ee54af9cfe01d99a6334dc31c9628ffa84dd" short />).
+- These are all <Term id="test-token">test tokens</Term>. **They have no market value** and cannot be turned into real money.
+
+## Lab 1: the first swap
+
+<Lab title="Swap 0.001 SepETH for USDC" goal="See the quote, minimum received, fee and on-chain result of one swap">
+
+1. **Quote**: at block 12165307, the WETH/USDC 0.05% pool (<Addr a="0x3289680dD4d6C10bb19b899729cda5eEF58AEfF1" short />) quoted 0.001 WETH → **30.124575 USDC**. That was 0.165 USDC more than the 1% pool.
+2. **Minimum received**: quote × 99.5% = **29.973952 USDC**. The deadline was about 20 minutes.
+3. **<Term id="simulate">Simulate</Term> first**: the public-node rehearsal succeeded and estimated 388,578 gas. Running it on a local <Term id="fork">fork</Term> used 271,686 gas.
+4. **No approval to pay in ETH**: the ETH goes with the transaction to the <Term id="router">router</Term> SwapRouter02 (<Addr a="0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E" short />). It wraps the ETH into WETH automatically.
+5. **Send**: sent after Kang approved.
+
+Result: <Tx h="0x6ab6dc967d89a4103ef34919f2f06d5bbd5158449210eeb05e4d6371709c5814" />
+
+- Block 12165362, 2026-11-19 09:51:00, success. Received **30.124575 USDC**, exactly the quote.
+- gasUsed was **271,686**, the same as the fork rehearsal. The estimate (about 388,000) was clearly higher. **An estimate is not actual usage.**
+- Fee: **0.000000271713440286 SepETH**. No allowance was left, and the router kept no ETH or tokens.
+
+</Lab>
+
+## Lab 2: the odd-priced pool
+
+After the faucet, a script made **read-only** quotes on every USDC/EURC pool (block 12165456):
+
+<T label="USDC received for selling 1 EURC in each pool">
+
+| Pool | 1 EURC gives |
+| --- | ---: |
+| v3 0.01% pool | 0.013694 USDC |
+| **v3 0.05% pool** | **137.511401 USDC** |
+| v3 0.3% pool | 1.8959 USDC |
+| v3 1% pool | 0.6936 USDC |
+| v2 pool | 1.936355 USDC |
+
+</T>
+
+The odd 0.05% pool’s address: <Addr a="0x68adf381B8F9e9e100bb6E13d50b14094e3b6a9d" short />.
+
+The same 1 EURC got 137 USDC in one pool and 0.014 USDC in another, almost ten thousand times apart. In reality 1 EURC is worth about 1.05–1.2 USDC. The 0.05% pool's price then meant "1 EURC ≈ 152.75 USDC", and it held only about 1,630.72 USDC and 10.17 EURC.
+
+<Lab title="Sell 1 EURC into the odd pool, then swap 1 USDC for WETH" goal="Check that the odd price really executes, and observe slippage">
+
+Kang set the minimum received for selling 1 EURC at **130 USDC**. Each group is two transactions: an exact approval and a swap.
+
+<T label="Lab 2 transactions">
+
+| # | Step | Transaction | Result |
+| --- | --- | --- | --- |
+| 1 | Approve SwapRouter02 for exactly 1 EURC | <Tx h="0x41a690e54fb91d0ed4abf33f153fb713139c710590705f35d5f7c7a6b37291a2" short /> | Success |
+| 2 | 1 EURC → USDC (0.05% odd pool, minimum 130) | <Tx h="0xfc502669376a0a91a773354ded845ec1d15c88ebd6e58dd543bfe7681d4e9c71" short /> | Received **137.511401 USDC**, equal to the quote |
+| 3 | Approve SwapRouter02 for exactly 1 USDC | <Tx h="0x1e7321b9f3371f05451174762c71db159fecf46bc70a82b41dbc125c0a82cc81" short /> | Success |
+| 4 | 1 USDC → WETH (0.05% pool) | <Tx h="0x72d2bea9a6365225dcab38b4c58c40333b636fd70eef05caa983c0de7478c297" short /> | Received **0.000033206646228889 WETH** |
+
+</T>
+
+Transaction 4 was quoted 0.000033234431958439 WETH and received about **0.08%** less. Between the quote and the trade, someone else traded in that pool and moved the price. The amount still beat the minimum of 0.000033068259798646, so the swap went through. **That is slippage, and that is why the minimum exists.**
+
+Each approval was used up exactly by its swap, so the allowance went back to 0 by itself.
+
+</Lab>
+
+### Why do odd pools exist?
+
+- **Confirmed fact**: whoever creates a v3 pool sets its starting price. After that, the price depends only on the pool itself. **It never follows the outside market by itself.** It only moves when someone trades.
+- **Guess (cannot be confirmed)**: a tester probably set a wild starting price and added liquidity in a wild range. Test tokens are worthless, so nobody bothers to correct it. We do not know who created the pool or why.
+
+## Lab 3: arbitrage
+
+The odd pool "pays a lot for EURC". So buy EURC cheaply in other pools and sell it into the odd pool. That is <Term id="arbitrage">arbitrage</Term>.
+
+**How the best plan was found: marginal prices.** The more EURC you sell into the odd pool, the less each extra one earns. Buying works the other way: each extra EURC costs more.
+
+<T label="Marginal price when selling into the odd pool (fork measurement)">
+
+| EURC sold so far | 1 | 19 | 50 | 80 |
+| --- | ---: | ---: | ---: | ---: |
+| USDC for this one EURC | ≈ 101.6 | ≈ 14.8 | ≈ 3.5 | ≈ 1.55 |
+
+</T>
+
+The script spent 0.5 USDC at a time on whichever pool bought the most EURC. It then checked how much more USDC those EURC would earn. It kept going while the extra earned beat the extra spent. It stopped where the marginal buy price (2.972) met the marginal sell price (2.970). The whole plan was rehearsed on a fork first:
+
+<T label="Planned gain of three approaches">
+
+| Approach | Planned USDC gain |
+| --- | ---: |
+| Sell only the 19 EURC already held | 815.04 |
+| Buy and sell, without the v2 pool | 874.93 |
+| Buy and sell, including the v2 pool (used) | 969.08 |
+
+</T>
+
+<Lab title="Arbitrage on-chain (5 transactions)" goal="Buy EURC in cheap pools and sell it into the odd pool">
+
+<T label="Lab 3 arbitrage transactions">
+
+| nonce | Transaction | Hash |
+| --- | --- | --- |
+| 25 | Approve V2Router02 for exactly 72.5 USDC | <Tx h="0x844f97e1ee7096f80c59d8e7b227fd7788af7703c43b507e6f3ebc42b25db341" short /> |
+| 26 | v2: 72.5 USDC → 30.058247 EURC | <Tx h="0x6c9e5f2491d4f3bba63275ba4cb667824ade8c848514fe1356d103b4b3c65840" short /> |
+| 27 | Approve SwapRouter02 for exactly 12 USDC | <Tx h="0x12b9dafb86171fc757a3e0f3076bbb46a57740e8f8cdabbae3e7f9b8df005dfd" short /> |
+| 28 | Approve SwapRouter02 for exactly 48.907955 EURC | <Tx h="0xc29fa49a501d61e6d4d65e0f7feaa3776dd4a08a26bd7a972d29a103278d46fc" short /> |
+| 29 | <Term id="multicall">Multicall</Term>: buy EURC in two v3 pools + pull A's EURC + sell it all into the odd pool | <Tx h="0x5ea92330412d28e8813ebb5e28d5e8d775e22793cd9c2e9b69dbf8b589e93871" short /> |
+
+</T>
+
+- Transaction 29 sold **54.713104 EURC** for **1053.128756 USDC** (minimum 1047.776677). The four steps were bundled in one transaction: all succeed or none do.
+- A's USDC rose by **968.628756** (planned 969.08). The gap is the 0.150292 EURC extra from v2, which stayed in the account unsold.
+- The odd pool's price fell from about 123.91 to about **2.99 USDC/EURC**, close to the cost of buying EURC elsewhere (about 3). **Selling where the price is high pushes that price down.** That is how arbitrage pulls prices back.
+- All allowances were 0 afterwards.
+
+</Lab>
+
+<Callout type="warn" title="On mainnet: do not expect free money">
+
+- Mainnet has many arbitrage bots (<Term id="mev">MEV</Term> searchers). They usually close a gap within seconds, often in the same block. A person trading by hand will almost never win.
+- Your transaction is public before it is included. Bots can trade just before you or "sandwich" you so you get a worse price. The minimum received is your floor against that.
+- The testnet "profit" here was really the loss of the odd pool's liquidity provider. On mainnet, a provider who sets the wrong price loses real money in moments.
+- Mainnet also has fake tokens, look-alike names and tokens you can buy but never sell. **When a price looks too good, first ask: "Is this a trap?"**
+
+</Callout>
+
+## Lab 4: getting the starting tokens back (plans X and Y)
+
+After the arbitrage, A held only 0.150292 EURC, but had started with 20. Kang wanted **at least 20 EURC kept**, in other words to recover the starting amount. Using the same marginal-price method, two plans were built on a fork:
+
+<T label="Plan X and plan Y">
+
+| Item | Plan X: exact output | Plan Y: exact input |
+| --- | --- | --- |
+| Method | Ask for an exact amount of EURC; pay at most quote +0.5% per pool | Spend an exact USDC amount per pool; receive at least quote −0.5% per pool |
+| USDC spent | About **62.708**, at most 63.022 | Fixed **63.5** |
+| EURC result | **Exactly 20.000000** | At least 20.12; 20.22 in the rehearsal |
+| Transactions | 6 (including 2 to reset leftover allowances) | 4 |
+| Leftover allowance | The router pulls only what it spends, so a little is left and needs extra transactions | Used up exactly; 0 by itself |
+| Cheapest? | Yes | No: about 0.79 USDC more |
+
+</T>
+
+**Kang chose plan Y on purpose**: to show the starting amount coming back, plus "earning" a tiny bit more. Plan Y is not the cheapest. It costs about 0.79 USDC more and returns about 0.2 EURC more, with two fewer transactions and no leftover allowance. This was a deliberate trade-off, not a mistake.
+
+<Lab title="Plan Y on-chain (4 transactions)" goal="Hold at least 20 EURC again">
+
+<T label="Lab 4 transactions">
+
+| nonce | Transaction | Hash |
+| --- | --- | --- |
+| 30 | Approve V2Router02 for exactly 35.5 USDC | <Tx h="0x96ba250f46497557bb105c614f9c42ada3859103efe47f4114f58853782e1db3" short /> |
+| 31 | v2: 35.5 USDC → 10.950274 EURC | <Tx h="0xc38dc29463cc1fcfecbb2686a66e1b300f193f27e4c91bfbb77acd8b61b4574e" short /> |
+| 32 | Approve SwapRouter02 for exactly 28 USDC | <Tx h="0xc6898bb7fc82cde0e58bb904935aca2c1868e18974c5f31285bded8194d09e30" short /> |
+| 33 | Multicall: three v3 pools + one two-hop route, 28 USDC → 9.103316 EURC | <Tx h="0x92302fb62aeace0a8a8ae7ffb4837055ccb7bfa2f65bd972581e3ba54cc6a75c" short /> |
+
+</T>
+
+In total **63.5 USDC** bought **20.05359 EURC**. A's EURC became **20.203882** (≥ 20 ✅). All allowances were 0.
+
+</Lab>
+
+## Why simulation and reality differ
+
+<T label="Differences between plan and result">
+
+| Case | Plan / simulation | Actual | Reason |
+| --- | --- | --- | --- |
+| 1 USDC → WETH | 0.000033234431958439 WETH | 0.000033206646228889 WETH | Someone traded after the quote; about 0.08% less, still above the minimum |
+| Arbitrage gain | 969.08 USDC | 968.628756 USDC | The extra 0.150292 EURC from v2 stayed in the account |
+| Gas of the first swap | Estimate 388,578 | Actual 271,686 | Estimates run high; the fork measurement matched the chain exactly |
+| Fee of the first swap | Card used a 2 wei tip: about 0.0000000000132 SepETH | 0.000000271713440286 SepETH | The <Term id="tip">tip</Term> was raised to 1,000,000 wei so the transaction would be included. The card under-stated the fee; this was disclosed, and later cards used 1,000,000 wei |
+
+</T>
+
+**In one sentence**: a simulation only shows what would happen in that block's state. By the time you send, time has passed and others may have traded first, so always set a minimum received.
+
+## Impermanent loss on paper
+
+A <Term id="liquidity-provider">liquidity provider (LP)</Term> deposits two tokens and earns fees from other people's swaps. The cost is <Term id="impermanent-loss">impermanent loss</Term>: after the price moves, tokens in a pool are worth less than the same tokens simply held (HODL).
+
+Paper set-up: starting price 1.10 USDC/EURC, deposit 10 USDC + 9.090909 EURC (worth 20 USDC), fee 0.3%, gas ignored.
+
+<T label="v2 full-range impermanent loss (paper model)">
+
+| Price becomes | LP value | HODL value | Impermanent loss | Fees needed to break even |
+| --- | ---: | ---: | ---: | ---: |
+| 0.2× | 8.944272 | 12 | −25.464401% | 3.055728 |
+| 0.5× | 14.142136 | 15 | −5.719096% | 0.857864 |
+| 0.8× | 17.888544 | 18 | −0.619201% | 0.111456 |
+| 1.25× | 22.360680 | 22.5 | −0.619201% | 0.139320 |
+| 2× | 28.284271 | 30 | −5.719096% | 1.715729 |
+| 5× | 44.721360 | 60 | −25.464401% | 15.278640 |
+
+</T>
+
+- If the price doubles or halves, the loss is about 5.7%. At 5× or one fifth, it is about 25.5%. The loss depends only on how many times the price moved, not on the direction.
+- At 2×, the provider needs 1.715729 USDC of fees to break even. If they own the whole pool, the pool must trade 571.91 USDC. If they own 1%, it must trade 57,190.96 USDC.
+- In v3, put the same money only in the range [p0÷1.2, p0×1.2]. Inside that range the liquidity is **11.477226 times** the full-range amount, and so are the fees. But at 2× the impermanent loss grows to **−30.151829%**. Once the price leaves the range, the position turns entirely into one token and earns no fees.
+
+## Lab 5: v2 liquidity: deposit, self-swap, withdraw
+
+The pool is the v2 USDC/EURC pair <Addr a="0x1E22A91dd582f2b69D8c375a08578314399058D0" short />, and the router is V2Router02 <Addr a="0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3" short />. Before the deposit the pool held 119.441821 EURC + 421.560085 USDC, a price of about 3.5294 USDC/EURC (another testnet oddity).
+
+<Lab title="v2: deposit → one self-swap → withdraw (6 transactions)" goal="See LP tokens, the fee share and impermanent loss with your own eyes">
+
+<T label="Lab 5 v2 liquidity transactions">
+
+| # | Transaction | Hash |
+| --- | --- | --- |
+| 1 | Approve V2Router02 for exactly 15 USDC (10 to deposit + 5 to swap) | <Tx h="0x6b684637c27d82d9f88fb72fe9ac8dbaa4ab1bd55842a24627f52d2cb5ddc03f" short /> |
+| 2 | Approve V2Router02 for exactly 2.833328 EURC | <Tx h="0xe8c6efdf5beb582e5446b409f1223621f678f93902630818a0b012863bba5cac" short /> |
+| 3 | Deposit 10 USDC + 2.833328 EURC (minimums −0.5%) | <Tx h="0x4e5027efac4661e5df366b6832535cc556e0fa714c87ca402ea7e9517b3a2c46" short /> |
+| 4 | Self-swap 5 USDC → 1.396285 EURC | <Tx h="0xb1b77ebf81de939357c0461658b9ebbd6e2c0aea0804e2d71cbb0ece10b1afe4" short /> |
+| 5 | Approve V2Router02 for exactly 5,239,894 LP tokens | <Tx h="0xcefa63297927d4bc7cbba43f2d727dfbc9e829f3941a1b86887db65126c0c720" short /> |
+| 6 | Withdraw everything (minimums −0.5%) | <Tx h="0x02d4514c5f5fb5989fc9e244879956743aed2c82ae7acb91c5249c3cdcb591a2" short /> |
+
+</T>
+
+- **Deposit**: v2 takes tokens at the pool's current ratio, so 10 USDC needed 2.833328 EURC. A received 5,239,894 LP tokens (raw units), a **2.3172%** share of the pool.
+- **Who gets the fee**: the self-swap paid a 0.015 USDC fee, out of A's own pocket. With a 2.3172% share, only about **0.000348 USDC** came back to A. The rest went to the other providers. **Swapping against your own position to earn fees always loses.**
+- **Withdraw**: A got back **10.115856 USDC + 2.800973 EURC**.
+- **Against HODL**: the price moved from 3.52942 to 3.61155. At the final price, HODL = 20.232706 USDC and the LP withdrawal = 20.231711 USDC, **0.000996 USDC less**. About −0.001338 was impermanent loss, and about +0.000343 was the fee share and rounding.
+- Fees for the 6 transactions: **0.000001084158159794 SepETH**. Afterwards every allowance was 0 and the LP balance was 0.
+
+</Lab>
+
+While the deposited EURC sat in the pool, A's wallet held only about 17.37 EURC, below Kang's minimum of 20. After the withdrawal it was 21.567812. **Tokens in a position are not money you can spend right now.**
+
+## Lab 6: a v3 concentrated-liquidity position (NFT)
+
+The pool is WETH/USDC 0.05%: deep, close to a realistic price, and it leaves EURC alone. The NonfungiblePositionManager (NFPM) <Addr a="0x1238536071E1c677A632429e3655c799b22cDA52" short /> matches the Uniswap docs, and the factory and WETH addresses it reports were checked on-chain.
+
+<Lab title="v3: mint a ±10% range → close it and burn the NFT (3 transactions)" goal="Understand tick ranges, NFT positions and where fees come from">
+
+<T label="Lab 6 v3 position transactions">
+
+| # | Transaction | Hash |
+| --- | --- | --- |
+| 7 | Approve NFPM for exactly 5 USDC | <Tx h="0x5bbc9a6a6a5f96f320008d3494e8b15fc71985c4633ef5e0395bff6182ed2ac0" short /> |
+| 8 | Multicall: mint the position + refundETH (ETH sent with the transaction) | <Tx h="0x8f08ff416516cca854afbaa7ed4a55316dcdd9af40fd8d2752d9238bc678f08f" short /> |
+| 9 | Multicall: remove all liquidity + collect everything + burn the NFT | <Tx h="0xcaa10aabf0693bee77c4a30f389b9ac25c58f01f0e400611f7e0b817d00e52d1" short /> |
+
+</T>
+
+- **Range**: at mint the pool was at <Term id="tick">tick</Term> 173058 (about 30,516.63 USDC/WETH). The range was ticks **172100 to 174020**, about 27,719 to 33,587 USDC/WETH (about −9.2% / +10.1%).
+- **Deposit**: 5 USDC + 0.000163376950048134 ETH, about 9.99 USDC in total. It minted NFT **#234636** with liquidity 609,876,916,995. That is **21.34 times** the liquidity the same money gives across the full range.
+- **Close**: closed in the next block. A got back 4.999999 USDC + 0.000163376950048133 **WETH**. ETH went in and WETH tokens came out; WETH can be unwrapped to ETH 1:1 at any time.
+- **Fees were 0**: the position existed for one block, and nobody traded in the pool meanwhile. **Fees only come from other people trading inside your range.**
+- The NFT is burned: asking for its owner now reverts, and A holds 0 position NFTs. Fees for the 3 transactions: 0.000002525700461790 SepETH. Every allowance was 0.
+
+</Lab>
+
+**Fork demonstration (never run on-chain)**: on a local fork, fake ETH was used to push the price and watch the same position.
+
+<T label="Fork demo: how a v3 position changes as the price moves">
+
+| Stage | tick | Price (USDC/WETH) | In range? | Position holds | Uncollected fees |
+| --- | ---: | ---: | --- | --- | --- |
+| At mint | 173058 | 30,516.63 | Yes | 5 USDC + 0.000163377 WETH | 0 |
+| Pushed to the upper half | 173539 | 29,085.32 | Yes | 2.471501 USDC + 0.000248248 WETH | 0.000000042457 WETH |
+| Pushed out of range | 174220 | 27,170.64 | **No** | **All 0.000335290 WETH** | 0.000000086000 WETH |
+
+</T>
+
+The price fell only about 11%, and all of the position's USDC turned into WETH. At the exit price the impermanent loss was about **−3.49%**. The fees (about 0.0023 USDC) came nowhere near covering it, leaving about 0.327 USDC less than HODL.
+
+<Callout type="danger" title="⚠️ Mainnet safety: anyone can take change left in a router">
+
+**If you overpay in ETH, call `refundETH` in the same transaction.** ETH or tokens left in a router or the NFPM are like cash dropped on the street.
+
+- **Why anyone can take it**: these contracts keep no books. They do not remember who overpaid. `refundETH()` sends **all** ETH the contract holds (`address(this).balance`) to **whoever calls it**. `sweepToken` does the same for tokens.
+- **On mainnet**: MEV bots watch these contracts. A leftover balance is usually swept in the same block or the next one.
+- **Rules**:
+  1. When you pay in ETH, put `refundETH` in **the same multicall** as the mint or swap.
+  2. To take WETH or tokens out of the contract, add `unwrapWETH9` or `sweepToken` with a minimum amount in the same multicall. Or set yourself as the recipient directly.
+  3. **Never** send ETH or tokens straight to a router or the NFPM. Never pay in one transaction and refund in a later one.
+  4. Check the wallet preview before signing. A call paid in ETH should show `refundETH`. If it does not, do not sign.
+
+</Callout>
+
+**The extra 1 wei.** In Lab 6, transaction 8 refunded A **1 wei** more than A had overpaid (1 ETH = 10¹⁸ wei). The investigation found the cause. About six and a half hours earlier, another address sent 1 ETH with transaction <Tx h="0x1295b1c29efc21ebbca1f3a4bee905be2e03bb4650c7ec89f0a40cdb2e9f471d" short /> to mint a position. The position needed only 0.999999999999999999 ETH, so 1 wei stayed in the NFPM. That sender did not call `refundETH` in the same transaction. Our multicall did, so their 1 wei was refunded to A as well. The 1 wei is worthless, but the mechanism is real. **With a large amount on mainnet, the swept money would be real money.**
+
+## Surprises and easter eggs
+
+These unexpected moments taught the most:
+
+- **The first send attempt failed, and nothing was sent.** It stopped at the fork pre-check with a network error (`fetch failed`). The nonce did not change, which proves no transaction reached the chain. **Pre-check first and stop on failure.** That rule protected the account.
+- **A run was interrupted, but nothing was duplicated.** One send script ended right after printing its last "broadcast" line. The chain shows four transactions with nonces 21, 22, 23 and 24, and no duplicates. **After an interruption, check the nonce and the chain before you re-run anything.**
+- **SwapRouter02 on Sepolia does not support v2.** Its v2 factory address is the zero address. v2 had to go through V2Router02, which cost one more approval and one more transaction. **The same contract name can be configured differently on another network. Read the on-chain settings first.**
+- **cirBTC has no pools at all.** Being able to get a token does not mean you can sell it. Before buying any token, check for a pool deep enough to sell into.
+- **A self-swap earns back only about 2.3% of its own fee**, and **EURC dipped to about 17.37**. See Lab 5.
+- **ETH goes into v3 and WETH comes out**, and **the fees were 0**. See Lab 6.
+- **The rehearsal and the real run produced the same NFT number, #234636.** The v2 LP amount and withdrawals matched exactly too, because nobody else traded those pools during those minutes. **An exact match is luck, not the norm.**
+- **One approval cost 137,757 gas.** On Sepolia, approvals of USDC and EURC each used 137,757 gas, far more than the tens of thousands that tutorials often quote. The reason was not investigated. **Use the current estimate and a fork measurement, not numbers from a tutorial.**
+- **We took someone else's leftover 1 wei.** See the safety warning above.
+
+## Safety checklist
+
+1. Use only the testnet and test tokens. Test tokens have no value.
+2. Check contract addresses against official docs. Only use contracts with verified source (the Etherscan green check).
+3. Approve exactly the amount needed. No infinite approvals. Do not sign Permit or Permit2.
+4. Give every swap a minimum received (never 0) and a deadline.
+5. Simulate first. Then read the confirmation card: amounts, minimums, gas, expected fee and fee cap. Only then sign.
+6. When paying in ETH, put `refundETH` in the same multicall. Never send money straight to a router.
+7. Afterwards, check that every allowance is 0 and the router holds none of your funds.
+8. After an error or interruption, check the nonce and the chain before you send again.
+9. When a price looks too good, suspect a trap first.
+
+## Final ledger
+
+From just before the first swap (block 12165307, 2026-11-19 09:39) to just after the last liquidity transaction (block 12165973, 11:58), account A changed as follows:
+
+<T label="Chapter 19 ledger (account A)">
+
+| Asset | Start | End | Change | Main reasons |
+| --- | ---: | ---: | ---: | --- |
+| SepETH | 0.099899995780508095 | 0.098729682266208008 | −0.001170313514300087 | 0.001 swapped for USDC + 0.000163376950048133 that went into v3 and came back as WETH + gas |
+| USDC | 0 | 1086.880587 | +1086.880587 | Faucet 20 + first swap 30.124575 + arbitrage, minus buying EURC back and more |
+| EURC | 0 | 21.567812 | +21.567812 | Faucet 20, sold, bought back, liquidity-lab self-swap |
+| WETH | 0 | 0.000196583596277022 | +0.000196583596277022 | From 1 USDC + returned by v3 |
+| cirBTC | 0 | 0.0001 | +0.0001 | Faucet; never moved |
+| Gas for 23 transactions | | | 0.000006936564251954 SepETH | Tip 1,000,000 wei; base fee only tens to about a hundred wei |
+
+</T>
+
+**Once more: these are test tokens with no real value.** "Over a thousand extra USDC" only shows that the odd pool's provider set a wrong price. It does not show that DeFi makes money.
+
+## Summary
+
+- On a DEX your counterparty is a pool contract. v2 prices with `x·y=k`; v3 lets providers concentrate money in a price range.
+- Price impact comes from your own order. Slippage also includes others trading first. The minimum received is your floor, and the deadline stops a stale transaction.
+- Approve exact amounts and reset them to 0. Avoid infinite approvals and unknown Permit signatures. Only use contracts with verified source.
+- Odd testnet pools can be arbitraged. On mainnet, bots take such chances within seconds.
+- Providing liquidity earns fees and carries impermanent loss. v3 magnifies both and earns nothing out of range.
+- Refund overpaid ETH in the same transaction. Anyone can take change left in a router.
 
 ## Where to read more
 
-- Ethereum developer docs: [ethereum.org/en/developers/docs](https://ethereum.org/en/developers/docs/)
-- Solidity: [docs.soliditylang.org](https://docs.soliditylang.org/)
-- Foundry: [getfoundry.sh](https://getfoundry.sh/)
-- The ERC-20 standard: [eips.ethereum.org/EIPS/eip-20](https://eips.ethereum.org/EIPS/eip-20)
-- Sourcify: [docs.sourcify.dev](https://docs.sourcify.dev/)
+- Uniswap v3 Sepolia deployments: [Uniswap docs](https://docs.uniswap.org/contracts/v3/reference/deployments/ethereum-deployments)
+- Circle test-token faucet: [faucet.circle.com](https://faucet.circle.com/)
+- Circle USDC contract addresses: [Circle docs](https://developers.circle.com/stablecoins/usdc-contract-addresses)
+- Uniswap v3 periphery source (`PeripheryPayments.sol`): [Uniswap/v3-periphery on GitHub](https://github.com/Uniswap/v3-periphery)
 - Sepolia Etherscan: [sepolia.etherscan.io](https://sepolia.etherscan.io/)
