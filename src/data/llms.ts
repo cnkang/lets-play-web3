@@ -68,11 +68,13 @@ function chapterBody(chapter: BookChapter, lang: Lang, url: string): string {
 }
 
 export function llmsChapter(chapter: BookChapter, lang: Lang): string {
-  const { title, description } = chapter.entries[lang].data
+  const { title, description, snapshot: own } = chapter.entries[lang].data
   const url = absolute(`${lang}/chapters/${chapter.slug}/`)
+  const at = own?.at ?? SNAPSHOT_ISO
+  const block = own?.block ?? SNAPSHOT_BLOCK
   const snapshot = lang === 'zh'
-    ? `链上历史快照：${SNAPSHOT_ISO}，Sepolia 区块 ${SNAPSHOT_BLOCK}。章节另有注明时，以文中时间为准。`
-    : `Historical chain snapshot: ${SNAPSHOT_ISO}, Sepolia block ${SNAPSHOT_BLOCK}. Dates noted in the chapter take precedence.`
+    ? `链上历史快照：${at}，Sepolia 区块 ${block}。章节另有注明时，以文中时间为准。`
+    : `Historical chain snapshot: ${at}, Sepolia block ${block}. Dates noted in the chapter take precedence.`
   return `# ${title}\n\n> ${description.replace(/\s+/g, ' ')}\n\n${snapshot}\n\n${license}\n\n[HTML](${url}) · [Book index and citation context](${absolute('llms.txt')})\n\n${chapterBody(chapter, lang, url)}\n`
 }
 
