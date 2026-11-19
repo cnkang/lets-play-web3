@@ -1,6 +1,6 @@
 ---
 title: "DeFi labs: swaps, arbitrage and liquidity"
-description: "Phase-1 on the Sepolia testnet: a first swap, exact approvals, an odd-priced pool and arbitrage, two plans to win back the starting tokens, a paper model of impermanent loss, a v2 liquidity position and a v3 concentrated-liquidity NFT position. Every figure matches an on-chain transaction. Test tokens have no real value."
+description: "Phase-1 on the Sepolia testnet: a first swap, exact approvals, an odd-priced pool and arbitrage, two plans to win back the starting tokens, a paper model of impermanent loss, a v2 liquidity position and a v3 concentrated-liquidity NFT position. On-chain results match their transactions. Paper models are labelled as such. Test tokens have no real value."
 navTitle: "19 · DeFi labs: swaps, arbitrage and liquidity"
 part: p1-defi
 order: 190
@@ -11,7 +11,7 @@ snapshot:
   block: 12165973
 ---
 
-<p class="lead">This chapter records the Phase-1 <Term id="defi">DeFi</Term> labs from start to finish. Everything ran on the Sepolia testnet with free test tokens. You will see what one swap really does, why a price that looks too good deserves suspicion, and what you earn and lose when you put money into a pool.</p>
+<p class="lead">This chapter records the Phase-1 <Term id="defi">DeFi</Term> labs from start to finish. Everything ran on the Sepolia testnet with free test tokens. You will see what one swap really does, and why a price that looks too good deserves suspicion. You will also see what you earn and lose when you put money into a pool.</p>
 
 <Callout type="note" title="Snapshot and scope of this chapter">
 
@@ -216,7 +216,7 @@ After the arbitrage, A held only 0.150292 EURC, but had started with 20. Kang wa
 | --- | --- | --- |
 | Method | Ask for an exact amount of EURC; pay at most quote +0.5% per pool | Spend an exact USDC amount per pool; receive at least quote −0.5% per pool |
 | USDC spent | About **62.708**, at most 63.022 | Fixed **63.5** |
-| EURC result | **Exactly 20.000000** | At least 20.12; 20.22 in the rehearsal |
+| EURC result (account total) | **Exactly 20.000000** | At least 20.12; 20.22 in the rehearsal |
 | Transactions | 6 (including 2 to reset leftover allowances) | 4 |
 | Leftover allowance | The router pulls only what it spends, so a little is left and needs extra transactions | Used up exactly; 0 by itself |
 | Cheapest? | Yes | No: about 0.79 USDC more |
@@ -327,7 +327,7 @@ The pool is WETH/USDC 0.05%: deep, close to a realistic price, and it leaves EUR
 
 - **Range**: at mint the pool was at <Term id="tick">tick</Term> 173058 (about 30,516.63 USDC/WETH). The range was ticks **172100 to 174020**, about 27,719 to 33,587 USDC/WETH (about −9.2% / +10.1%).
 - **Deposit**: 5 USDC + 0.000163376950048134 ETH, about 9.99 USDC in total. It minted NFT **#234636** with liquidity 609,876,916,995. That is **21.34 times** the liquidity the same money gives across the full range.
-- **Close**: closed in the next block. A got back 4.999999 USDC + 0.000163376950048133 **WETH**. ETH went in and WETH tokens came out; WETH can be unwrapped to ETH 1:1 at any time.
+- **Close**: closed in the next block. A got back 4.999999 USDC + 0.000163376950048133 **WETH**. ETH went in and WETH tokens came out. WETH can be unwrapped to ETH 1:1 at any time.
 - **Fees were 0**: the position existed for one block, and nobody traded in the pool meanwhile. **Fees only come from other people trading inside your range.**
 - The NFT is burned: asking for its owner now reverts, and A holds 0 position NFTs. Fees for the 3 transactions: 0.000002525700461790 SepETH. Every allowance was 0.
 
@@ -391,7 +391,7 @@ These unexpected moments taught the most:
 
 ## Final ledger
 
-From just before the first swap (block 12165307, 2026-11-19 09:39) to just after the last liquidity transaction (block 12165973, 11:58), account A changed as follows:
+The table compares account A's balances just before the first swap with the balances just after the last liquidity transaction. The first swap was in block 12165307 (2026-11-19 09:39). The last liquidity transaction was in block 12165973 (11:58).
 
 <T label="Chapter 19 ledger (account A)">
 
@@ -406,11 +406,13 @@ From just before the first swap (block 12165307, 2026-11-19 09:39) to just after
 
 </T>
 
+Amounts are rounded to each token's display precision. If you add them up, the total can differ from the end value by one smallest unit (0.000001 USDC).
+
 **Once more: these are test tokens with no real value.** "Over a thousand extra USDC" only shows that the odd pool's provider set a wrong price. It does not show that DeFi makes money.
 
 ## Summary
 
-- On a DEX your counterparty is a pool contract. v2 prices with `x·y=k`; v3 lets providers concentrate money in a price range.
+- On a DEX your counterparty is a pool contract. v2 prices with `x·y=k`. v3 lets providers concentrate money in a price range.
 - Price impact comes from your own order. Slippage also includes others trading first. The minimum received is your floor, and the deadline stops a stale transaction.
 - Approve exact amounts and reset them to 0. Avoid infinite approvals and unknown Permit signatures. Only use contracts with verified source.
 - Odd testnet pools can be arbitraged. On mainnet, bots take such chances within seconds.
