@@ -46,7 +46,7 @@ The content check and Astro both enforce pairing and shared fields. `ALLOW_UNPAI
 
 ## Parts and phases
 
-Phases live in `src/content/phases.json`; parts in `src/content/parts.json`. A phase has `id`, `order`, `zh`, `en`; a part also has `phase`, pointing to a phase ID. Contents sort by phase, part and chapter order; empty parts stay hidden. Add both language labels when adding either. Use **Phase-0** for the completed basics, experiments and review, and **Phase-1** for the DeFi labs in Chapter 19.
+Phases live in `src/content/phases.json`; parts in `src/content/parts.json`. A phase has `id`, `order`, `zh`, `en`; a part also has `phase`, pointing to a phase ID. Contents sort by phase, part and chapter order; empty parts stay hidden. Add both language labels when adding either. Use **Phase-0** for the completed basics, experiments and review, and **Phase-1** for the DeFi labs in Chapter 19. Keep the `appendices` part after all content parts (currently order 80 in Phase-1); if you add another phase or part, keep the appendices last.
 
 ## Write and illustrate
 

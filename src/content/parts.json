@@ -4,5 +4,6 @@
   { "id": "tokens", "order": 30, "phase": "p0", "zh": "第三部分 · 代币与授权", "en": "Part III · Tokens and allowances" },
   { "id": "upgradeable", "order": 40, "phase": "p0", "zh": "第四部分 · 可升级合约", "en": "Part IV · Upgradeable contracts" },
   { "id": "wrapup", "order": 50, "phase": "p0", "zh": "第五部分 · 证据与收尾", "en": "Part V · Evidence and wrap-up" },
-  { "id": "p1-defi", "order": 60, "phase": "p1", "zh": "第六部分 · DeFi 实验", "en": "Part VI · DeFi labs" }
+  { "id": "p1-defi", "order": 60, "phase": "p1", "zh": "第六部分 · DeFi 实验", "en": "Part VI · DeFi labs" },
+  { "id": "appendices", "order": 80, "phase": "p1", "zh": "附录", "en": "Appendices" }
 ]

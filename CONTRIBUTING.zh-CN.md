@@ -71,9 +71,10 @@ updated: "2026-12-01"               # 可选：内容更新日期，会显示在
   ```
 - **部分**写在 `src/content/parts.json`，每个部分属于一个阶段：
   ```json
-  { "id": "p1-dex", "order": 70, "phase": "p1", "zh": "第六部分 · 去中心化交易", "en": "Part VI · Decentralised exchanges" }
+  { "id": "p1-dex", "order": 70, "phase": "p1", "zh": "第七部分 · 去中心化交易", "en": "Part VII · Decentralised exchanges" }
   ```
 - 目录按「阶段 → 部分 → 章节 order」排序；有多个阶段时，目录里会显示阶段小标签。没有任何章节的部分不会显示。
+- 附录放在所有正文内容之后。当前 `appendices` 是 Phase-1 最后一部分（order 80），排在第 19 章之后；新增部分或阶段时，也要让它保持在最后。
 
 ## 四、中英配对检查
 
