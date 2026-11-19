@@ -180,6 +180,8 @@ Every fee is paid in <Term id="eth">ETH</Term>.
    npm run build
    ```
    如果缺区块号或英文说明，脚本会停下并逐条列出缺什么。
+
+Phase-1（第 19 章）的交易来自 `$P1_SOURCES_DIR/out/p19-appendix-txs.json`（账户 A nonce 20–42 以及水龙头转入，附中英文说明）；第 19 章的合约地址写在生成脚本的 `p1_contracts` 里。以后追加 Phase-1 实验时，扩充这两处即可。
 4. 保留 `2026-11-12 15:39:55 UTC+8 / Sepolia block 12117419` 历史快照。后续证据另加日期、网络、区块、来源和适用范围，不直接改全书的快照常量，也不要用早期笔记覆盖较晚的复核。
 
 ### 区分原理、链上结果、本地测试和计划

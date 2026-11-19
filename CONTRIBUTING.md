@@ -102,6 +102,8 @@ Appendix A is generated; edit its generator rather than the two MDX tables. When
 3. Run `python3 scripts/gen_appendix.py /absolute/path/to/实验记录.md` (without an argument it uses `/workspace/web3-sandbox/实验记录.md`), then `SOURCES_DIR=/absolute/path/to/web3-sandbox P1_SOURCES_DIR=/absolute/path/to/web3-p1a-swap npm run check:facts` and `npm run build`. Missing blocks or English labels stop generation with a list.
 4. Add subsequent evidence as dated additions; retain the historical snapshot. Check the generator’s output diff before committing.
 
+Phase-1 (Chapter 19) rows come from `$P1_SOURCES_DIR/out/p19-appendix-txs.json` (account A nonces 20–42 and the faucet transfers, with zh/en labels); Chapter 19 contracts live in `p1_contracts` in the generator. Extend that file and list for later Phase-1 experiments.
+
 `check:facts` always scans for suspected secrets. Without external source files it skips address/hash provenance; report that skip. Its default source directory is `/workspace/web3-sandbox`. It verifies literal presence, not the semantics of a claim; see [deployment docs](docs/DEPLOYMENT.md).
 
 ## Checks before submitting
