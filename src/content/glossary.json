@@ -478,8 +478,8 @@
   },
   "slippage": {
     "chapter": "19-next-p1-defi",
-    "zh": { "term": "滑点", "def": "看到的报价和最终成交价之间的差。原因可能是你自己的单子推动了价格，也可能是在你之前有人先成交了。" },
-    "en": { "term": "slippage", "def": "The gap between the price you were quoted and the price you finally got. Your own order may have moved the price, or someone else traded first." }
+    "zh": { "term": "滑点", "def": "看到的报价和最终成交价之间的差。报价已经考虑了兑换数量。如果有人在你之前成交，实际到账就可能变化。" },
+    "en": { "term": "slippage", "def": "The gap between the price you were quoted and the price you finally got. The quote already accounts for your order size. If someone trades before you, the amount you receive can change." }
   },
   "min-received": {
     "chapter": "19-next-p1-defi",
