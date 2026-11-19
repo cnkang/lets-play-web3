@@ -34,7 +34,7 @@ The second call moved 200 from A to A. Balances did not change, yet the chain st
 
 </Callout>
 
-## Lab 2: an intentionally failing batchTransfer (atomic)
+## Lab 2: an intentionally failing batchTransfer (it is atomic)
 
 After the upgrade to V2 (Chapter 13), the UBOX <Term id="token">token</Term> gained `batchTransfer`: it pays several recipients **inside one transaction**, and if any item fails the whole call <Term id="revert">reverts</Term>.
 
