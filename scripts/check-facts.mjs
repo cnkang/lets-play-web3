@@ -2,7 +2,8 @@
 // Fact & secret guard for the guide.
 // 1. Every 0x address (40 hex) and 0x hash (64 hex) in the book content, data
 //    and diagrams must appear verbatim (case-insensitive) in the lab sources.
-//    Sources live outside this repo; point SOURCES_DIR at the sandbox repo.
+//    Sources live outside this repo; point SOURCES_DIR at the sandbox repo and
+//    P1_SOURCES_DIR at the Phase-1 swap/LP lab folder (Chapter 19).
 //    If the sources are absent (e.g. in CI), the fact check is skipped.
 // 2. A secret scan that always runs: no private-key blocks, no .env files,
 //    no long hex strings outside the known set, no API-key-looking literals.
@@ -12,13 +13,20 @@ import { execSync } from 'node:child_process'
 
 const root = new URL('..', import.meta.url).pathname
 const SOURCES_DIR = process.env.SOURCES_DIR || '/workspace/web3-sandbox'
+const P1_SOURCES_DIR = process.env.P1_SOURCES_DIR || '/workspace/web3-p1a-swap'
 const sourceFiles = [
   join(SOURCES_DIR, '实验记录.md'),
   join(SOURCES_DIR, 'docs/新手指南-账号凭证与API密钥.md'),
   ...(existsSync(join(SOURCES_DIR, 'reports/p0'))
     ? readdirSync(join(SOURCES_DIR, 'reports/p0')).map((f) => join(SOURCES_DIR, 'reports/p0', f))
     : []),
-  process.env.WORD_TEXT || '/tmp/user-record-review.txt'
+  process.env.WORD_TEXT || '/tmp/user-record-review.txt',
+  // Phase-1 DeFi lab records (Chapter 19). Point P1_SOURCES_DIR at the swap/LP lab folder.
+  join(P1_SOURCES_DIR, 'P1A-SWAP-REPORT.md'),
+  join(P1_SOURCES_DIR, 'P19-ODD-POOL-ARBITRAGE.md'),
+  ...(existsSync(join(P1_SOURCES_DIR, 'out'))
+    ? readdirSync(join(P1_SOURCES_DIR, 'out')).filter((f) => f.endsWith('.json')).map((f) => join(P1_SOURCES_DIR, 'out', f))
+    : [])
 ].filter((f) => existsSync(f) && statSync(f).isFile())
 
 function walk(dir, out = []) {
