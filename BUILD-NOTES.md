@@ -307,3 +307,13 @@ Tools: axe-core 4.14.0 via puppeteer-core in Google Chrome 156 (headless), tags 
 - Both `BASE=/ SITE_URL=https://letsplayweb3.liukang.com` and `BASE=/lets-play-web3/ SITE_URL=https://example.github.io` passed `npm run build` and `npm run check:build`: **46 HTML pages, 38 search pages, 4,194 local references** per configuration. Deliberately using a wrong BASE failed as expected. Final `dist/` is the custom-domain root build.
 - Browser plugin was not available; used Playwright plus local Chrome and the existing Puppeteer QA scripts with scratch-only dependencies. Local preview: `http://localhost:4399`. Target flow: each language home → inspect transaction → copy receipt command / Solidity. **197 checks passed**, including axe, overflow at **1280/390/320**, light/dark, exact plain-text copy by keyboard, clipboard denial and no-JavaScript reading; no page script errors. Language checks, **128** contents-alignment cases, full keyboard checks and **16** SVG files (normal + wide-font stress) passed. Bash and zsh hidden-input examples were checked with dummy input only.
 - Root language routing, `x-default`, snapshot constants, dependency lockfile and chapter URLs were preserved. `git diff --check` passed. These are local browser/build checks, not a fresh chain review or a complete accessibility certification.
+
+## 2026-11-19 · Chapter 19 completed (Phase-1 DeFi labs)
+
+- Rewrote `19-next-p1-defi` (zh + en) from a plan into the completed Phase-1 chapter: swaps, exact approvals, an odd-priced pool and arbitrage, plans X/Y, impermanent loss on paper, v2 and v3 liquidity, the 1 wei `refundETH` story and a mainnet safety warning. The slug is unchanged so links keep working; title and navTitle changed.
+- Chapter 19 uses its own snapshot (2026-11-19 11:58:12 UTC+8, Sepolia block 12165973); the 2026-11-12 / block 12117419 snapshot is untouched.
+- Part `p1-defi` relabelled "第六部分 · DeFi 实验 / Part VI · DeFi labs". 21 new glossary terms (swap, slippage, impermanent loss, …), all pointing to Chapter 19.
+- `scripts/check-facts.mjs` also reads the Phase-1 lab records from `P1_SOURCES_DIR` (default `/workspace/web3-p1a-swap`: `P1A-SWAP-REPORT.md`, `P19-ODD-POOL-ARBITRAGE.md`, `out/*.json`).
+- The older row above that calls Chapter 19 "not started yet" is kept as dated history.
+
+- `Lab.astro` now keeps the last 4 CJK characters of a `goal` together (`<span class="nw">`), because `rehype-no-orphans` cannot see component props. Chapter 19's transaction tables are wrapped in `<T>` (fixes a 320/375px horizontal scroll), and its table headers and checklist no longer trigger axe `empty-table-header` / `label`.
