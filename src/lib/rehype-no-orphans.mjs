@@ -174,14 +174,19 @@ export function transformTree(tree) { return rehypeNoOrphans()(tree) }
 // Sätteri (Astro 7's default Markdown/MDX processor) hast plugin wrapper.
 // Each matched block is copied to a plain hast object, transformed, and swapped back in
 // only when something changed. Tables are handled whole (column sizing + every cell).
+const SATTERI_BLOCKS = ['table', 'p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'figcaption', 'dt', 'dd']
+const SATTERI_BLOCK_SET = new Set(SATTERI_BLOCKS)
+
 export const satteriNoOrphans = () => ({
   name: 'no-orphans',
   element: {
-    filter: ['table', 'p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'figcaption', 'dt', 'dd'],
+    filter: SATTERI_BLOCKS,
     visit(node, ctx) {
-      if (node.tagName !== 'table') {
-        // cells are done with their table; skip blocks inside a table cell
-        for (let p = ctx.parent(node); p; p = p.type === 'root' ? undefined : ctx.parent(p)) if (p.type === 'element' && (p.tagName === 'td' || p.tagName === 'th')) return
+      // Transform each matching subtree once. Returning replacements for both a
+      // block and its matching descendants leaves descendant patches targeting
+      // nodes the parent replacement has already removed.
+      for (let parent = ctx.parent(node); parent && parent.type !== 'root'; parent = ctx.parent(parent)) {
+        if (parent.type === 'element' && (parent.tagName === 'td' || parent.tagName === 'th' || SATTERI_BLOCK_SET.has(parent.tagName))) return
       }
       const plain = JSON.parse(JSON.stringify(node))
       const before = JSON.stringify(plain)

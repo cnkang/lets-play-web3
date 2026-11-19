@@ -23,6 +23,7 @@
     "astro": "7.4.12"
   },
   "devDependencies": {
+    "@astrojs/markdown-satteri": "0.4.10",
     "pagefind": "1.6.0"
   },
   "engines": {

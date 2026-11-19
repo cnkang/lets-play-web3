@@ -23,6 +23,7 @@ accounts.secret*.json
 public/og/*.png
 
 # local tooling / OS noise
+/IDEA.md
 .DS_Store
 Thumbs.db
 *.log
