@@ -1,3 +1,5 @@
+import sanitizeHtml from 'sanitize-html'
+
 import { type Lang } from './book'
 import { getPublishedChapters, type BookChapter } from './chapters'
 import { absolute, PUBLISHED, REPO_URL, sepoliaExplorerUrl, SNAPSHOT_BLOCK, SNAPSHOT_ISO } from './site'
@@ -93,22 +95,20 @@ function mapMarkdownProse(body: string, transform: (text: string) => string): st
 
 /** Turn chapter MDX into readable plain Markdown for llms-full.txt. */
 function plain(body: string): string {
-  return mapMarkdownProse(body, (text) => text
-    .replace(/^import .*$/gm, '')
-    .replace(/<Addr\s+a="([^"]+)"[^>]*\/>/g, (_match, address) => `[${address}](${sepoliaExplorerUrl('address', address)})`)
-    .replace(/<Tx\s+h="([^"]+)"[^>]*\/>/g, (_match, hash) => `[${hash}](${sepoliaExplorerUrl('tx', hash)})`)
-    .replace(/<Figure[^>]*alt="([^"]*)"[^>]*>([\s\S]*?)<\/Figure>/g, (_m, alt, cap) => `[Figure: ${alt}] ${cap.trim()}`)
-    .replace(/<Callout[^>]*title="([^"]*)"[^>]*>/g, '**$1**')
-    .replace(/<\/?(Callout|T)(\s[^>]*)?>/g, '')
-    .replace(/<Lab[^>]*title="([^"]*)"[^>]*>/g, '**$1**')
-    .replace(/<\/Lab>/g, '')
-    .replace(/<(SafetyNotice|Snapshot|Quiz)[^>]*\/>/g, '')
-    .replace(/<h([1-6])\b[^>]*>([^\n]*?)<\/h\1>/g, (_match, level, heading) => `${'#'.repeat(Number(level))} ${heading}`)
-    .replace(/<[^>]+>/g, '')
-    // Tag removal above can join text into a new tag; rewriting `<` blocks that reintroduction.
-    .replace(/</g, '&lt;')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim())
+  return mapMarkdownProse(body, (text) => sanitizeHtml(
+    text
+      .replace(/^import .*$/gm, '')
+      .replace(/<Addr\s+a="([^"]+)"[^>]*\/>/g, (_match, address) => `[${address}](${sepoliaExplorerUrl('address', address)})`)
+      .replace(/<Tx\s+h="([^"]+)"[^>]*\/>/g, (_match, hash) => `[${hash}](${sepoliaExplorerUrl('tx', hash)})`)
+      .replace(/<Figure[^>]*alt="([^"]*)"[^>]*>([\s\S]*?)<\/Figure>/g, (_m, alt, cap) => `[Figure: ${alt}] ${cap.trim()}`)
+      .replace(/<Callout[^>]*title="([^"]*)"[^>]*>/g, '**$1**')
+      .replace(/<\/?(Callout|T)(\s[^>]*)?>/g, '')
+      .replace(/<Lab[^>]*title="([^"]*)"[^>]*>/g, '**$1**')
+      .replace(/<\/Lab>/g, '')
+      .replace(/<(SafetyNotice|Snapshot|Quiz)[^>]*\/>/g, '')
+      .replace(/<h([1-6])\b[^>]*>([^\n]*?)<\/h\1>/g, (_match, level, heading) => `${'#'.repeat(Number(level))} ${heading}`),
+    { allowedTags: [], allowedAttributes: {} },
+  ).replace(/\n{3,}/g, '\n\n').trim())
 }
 
 function chapterBody(chapter: BookChapter, lang: Lang, url: string): string {
