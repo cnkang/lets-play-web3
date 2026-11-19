@@ -1,4 +1,5 @@
 ---
+import Nw from './Nw.astro'
 // A lab box for hands-on experiments. Usage in MDX (no import needed):
 //   <Lab title="部署 Counter" goal="看懂一次链上状态变化" network="Sepolia">
 //   1. 步骤……
@@ -10,16 +11,13 @@ const zh = !Astro.url.pathname.includes('/en/')
 const tag = zh ? '实验' : 'Lab'
 const statusText = status === 'planned' ? (zh ? '计划中' : 'Planned') : (zh ? '已完成' : 'Done')
 const net = zh ? `${network} 测试网` : `${network} testnet`
-// Keep the last 4 CJK characters of the goal together (same rule as rehype-no-orphans, which cannot see props).
-const g = goal ?? ''
-const cut = /[\u4e00-\u9fff]{4}$/.test(g) ? g.length - 4 : g.length
 ---
 <div class={`lab lab-${status}`} role="group" aria-label={`${tag}${zh ? '：' : ': '}${title}`}>
   <div class="lab-head">
     <span class="lab-tag">{tag}</span>
-    <p class="lab-title">{title}</p>
+    <p class="lab-title"><Nw text={title} /></p>
     <span class="lab-meta">{net} · {statusText}</span>
   </div>
-  {goal && <p class="lab-goal"><strong>{zh ? '目标：' : 'Goal: '}</strong>{g.slice(0, cut)}{cut < g.length && <span class="nw">{g.slice(cut)}</span>}</p>}
+  {goal && <p class="lab-goal"><strong>{zh ? '目标：' : 'Goal: '}</strong><Nw text={goal} /></p>}
   <div class="lab-body"><slot /></div>
 </div>

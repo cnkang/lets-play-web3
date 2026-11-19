@@ -1,4 +1,5 @@
 ---
+import Nw from '../../components/Nw.astro'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { langs, type Lang } from '../../data/book'
 import { href } from '../../data/site'
@@ -13,14 +14,14 @@ const contentsHref = href(`${lang}/#contents-title`)
 <BaseLayout lang={lang} title={title} description={zh ? '在「一起玩 Web3」中文版中全文搜索章节、地址与术语。' : 'Full-text search across the English edition of Let’s Play Web3: chapters, addresses and terms.'} path="search/" navKey="search" noindex>
   <div class="shell">
     <div class="article" data-pagefind-ignore="all">
-      <h1>{title}</h1>
+      <h1><Nw text={title} /></h1>
       <p>{zh ? '搜索只是辅助：你也可以随时通过页面顶部的「目录」或首页的目录找到每一章。' : 'Search is only a helper: every chapter is also reachable from the contents in the menu and on the home page.'}</p>
       <form class="search-form" role="search" action="" method="get" id="search-form">
         <label for="q">{zh ? '输入关键词（例如 approve、nonce、0xc3F2…）' : 'Enter a keyword (for example approve, nonce, 0xc3F2…)'}</label>
         <input id="q" name="q" type="search" autocomplete="off" enterkeyhint="search" />
       </form>
       <p id="search-status" role="status" aria-live="polite" class="snapshot" style="margin-top:1rem"></p>
-      <p class="search-fallback"><a href={contentsHref}>{zh ? '返回目录，浏览全部章节' : 'Go back to the contents and browse all chapters'}</a></p>
+      <p class="search-fallback"><a href={contentsHref}><Nw text={zh ? '返回目录，浏览全部章节' : 'Go back to the contents and browse all chapters'} /></a></p>
       <ol id="search-results" class="search-results" aria-label={zh ? '搜索结果' : 'Search results'}></ol>
       <noscript><p>{zh ? '搜索需要 JavaScript。请改用目录浏览。' : 'Search needs JavaScript. Please use the contents instead.'}</p></noscript>
     </div>
