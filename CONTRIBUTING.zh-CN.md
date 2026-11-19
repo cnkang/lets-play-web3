@@ -176,7 +176,7 @@ Every fee is paid in <Term id="eth">ETH</Term>.
 3. 运行：
    ```bash
    python3 scripts/gen_appendix.py /absolute/path/to/实验记录.md
-   SOURCES_DIR=/absolute/path/to/web3-sandbox npm run check:facts
+   SOURCES_DIR=/absolute/path/to/web3-sandbox P1_SOURCES_DIR=/absolute/path/to/web3-p1a-swap npm run check:facts
    npm run build
    ```
    如果缺区块号或英文说明，脚本会停下并逐条列出缺什么。
@@ -187,7 +187,7 @@ Every fee is paid in <Term id="eth">ETH</Term>.
 - 通用原理和生活类比用于解释概念，不声称每句话都有链上证明。
 - 链上结果写清网络、交易、目标区块和当时状态；浏览器当前读数可能已经变化。MBox-Burn 剩余授权已由 D-01 撤销。
 - 单元测试、Fuzz、Invariant 和 fork 模拟单列为本地证据。UBOX V4 从未部署到 Sepolia，不能给它编交易哈希。
-- Phase-0 指基础实验与复核，已经收尾；Phase-1 专指尚未开始的 DeFi。Sourcify 8/8 匹配中只有 5 个 exact；Etherscan 快照时仍排队；PASS WITH FINDINGS 不等于没有漏洞。以第 15 章和相应原始证据为准。
+- Phase-0 指基础实验与复核，已经收尾；Phase-1 指第 19 章的 DeFi 实验（2026-11-19 完成，使用自己的快照：区块 12165973）。Sourcify 8/8 匹配中只有 5 个 exact；Etherscan 快照时仍排队；PASS WITH FINDINGS 不等于没有漏洞。以第 15 章和相应原始证据为准。
 
 ## 七、新示意图
 
