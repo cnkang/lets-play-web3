@@ -45,6 +45,9 @@ part: tokens                        # 属于哪个「部分」，取 src/content
 order: 100                          # 排序数字；建议用 10 的倍数，以后好在中间插章
 status: published                   # published / upcoming / draft
 updated: "2026-12-01"               # 可选：内容更新日期，会显示在页面并写进 sitemap 和 JSON-LD
+# snapshot:                         # 可选：本章自己的链上快照（如第 19 章），页头和 JSON-LD 会用它代替全书快照
+#   at: "2026-11-19T11:58:12+08:00"
+#   block: 12165973
 ---
 ```
 
