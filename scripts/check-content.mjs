@@ -34,6 +34,16 @@ function frontmatter(file) {
   return data
 }
 
+// `snapshot:` is a nested block, so the flat parser above sees only an empty string.
+// Both languages must carry the same snapshot: the values are facts, not translation.
+function snapshotBlock(file) {
+  const src = readFileSync(file, 'utf8')
+  const fm = src.match(/^---\r?\n([\s\S]*?)\r?\n---/)
+  if (!fm) return ''
+  const m = fm[1].match(/^snapshot:[ \t]*\r?\n((?:[ \t]+\S.*(?:\r?\n|$))+)/m)
+  return m ? m[1].replace(/\r/g, '').replace(/[ \t]+/g, ' ').trim().replace(/\s*\n\s*/g, ' ') : ''
+}
+
 const errors = []
 const warnings = []
 const files = {}
@@ -58,6 +68,8 @@ for (const slug of [...slugs].sort()) {
     if (fm[l].part && !parts.has(fm[l].part)) errors.push(`${l}/${slug}.mdx: part "${fm[l].part}" is not in src/content/parts.json (known: ${[...parts].join(', ')})`)
   }
   if (fm.zh && fm.en) {
+    const snaps = Object.fromEntries(langs.map((l) => [l, snapshotBlock(join(dir, l, `${slug}.mdx`))]))
+    if (snaps.zh !== snaps.en) errors.push(`"${slug}": "snapshot" differs (zh: ${snaps.zh || 'none'}, en: ${snaps.en || 'none'}); keep it identical in both languages`)
     for (const k of ['part', 'order', 'status']) {
       if ((fm.zh[k] ?? 'published') !== (fm.en[k] ?? 'published')) errors.push(`"${slug}": "${k}" differs (zh: ${fm.zh[k]}, en: ${fm.en[k]}); keep it identical in both languages`)
     }
