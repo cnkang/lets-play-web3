@@ -25,7 +25,7 @@ Users talk to a fixed proxy; the proxy runs the implementation's code against it
 
 ## initialize is not a constructor
 
-A <Term id="constructor">constructor</Term> only writes into **the implementation contract's own storage**, never into the proxy. So upgradeable contracts use an ordinary <Term id="initialize">initializer function</Term>, `initialize()`, to set the name, supply and owner, called once through the proxy. It must be **callable only once**; running it again might <Term id="mint">mint</Term> again or change the owner.
+A <Term id="constructor">constructor</Term> runs when a contract is created. The constructor for the implementation can set up that contract’s own storage. UBOX needs the token name, supply and owner at the proxy address, where users will look them up. Calling the <Term id="initialize">initializer</Term> `initialize()` through the proxy writes those values there. UBOX allows this setup once. If someone could repeat it, they might <Term id="mint">mint</Term> tokens again or change the owner.
 
 ## Step 1: deploy V1 and the proxy (no V2 yet)
 
