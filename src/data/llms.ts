@@ -45,9 +45,55 @@ ${sections.join('\n\n')}
 `
 }
 
+/** Transform Markdown prose without rewriting authored inline or fenced code. */
+function mapMarkdownProse(body: string, transform: (text: string) => string): string {
+  const protectedCode: string[] = []
+  const protect = (code: string) => `\u0000${protectedCode.push(code) - 1}\u0000`
+  const transformProse = (text: string) => transform(
+    text.replace(/(`+)(?!`)([\s\S]*?)\1(?!`)/g, (code) => protect(code)),
+  )
+
+  let output = ''
+  let prose = ''
+  let fence: { char: string; length: number } | undefined
+  let fencedCode = ''
+  const flushProse = () => {
+    if (prose) output += transformProse(prose)
+    prose = ''
+  }
+
+  for (const line of body.match(/[^\n]*\n|[^\n]+$/g) ?? []) {
+    const content = line.replace(/\r?\n$/, '')
+    if (fence) {
+      fencedCode += line
+      const closing = /^( {0,3})(`+|~+)[ \t]*$/.exec(content)
+      if (closing && closing[2][0] === fence.char && closing[2].length >= fence.length) {
+        output += protect(fencedCode)
+        fence = undefined
+        fencedCode = ''
+      }
+      continue
+    }
+
+    const opening = /^( {0,3})(`{3,}|~{3,})(.*)$/.exec(content)
+    if (opening && !(opening[2][0] === '`' && opening[3].includes('`'))) {
+      flushProse()
+      fence = { char: opening[2][0], length: opening[2].length }
+      fencedCode = line
+      continue
+    }
+    prose += line
+  }
+
+  if (fence) output += protect(fencedCode)
+  else flushProse()
+
+  return output.replace(/\u0000(\d+)\u0000/g, (_marker, index: string) => protectedCode[Number(index)] ?? '')
+}
+
 /** Turn chapter MDX into readable plain Markdown for llms-full.txt. */
 function plain(body: string): string {
-  return body
+  return mapMarkdownProse(body, (text) => text
     .replace(/^import .*$/gm, '')
     .replace(/<Addr\s+a="([^"]+)"[^>]*\/>/g, (_match, address) => `[${address}](${sepoliaExplorerUrl('address', address)})`)
     .replace(/<Tx\s+h="([^"]+)"[^>]*\/>/g, (_match, hash) => `[${hash}](${sepoliaExplorerUrl('tx', hash)})`)
@@ -59,8 +105,10 @@ function plain(body: string): string {
     .replace(/<(SafetyNotice|Snapshot|Quiz)[^>]*\/>/g, '')
     .replace(/<h([1-6])\b[^>]*>([^\n]*?)<\/h\1>/g, (_match, level, heading) => `${'#'.repeat(Number(level))} ${heading}`)
     .replace(/<[^>]+>/g, '')
+    // Tag removal above can join text into a new tag; rewriting `<` blocks that reintroduction.
+    .replace(/</g, '&lt;')
     .replace(/\n{3,}/g, '\n\n')
-    .trim()
+    .trim())
 }
 
 function chapterBody(chapter: BookChapter, lang: Lang, url: string): string {

@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-// Dependency-free checks of static output. Run after build with the SAME public
+// Checks of static output. Run after build with the SAME public
 // SITE_URL / BASE. No server, wallet, RPC or external network requests are used.
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
+import { parse } from 'parse5'
 import { fileURLToPath } from 'node:url'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
@@ -26,8 +27,21 @@ function walk(dir) {
     return e.isDirectory() ? walk(path) : [path]
   })
 }
-function attrs(tag) {
+function attrs(element) {
+  return Object.fromEntries(element.attrs.map(({ name, value }) => [name, value]))
+}
+function xmlAttrs(tag) {
   return Object.fromEntries([...tag.matchAll(/([\w:-]+)\s*=\s*(["'])(.*?)\2/gs)].map((m) => [m[1], decode(m[3])]))
+}
+function htmlElements(root) {
+  const result = []
+  const visit = (node) => {
+    if (node.tagName) result.push(node)
+    for (const child of node.childNodes ?? []) visit(child)
+    for (const child of node.content?.childNodes ?? []) visit(child)
+  }
+  visit(root)
+  return result
 }
 function checkRef(value, from, where) {
   if (!value || /^(data:|mailto:|tel:|javascript:)/i.test(value)) return
@@ -45,7 +59,11 @@ function checkRef(value, from, where) {
     let id
     try { id = decodeURIComponent(url.hash.slice(1)).split(':~:text=')[0] } catch { fail(where, `invalid fragment ${value}`); return }
     if (!id) return
-    if (!cache.has(file)) cache.set(file, new Set([...read(file).matchAll(/\bid\s*=\s*(["'])(.*?)\1/gs)].map((m) => decode(m[2]))))
+    if (!cache.has(file)) {
+      const ids = htmlElements(parse(read(file)))
+        .flatMap((element) => element.attrs.filter(({ name }) => name === 'id').map(({ value }) => value))
+      cache.set(file, new Set(ids))
+    }
     if (!cache.get(file).has(id)) fail(where, `missing fragment ${value}`)
   }
 }
@@ -64,7 +82,10 @@ for (const file of html) {
   const path = rel.replace(/index\.html$/, '')
   const page = absolute(path)
   const source = read(file)
-  const tags = [...source.matchAll(/<(a|link|img|script|source|meta)\b[^>]*>/gs)].map((m) => ({ tag: m[1], a: attrs(m[0]) }))
+  const elements = htmlElements(parse(source))
+  const tags = elements
+    .filter(({ tagName }) => ['a', 'link', 'img', 'script', 'source', 'meta'].includes(tagName))
+    .map((element) => ({ tag: element.tagName, a: attrs(element) }))
   for (const { a } of tags) {
     for (const key of ['href', 'src']) if (a[key]) checkRef(a[key], page, rel)
     if (['og:url', 'og:image', 'twitter:image'].includes(a.property || a.name)) checkRef(a.content, page, rel)
@@ -111,13 +132,14 @@ for (const file of html) {
       }
     }
   }
-  for (const m of source.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
+  for (const script of elements.filter((element) => element.tagName === 'script'
+    && attrs(element).type?.trim().toLowerCase() === 'application/ld+json')) {
     try {
       const visit = (v) => {
         if (typeof v === 'string' && /^https?:/.test(v)) checkRef(v, page, `${rel} JSON-LD`)
         else if (v && typeof v === 'object') Object.values(v).forEach(visit)
       }
-      visit(JSON.parse(m[1]))
+      visit(JSON.parse(script.childNodes.map((node) => node.value ?? '').join('')))
     } catch { fail(rel, 'invalid JSON-LD') }
   }
 }
@@ -145,7 +167,7 @@ for (const name of ['sitemap.xml', 'robots.txt', 'llms.txt', 'llms-full.txt']) {
     for (const [, entry] of source.matchAll(/<url>([\s\S]*?)<\/url>/g)) {
       const location = decode(entry.match(/<loc>(.*?)<\/loc>/)?.[1] ?? '')
       locations.push(location)
-      const alternates = [...entry.matchAll(/<xhtml:link\b[^>]*>/g)].map(([link]) => attrs(link))
+      const alternates = [...entry.matchAll(/<xhtml:link\b[^>]*>/g)].map(([link]) => xmlAttrs(link))
       const expected = indexablePages.get(location)
       if (expected && (alternates.length !== expected.size || [...expected].some(([lang, href]) =>
         alternates.filter((link) => link.rel === 'alternate' && link.hreflang === lang && link.href === href).length !== 1
