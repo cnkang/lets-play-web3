@@ -329,3 +329,12 @@ Tools: axe-core 4.14.0 via puppeteer-core in Google Chrome 156 (headless), tags 
 - Remaining: `/en/accessibility/` "Accessibility statement" at 320px. Two long words cannot share one line at that width, so `text-wrap: balance` puts one on each line. Accepted.
 - New optional frontmatter `snapshot: { at, block }` so Chapter 19's header and JSON-LD show its own snapshot (2026-11-19 11:58:12 UTC+8, block 12165973) instead of the book's.
 - Keyboard focus: a `.table-wrap` reached by Tab whose top lands under the sticky header is scrolled to `block: 'start'` (keyboard focus only, `:focus-visible`). Found by `keyboard-check.mjs` on Appendix A's new Chapter 19 tables at 800px height (WCAG 2.4.11).
+
+## 2026-11-19 · Chapter 19 corrections
+
+- Chapter 19's description no longer claims that every figure matches an on-chain transaction: on-chain results match their transactions, and the paper impermanent-loss model is labelled as a model (zh + en). The same text feeds the meta description, `index.md` and `llms.txt`.
+- Plan X/Y table: the "EURC result" row now says "account total". Read as a purchased amount, the 20.12 floor looked violated by the run that bought 20.05359 and ended at 20.203882.
+- Ledger: one line says amounts are rounded to each token's display precision, so adding them up can differ from the end value by one smallest unit.
+- English prose only: two semicolons became full stops and two sentences over 25 words were split (lead paragraph, ledger intro). No figure or claim changed.
+- `scripts/gen_appendix.py`: a missing Phase-1 JSON now stops with a message that names `P1_SOURCES_DIR` instead of raising `FileNotFoundError`; later Phase-1 rows are accepted (nonces must start at 20, no gaps); the SepETH total is derived from `total_fee_wei`, not hardcoded. CONTRIBUTING documents the variable for the generator, not only for `check:facts`.
+- `scripts/check-content.mjs` compares the optional `snapshot` block across zh/en. `chapters/[slug].astro` uses `SNAPSHOT_BLOCK` rather than a second hardcoded 12117419. The READMEs name Chapter 19 as the exception to the book snapshot.
