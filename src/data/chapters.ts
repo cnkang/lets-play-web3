@@ -135,7 +135,7 @@ export function partOf(book: Book, slug: string) {
 }
 
 /** "11　实验：…" / "11 · Lab: …" / "附录 A　…" / "Appendix A · …" → { num: "11", text: "实验：…" }.
- *  Labels without a leading number ("下一站：…", "Next stop: …") come back with num = "". */
+ *  A label with no leading number comes back with num = "". */
 export function splitNumLabel(label: string): { num: string; text: string } {
   const m = /^((?:附录\s*|Appendix\s+)?(?:\d+|[A-Z]))(?:\s*·\s*|\u3000+|\s+)(\S.*)$/u.exec(label.trim())
   return m ? { num: m[1], text: m[2] } : { num: '', text: label.trim() }

@@ -17,7 +17,7 @@ import Term from '../../../components/Term.astro'
 import Glossary from '../../../components/Glossary.astro'
 import { ui, langs, type Lang } from '../../../data/book'
 import { getBook, partOf } from '../../../data/chapters'
-import { href, absolute, htmlLang, authorFor, authorLd, PUBLISHED, SNAPSHOT_ISO } from '../../../data/site'
+import { href, absolute, htmlLang, authorFor, authorLd, PUBLISHED, SNAPSHOT_ISO, SNAPSHOT_BLOCK } from '../../../data/site'
 import { quiz } from '../../../data/quiz'
 
 export async function getStaticPaths() {
@@ -37,7 +37,7 @@ const next = idx < book.pages.length - 1 ? book.pages[idx + 1] : undefined
 const part = partOf(book, slug)
 const isDraft = entry.data.status === 'draft'
 const modified = entry.data.updated ?? PUBLISHED
-const snap = entry.data.snapshot ?? { at: SNAPSHOT_ISO, block: 12117419 }
+const snap = entry.data.snapshot ?? { at: SNAPSHOT_ISO, block: SNAPSHOT_BLOCK }
 const snapLabel = `${snap.at.slice(0, 10)} ${snap.at.slice(11, 19)} (UTC+8)`
 const author = authorLd(lang)
 const byline = authorFor(lang)
