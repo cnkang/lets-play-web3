@@ -15,10 +15,18 @@ Adding a new experiment (see CONTRIBUTING.zh-CN.md「追加实验到附录 A」)
   5. Run `npm run appendix`, then `npm run check:facts` and `npm run build`.
 The script stops with a clear message if a row has no block number or label.
 Only zh/en 16-appendix-addresses-txs.mdx are written; never edit them by hand.
+
+Chapter 19 (Phase-1 DeFi labs) rows come from a second source:
+  $P1_SOURCES_DIR/out/p19-appendix-txs.json  (default P1_SOURCES_DIR=/workspace/web3-p1a-swap)
+That file holds account A's nonce 20-42 transactions and the faucet transfers, read from
+Blockscout, with zh/en labels. Contract rows for Chapter 19 are in `p1_contracts` below.
 """
-import re, sys
+import json, os, re, sys
 from pathlib import Path
 
+p1 = json.loads((Path(os.environ.get('P1_SOURCES_DIR', '/workspace/web3-p1a-swap')) / 'out' / 'p19-appendix-txs.json').read_text(encoding='utf-8'))
+assert [t['nonce'] for t in p1['txs']] == list(range(20, 43)), 'p19-appendix-txs.json must list nonces 20-42'
+assert sum(t['fee_wei'] for t in p1['txs']) == p1['total_fee_wei'] == 6936564251954
 nb = Path(sys.argv[1] if len(sys.argv) > 1 else '/workspace/web3-sandbox/实验记录.md').read_text(encoding='utf-8')
 sec = nb[nb.index('### 5.2'):nb.index('## 6.')]
 rows = []
@@ -96,7 +104,7 @@ accounts = [
     ('B', '0x1dB261d3d5BE16E1A81582E8786A6FAB82Fe218c', '被授权者（spender）', 'Approved spender'),
     ('MBox demo', '0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E', '**无私钥，不可找回**；持有 1,000 MBox。请勿再转入', '**No key, unrecoverable**; holds 1,000 MBox. Do not send anything here'),
     ('C', '0x6E7F8eF4353DB8012Dea3F70eb523aB1A3051711', '失败批次的演示收款方，不保存密钥，收到 0', 'Recipient in the failing batch; key never stored; received 0'),
-    ('Faucet source', '0x52f1984Cd3e46e1214dB222D3Ff63712E7aCEedD', '启动资金 0.05 SepETH 的来源，无官方名称标签', 'Source of the 0.05 SepETH starting funds; no official name tag'),
+    ('Faucet source', '0x52f1984Cd3e46e1214dB222D3Ff63712E7aCEedD', '启动资金 0.05 SepETH 的来源：Google Cloud 的 Sepolia 水龙头（Kang 已确认；链上无官方名称标签）', 'Source of the 0.05 SepETH starting funds: Google Cloud\'s Sepolia faucet (confirmed by Kang; no official name tag on-chain)'),
 ]
 zh_names = {'UBOX proxy': 'UBOX 代理', 'UBOX V1': 'UBOX V1 实现', 'UBOX V2': 'UBOX V2 实现', 'UBOX V3': 'UBOX V3 实现',
             'A': '账户 A', 'B': '账户 B', 'MBox demo': 'MBox 演示收款地址', 'C': '演示地址 C', 'Faucet source': '启动资金来源'}
@@ -104,13 +112,36 @@ en_names = {'UBOX proxy': 'UBOX proxy', 'UBOX V1': 'UBOX V1 implementation', 'UB
             'UBOX V3': 'UBOX V3 implementation', 'A': 'Account A', 'B': 'Account B', 'MBox demo': 'MBox demo recipient',
             'C': 'Demo address C', 'Faucet source': 'Starting-funds source'}
 
+p1_contracts = [
+    ('SwapRouter02', '0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E', 'Uniswap v3 兑换路由', 'Uniswap v3 swap router'),
+    ('NFPM', '0x1238536071E1c677A632429e3655c799b22cDA52', 'Uniswap v3 仓位管理合约（NonfungiblePositionManager）', 'Uniswap v3 position manager (NonfungiblePositionManager)'),
+    ('V2Router02', '0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3', 'Uniswap v2 路由', 'Uniswap v2 router'),
+    ('v2 USDC/EURC pair', '0x1E22A91dd582f2b69D8c375a08578314399058D0', 'Uniswap v2 USDC/EURC 交易对（实验 5）', 'Uniswap v2 USDC/EURC pair (Lab 5)'),
+    ('Odd pool', '0x68adf381B8F9e9e100bb6E13d50b14094e3b6a9d', 'v3 USDC/EURC 0.05% 怪价池（实验 2–4）', 'v3 USDC/EURC 0.05% odd-priced pool (Labs 2–4)'),
+    ('WETH/USDC 0.05%', '0x3289680dD4d6C10bb19b899729cda5eEF58AEfF1', 'v3 WETH/USDC 0.05% 池（实验 6）', 'v3 WETH/USDC 0.05% pool (Lab 6)'),
+    ('USDC', '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238', 'Circle 测试 USDC，6 位小数', 'Circle test USDC, 6 decimals'),
+    ('EURC', '0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4', 'Circle 测试 EURC，6 位小数', 'Circle test EURC, 6 decimals'),
+    ('WETH', '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14', '包装 ETH，18 位小数', 'Wrapped ETH, 18 decimals'),
+    ('cirBTC', '0x3a3fe695F684Bf9b9e43CF43C2b895Ea5e392bB3', 'Circle 测试 cirBTC；快照时没有可用池子', 'Circle test cirBTC; no usable pool at the snapshot'),
+]
+zh_names.update({'v2 USDC/EURC pair': 'v2 USDC/EURC 交易对', 'Odd pool': '怪价池'})
+en_names.update({'Odd pool': 'Odd-priced pool'})
+
+def p1_rows(lang):
+    zh = lang == 'zh'
+    return '\n'.join(f"| A | {t['nonce']} | {t['lab_zh'] if zh else t['lab_en']} | {t['zh'] if zh else t['en']} | {'成功' if zh else 'success'} | {t['block']} | {fmt(t['fee_wei'])} | <Tx h=\"{t['hash']}\" /> |" for t in p1['txs'])
+
+def p1_incoming(lang):
+    zh = lang == 'zh'
+    return '\n'.join(f"| {t['timestamp_utc'][:10]} | {t['block']} | {t['zh'] if zh else t['en']} | <Tx h=\"{t['hash']}\" /> |" for t in p1['incoming'])
+
 def table(items, lang):
     names = zh_names if lang == 'zh' else en_names
     return '\n'.join(f'| {names.get(n, n)} | <Addr a="{a}" /> | {zh if lang == "zh" else en} |' for n, a, zh, en in items)
 
 ZH = f'''---
 title: "附录 A　地址与交易总表"
-description: "本书提到的全部 Sepolia 合约地址、账户地址，以及账户 A（nonce 0–19）和账户 B（nonce 0–2）的全部已广播交易，附完整哈希、区块号、手续费和 Sepolia Etherscan 链接；另附实验环境参数。"
+description: "本书提到的全部 Sepolia 合约地址、账户地址，以及账户 A（nonce 0–19）和账户 B（nonce 0–2）的全部已广播交易，附完整哈希、区块号、手续费和 Sepolia Etherscan 链接；另附实验环境参数，以及第 19 章 DeFi 实验（账户 A nonce 20–42）的地址与交易。"
 navTitle: "附录 A　地址与交易总表"
 part: wrapup
 order: 160
@@ -202,11 +233,46 @@ status: published
 | UBOX owner 与 ProxyAdmin owner | 账户 A |
 
 </T>
+
+## 第 19 章：DeFi 实验的地址与交易
+
+第 19 章用自己的快照：2026-11-19 11:58:12（新加坡时间），区块 **12165973**。上面各表是 2026-11-12 的历史快照，不受影响。
+
+<T label="第 19 章用到的合约地址">
+
+| 名称 | 地址 | 说明 |
+| --- | --- | --- |
+{table(p1_contracts, 'zh')}
+
+</T>
+
+免费测试资金（转入，不占 A 的 nonce；测试币没有任何真实价值）：
+
+<T label="第 19 章的测试资金转入">
+
+| 日期（UTC） | 区块 | 内容 | 交易哈希 |
+| --- | ---: | --- | --- |
+{p1_incoming('zh')}
+
+</T>
+
+账户 A 在第 19 章的全部交易（nonce 20–42，共 23 笔，全部成功）。手续费单位为 wei。
+
+<T label="第 19 章的全部已广播交易">
+
+| 发送者 | nonce | 实验 | 目的 | 状态 | 区块 | 手续费（wei） | 交易哈希 |
+| --- | ---: | --- | --- | --- | ---: | ---: | --- |
+{p1_rows('zh')}
+
+</T>
+
+- 23 笔交易的手续费合计 **{fmt(p1['total_fee_wei'])} wei**（0.000006936564251954 SepETH），与第 19 章的总账一致。
+- 快照时 A 的 nonce 为 **43**。
 '''
 
 EN = f'''---
 title: "Appendix A · Addresses and transactions"
-description: "Every Sepolia contract address and account address mentioned in this book, plus every broadcast transaction from account A (nonces 0–19) and account B (nonces 0–2), with full hashes, block numbers, fees and Sepolia Etherscan links, and the lab environment."
+description: "Every Sepolia contract address and account address mentioned in this book, plus every broadcast transaction from account A (nonces 0–19) and account B (nonces 0–2), with full hashes, block numbers, fees and Sepolia Etherscan links, the lab environment, and Chapter 19's DeFi lab addresses and transactions (account A nonces 20–42)."
 navTitle: "Appendix A · Addresses and transactions"
 part: wrapup
 order: 160
@@ -298,6 +364,41 @@ The table lists every transaction from account A (nonces 0–19) and from accoun
 | UBOX owner and ProxyAdmin owner | Account A |
 
 </T>
+
+## Chapter 19: DeFi lab addresses and transactions
+
+Chapter 19 uses its own snapshot: 2026-11-19 11:58:12 Singapore time, block **12165973**. The tables above are the 2026-11-12 historical snapshot and are unchanged.
+
+<T label="Contract addresses used in Chapter 19">
+
+| Name | Address | Notes |
+| --- | --- | --- |
+{table(p1_contracts, 'en')}
+
+</T>
+
+Free test funds (incoming transfers, not using A's nonces; test tokens have no real value):
+
+<T label="Chapter 19 test-fund transfers">
+
+| Date (UTC) | Block | What | Transaction hash |
+| --- | ---: | --- | --- |
+{p1_incoming('en')}
+
+</T>
+
+Every transaction account A sent in Chapter 19 (nonces 20–42, 23 in total, all successful). Fees are in wei.
+
+<T label="Every Chapter 19 broadcast transaction">
+
+| Sender | Nonce | Lab | Purpose | Status | Block | Fee (wei) | Transaction hash |
+| --- | ---: | --- | --- | --- | ---: | ---: | --- |
+{p1_rows('en')}
+
+</T>
+
+- The 23 transactions' fees total **{fmt(p1['total_fee_wei'])} wei** (0.000006936564251954 SepETH), matching Chapter 19's ledger.
+- At that snapshot, A's nonce was **43**.
 '''
 base = Path(__file__).resolve().parent.parent / 'src' / 'content' / 'chapters'
 (base / 'zh' / '16-appendix-addresses-txs.mdx').write_text(ZH, encoding='utf-8')
