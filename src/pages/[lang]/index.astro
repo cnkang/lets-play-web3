@@ -66,9 +66,9 @@ const jsonLd = [
       <p class="kicker"><span class="pill">{t.siteTitle}</span><span>{zh ? '免费入门指南 · 中英双语 · 测试网实验' : 'A hands-on guide for beginners · Free · Bilingual'}</span></p>
       <h1 id="hero-title">{t.siteTagline}</h1>
       <p class="sub">
-        {zh
+        <Nw text={zh
           ? '会用电脑、会上网，却不知道区块链有什么用？从几家店共用积分这样的例子出发，分清什么时候需要区块链、什么时候普通数据库就够了。再跟着真实实验，看懂交易、合约和授权。实验使用 Sepolia——以太坊专门用来练习的测试网，预算 $0。遇到生词，点旁边的 ?。'
-          : 'Comfortable with a computer, but new to blockchains? Start with everyday examples to learn when a blockchain helps and when a database is enough. Then follow real experiments to understand transactions, contracts and approvals. The labs used Sepolia, Ethereum’s practice network, with a $0 budget. Press ? beside a new term for an explanation.'}
+          : 'Comfortable with a computer, but new to blockchains? Start with everyday examples to learn when a blockchain helps and when a database is enough. Then follow real experiments to understand transactions, contracts and approvals. The labs used Sepolia, Ethereum’s practice network, with a $0 budget. Press ? beside a new term for an explanation.'} />
       </p>
       <div class="btn-row">
         <a class="btn primary" href={href(`${lang}/chapters/01-how-to-read/`)}>{zh ? '从第 1 章开始读' : 'Start with Chapter 1'}</a>

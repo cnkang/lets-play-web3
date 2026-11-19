@@ -1516,6 +1516,11 @@ h1, h2, h3, .brand-text, .btn, .card h3 {
   font-weight: 800;
   letter-spacing: -0.025em;
 }
+/* Very narrow phones (320px): a slightly smaller title so long words such as
+   "explained" do not end up alone on the last line (see orphan-check.mjs). */
+@media (max-width: 359px) {
+  .article h1 { font-size: 1.65rem; }
+}
 .prose {
   font-size: 1.0625rem;
   line-height: 1.9;
