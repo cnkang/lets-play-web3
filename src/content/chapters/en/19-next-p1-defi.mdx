@@ -377,6 +377,276 @@ These unexpected moments taught the most:
 - **One approval cost 137,757 gas.** On Sepolia, approvals of USDC and EURC each used 137,757 gas, far more than the tens of thousands that tutorials often quote. The reason was not investigated. **Use the current estimate and a fork measurement, not numbers from a tutorial.**
 - **We took someone else's leftover 1 wei.** See the safety warning above.
 
+## Try it yourself: copyable commands
+
+The labs above used scripts. The commands below do the same steps by hand with <Term id="foundry">Foundry</Term>'s `cast` and `anvil` tools, so you can check the results or practise the labs. **They are split into three levels:**
+
+1. **Read-only checks** call contracts through an <Term id="eth-call">eth_call</Term>. They sign nothing and cost nothing.
+2. **Rehearsals on a local fork** run real transactions, but only on a copy of Sepolia on your own computer. Nothing reaches the real chain, and no <Term id="private-key">private key</Term> is needed.
+3. **Sending on Sepolia** is the last step, and only after a rehearsal works. It uses a test wallet stored in an encrypted <Term id="keystore">keystore</Term>.
+
+<Callout type="danger" title="Testnet only, test wallet only">
+
+- Every command here is for **Sepolia (chain ID 11155111)**. Do not point them at mainnet.
+- Use a **new wallet made only for tests**. Never import the private key or seed phrase of a wallet that holds real assets.
+- Never type a private key into a command line. It ends up in your shell history. Use `--interactive` and let the tool ask for it.
+
+</Callout>
+
+### Get ready: install Foundry and set the addresses
+
+Works in a macOS or Linux terminal, or WSL on Windows. The official installer downloads and installs Foundry (these commands were tested with version 1.9.0):
+
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+cast --version
+```
+
+Open a new terminal, then copy the whole block below. The first line uses the same free public <Term id="rpc">RPC</Term> as the rest of the book. Replace `0xYourTestAddress` with your test wallet's address. The other addresses are the ones used in this chapter:
+
+```bash
+export RPC=https://ethereum-sepolia-rpc.publicnode.com
+export ME=0xYourTestAddress
+export USDC=0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+export EURC=0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4
+export WETH=0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14
+export SR02=0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E
+export QUOTER=0xEd1f6473345F45b75F8179591dd5bA1888cf2FB3
+export V2R=0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3
+export V2PAIR=0x1E22A91dd582f2b69D8c375a08578314399058D0
+export NFPM=0x1238536071E1c677A632429e3655c799b22cDA52
+export POOL=0x3289680dD4d6C10bb19b899729cda5eEF58AEfF1
+```
+
+Before you rely on any address, check it against the official docs and make sure Etherscan shows verified source. Variables last only in this terminal window. In a new window, copy the block again.
+
+### Read-only checks (no signature, no cost)
+
+Check the network <Term id="chainid">chain ID</Term>, your balances and your allowance for SwapRouter02:
+
+```bash
+cast chain-id --rpc-url $RPC
+cast balance $ME --ether --rpc-url $RPC
+cast call $USDC "balanceOf(address)(uint256)" $ME --rpc-url $RPC
+cast call $USDC "allowance(address,address)(uint256)" $ME $SR02 --rpc-url $RPC
+```
+
+The first line must print `11155111`. Token amounts are raw integers: USDC and EURC have 6 decimals, so `1000000` means 1 USDC. `cast` adds a short form in brackets, such as `[1.086e9]`.
+
+Check that the router and the pool are what you expect. SwapRouter02 should report the official WETH address. The pool's `token0` should be USDC and its fee tier 500 (0.05%):
+
+```bash
+cast call $SR02 "WETH9()(address)" --rpc-url $RPC
+cast call $POOL "token0()(address)" --rpc-url $RPC
+cast call $POOL "fee()(uint24)" --rpc-url $RPC
+cast call $POOL "slot0()(uint160,int24,uint16,uint16,uint16,uint8,bool)" --rpc-url $RPC
+cast call $POOL "liquidity()(uint128)" --rpc-url $RPC
+```
+
+The second line of `slot0` is the current tick (Lab 6 started at 173058).
+
+Ask QuoterV2 how much USDC 0.001 WETH buys in this pool right now. The first line of the result is the USDC amount. On the afternoon of 2026-11-19 it was 30561086, about 30.56 USDC:
+
+```bash
+cast call $QUOTER "quoteExactInputSingle((address,address,uint256,uint24,uint160))(uint256,uint160,uint32,uint256)" "($WETH,$USDC,1000000000000000,500,0)" --rpc-url $RPC
+```
+
+Look up a transaction from this chapter, such as Lab 1's first swap. `status` prints `true` for success:
+
+```bash
+cast receipt 0x6ab6dc967d89a4103ef34919f2f06d5bbd5158449210eeb05e4d6371709c5814 status --rpc-url $RPC
+cast receipt 0x6ab6dc967d89a4103ef34919f2f06d5bbd5158449210eeb05e4d6371709c5814 blockNumber --rpc-url $RPC
+cast tx 0x6ab6dc967d89a4103ef34919f2f06d5bbd5158449210eeb05e4d6371709c5814 value --rpc-url $RPC
+```
+
+Expected: `true`, `12165362` and `1000000000000000` (0.001 ETH in wei).
+
+### Rehearse on a local fork (the real chain is not touched)
+
+Open a **second terminal** and start a local copy of Sepolia. Leave it running:
+
+```bash
+anvil --fork-url https://ethereum-sepolia-rpc.publicnode.com --port 8545
+```
+
+Back in the first terminal, point to the fork, let it send as `$ME` without a key, and give `$ME` 0.1 fake ETH. These two `anvil_` commands only work on a local fork:
+
+```bash
+export FORK=http://127.0.0.1:8545
+cast chain-id --rpc-url $FORK
+cast rpc anvil_impersonateAccount $ME --rpc-url $FORK
+cast rpc anvil_setBalance $ME 0x16345785D8A0000 --rpc-url $FORK
+cast balance $ME --ether --rpc-url $FORK
+```
+
+The fork also reports chain ID `11155111`, so always check which URL a command uses. If your test wallet has no USDC or EURC yet, you can set `ME` to the book's account A (`0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC`) **on the fork only** and borrow its test balances. On the real chain nobody can send from another address without its key.
+
+To start over, stop `anvil` with Ctrl+C, start it again, and copy the block above again.
+
+### Rehearsal 1: swap 0.001 ETH for USDC (simulate, then send)
+
+This repeats Lab 1. Take a fresh quote, set the minimum received to quote −0.5%, and set a deadline 10 minutes ahead. Then simulate:
+
+```bash
+AMOUNT_IN=1000000000000000
+QUOTE=$(cast call $QUOTER "quoteExactInputSingle((address,address,uint256,uint24,uint160))(uint256,uint160,uint32,uint256)" "($WETH,$USDC,$AMOUNT_IN,500,0)" --rpc-url $FORK | head -n1 | cut -d' ' -f1)
+MIN_OUT=$(( QUOTE * 995 / 1000 ))
+DEADLINE=$(( $(date +%s) + 600 ))
+echo "quote=$QUOTE minimum=$MIN_OUT"
+SWAP=$(cast calldata "exactInputSingle((address,address,uint24,address,uint256,uint256,uint160))" "($WETH,$USDC,500,$ME,$AMOUNT_IN,$MIN_OUT,0)")
+cast call $SR02 "multicall(uint256,bytes[])(bytes[])" $DEADLINE "[$SWAP]" --value $AMOUNT_IN --from $ME --rpc-url $FORK
+cast estimate $SR02 "multicall(uint256,bytes[])" $DEADLINE "[$SWAP]" --value $AMOUNT_IN --from $ME --rpc-url $FORK
+```
+
+Paying with ETH needs no approval: the router wraps exactly `--value` into WETH. The simulation returns the encoded USDC amount, and `cast estimate` prints the gas. If both work, send it on the fork and check your USDC:
+
+```bash
+cast send $SR02 "multicall(uint256,bytes[])" $DEADLINE "[$SWAP]" --value $AMOUNT_IN --unlocked --from $ME --rpc-url $FORK
+cast call $USDC "balanceOf(address)(uint256)" $ME --rpc-url $FORK
+```
+
+The receipt shows `status 1 (success)`. In our rehearsal the quote was 30561086 and exactly 30561086 arrived, above the minimum of 30408280.
+
+### Rehearsal 2: exact approval, swap, revoke
+
+This repeats Lab 2's 1 USDC → WETH swap. Approve exactly 1 USDC, simulate, send, then check that the allowance is back to 0:
+
+```bash
+AMOUNT_IN=1000000
+cast send $USDC "approve(address,uint256)" $SR02 $AMOUNT_IN --unlocked --from $ME --rpc-url $FORK
+QUOTE=$(cast call $QUOTER "quoteExactInputSingle((address,address,uint256,uint24,uint160))(uint256,uint160,uint32,uint256)" "($USDC,$WETH,$AMOUNT_IN,500,0)" --rpc-url $FORK | head -n1 | cut -d' ' -f1)
+MIN_OUT=$(( QUOTE * 995 / 1000 ))
+DEADLINE=$(( $(date +%s) + 600 ))
+SWAP=$(cast calldata "exactInputSingle((address,address,uint24,address,uint256,uint256,uint160))" "($USDC,$WETH,500,$ME,$AMOUNT_IN,$MIN_OUT,0)")
+cast call $SR02 "multicall(uint256,bytes[])(bytes[])" $DEADLINE "[$SWAP]" --from $ME --rpc-url $FORK
+cast send $SR02 "multicall(uint256,bytes[])" $DEADLINE "[$SWAP]" --unlocked --from $ME --rpc-url $FORK
+cast call $USDC "allowance(address,address)(uint256)" $ME $SR02 --rpc-url $FORK
+```
+
+The last line prints `0`: the swap used the approval exactly. To revoke an allowance that is not 0, approve 0. The same command works for any token and spender:
+
+```bash
+cast send $USDC "approve(address,uint256)" $SR02 0 --unlocked --from $ME --rpc-url $FORK
+```
+
+### Rehearsal 3: deposit and withdraw v2 liquidity
+
+This repeats Lab 5 without the self-swap. In this pair, `token0` is EURC and `token1` is USDC. Read the reserves, and let V2Router02 work out how much EURC goes with 10 USDC:
+
+```bash
+AMOUNT_USDC=10000000
+RES=$(cast call $V2PAIR "getReserves()(uint112,uint112,uint32)" --rpc-url $FORK)
+RES_EURC=$(echo "$RES" | sed -n 1p | cut -d' ' -f1)
+RES_USDC=$(echo "$RES" | sed -n 2p | cut -d' ' -f1)
+AMOUNT_EURC=$(cast call $V2R "quote(uint256,uint256,uint256)(uint256)" $AMOUNT_USDC $RES_USDC $RES_EURC --rpc-url $FORK | cut -d' ' -f1)
+MIN_USDC=$(( AMOUNT_USDC * 995 / 1000 ))
+MIN_EURC=$(( AMOUNT_EURC * 995 / 1000 ))
+DEADLINE=$(( $(date +%s) + 600 ))
+echo "deposit $AMOUNT_USDC USDC + $AMOUNT_EURC EURC"
+```
+
+Approve both tokens exactly, simulate, then deposit. Read your LP token balance afterwards:
+
+```bash
+cast send $USDC "approve(address,uint256)" $V2R $AMOUNT_USDC --unlocked --from $ME --rpc-url $FORK
+cast send $EURC "approve(address,uint256)" $V2R $AMOUNT_EURC --unlocked --from $ME --rpc-url $FORK
+cast call $V2R "addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)(uint256,uint256,uint256)" $USDC $EURC $AMOUNT_USDC $AMOUNT_EURC $MIN_USDC $MIN_EURC $ME $DEADLINE --from $ME --rpc-url $FORK
+cast send $V2R "addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)" $USDC $EURC $AMOUNT_USDC $AMOUNT_EURC $MIN_USDC $MIN_EURC $ME $DEADLINE --unlocked --from $ME --rpc-url $FORK
+LP=$(cast call $V2PAIR "balanceOf(address)(uint256)" $ME --rpc-url $FORK | cut -d' ' -f1)
+echo "LP tokens: $LP"
+```
+
+To withdraw, approve exactly your LP tokens to the router, simulate, then remove everything:
+
+```bash
+cast send $V2PAIR "approve(address,uint256)" $V2R $LP --unlocked --from $ME --rpc-url $FORK
+cast call $V2R "removeLiquidity(address,address,uint256,uint256,uint256,address,uint256)(uint256,uint256)" $USDC $EURC $LP $MIN_USDC $MIN_EURC $ME $DEADLINE --from $ME --rpc-url $FORK
+cast send $V2R "removeLiquidity(address,address,uint256,uint256,uint256,address,uint256)" $USDC $EURC $LP $MIN_USDC $MIN_EURC $ME $DEADLINE --unlocked --from $ME --rpc-url $FORK
+cast call $V2PAIR "balanceOf(address)(uint256)" $ME --rpc-url $FORK
+```
+
+In our rehearsal, 10 USDC + 2.768894 EURC went in and 9.999998 USDC + 2.768893 EURC came out. The tiny difference is rounding. The LP balance and both allowances ended at 0.
+
+### Rehearsal 4: a v3 position, with refundETH in the same transaction
+
+This repeats Lab 6. In this pool, `token0` is USDC and `token1` is WETH, and ticks must be multiples of 10. Set a range about ±10% around the current tick, and send at most 0.0002 ETH. Then approve exactly 5 USDC to the NFPM:
+
+```bash
+TICK=$(cast call $POOL "slot0()(uint160,int24,uint16,uint16,uint16,uint8,bool)" --rpc-url $FORK | sed -n 2p | cut -d' ' -f1)
+LOWER=$(( (TICK - 1000) / 10 * 10 ))
+UPPER=$(( (TICK + 1000) / 10 * 10 ))
+AMOUNT_USDC=5000000
+ETH_MAX=200000000000000
+DEADLINE=$(( $(date +%s) + 600 ))
+echo "tick=$TICK range=$LOWER..$UPPER"
+cast send $USDC "approve(address,uint256)" $NFPM $AMOUNT_USDC --unlocked --from $ME --rpc-url $FORK
+```
+
+Simulate `mint` and `refundETH` together. The decoded result is the NFT number, the liquidity, the USDC used and the ETH used:
+
+```bash
+REFUND=$(cast calldata "refundETH()")
+MINT=$(cast calldata "mint((address,address,uint24,int24,int24,uint256,uint256,uint256,uint256,address,uint256))" "($USDC,$WETH,500,$LOWER,$UPPER,$AMOUNT_USDC,$ETH_MAX,0,0,$ME,$DEADLINE)")
+SIM=$(cast call $NFPM "multicall(bytes[])(bytes[])" "[$MINT,$REFUND]" --value $ETH_MAX --from $ME --rpc-url $FORK | tr -d '[] ' | cut -d, -f1)
+cast decode-abi "mint()(uint256,uint128,uint256,uint256)" $SIM
+```
+
+Set the minimums to the simulated amounts −0.5%, so the mint never runs without protection. Then send both calls in **one** multicall. The ETH that the position does not need comes back in the same transaction:
+
+```bash
+USED_USDC=$(cast decode-abi "mint()(uint256,uint128,uint256,uint256)" $SIM | sed -n 3p | cut -d' ' -f1)
+USED_ETH=$(cast decode-abi "mint()(uint256,uint128,uint256,uint256)" $SIM | sed -n 4p | cut -d' ' -f1)
+MINT=$(cast calldata "mint((address,address,uint24,int24,int24,uint256,uint256,uint256,uint256,address,uint256))" "($USDC,$WETH,500,$LOWER,$UPPER,$AMOUNT_USDC,$ETH_MAX,$(( USED_USDC * 995 / 1000 )),$(( USED_ETH * 995 / 1000 )),$ME,$DEADLINE)")
+cast send $NFPM "multicall(bytes[])" "[$MINT,$REFUND]" --value $ETH_MAX --unlocked --from $ME --rpc-url $FORK
+cast balance $NFPM --rpc-url $FORK
+```
+
+The last line is the ETH left in the NFPM. In our rehearsal it was `0`: about 0.000166 ETH went into the position and the rest of the 0.0002 came back. Leave out `$REFUND` and that change would sit in the contract for anyone to take.
+
+To close the position, find your newest NFT and its liquidity. Simulate the withdrawal to get the minimums:
+
+```bash
+N=$(cast call $NFPM "balanceOf(address)(uint256)" $ME --rpc-url $FORK | cut -d' ' -f1)
+TOKEN_ID=$(cast call $NFPM "tokenOfOwnerByIndex(address,uint256)(uint256)" $ME $(( N - 1 )) --rpc-url $FORK | cut -d' ' -f1)
+LIQ=$(cast call $NFPM "positions(uint256)(uint96,address,address,address,uint24,int24,int24,uint128,uint256,uint256,uint128,uint128)" $TOKEN_ID --rpc-url $FORK | sed -n 8p | cut -d' ' -f1)
+OUT=$(cast call $NFPM "decreaseLiquidity((uint256,uint128,uint256,uint256,uint256))(uint256,uint256)" "($TOKEN_ID,$LIQ,0,0,$DEADLINE)" --from $ME --rpc-url $FORK)
+OUT_USDC=$(echo "$OUT" | sed -n 1p | cut -d' ' -f1)
+OUT_WETH=$(echo "$OUT" | sed -n 2p | cut -d' ' -f1)
+echo "NFT #$TOKEN_ID, liquidity $LIQ, back: $OUT_USDC USDC units + $OUT_WETH WETH wei"
+```
+
+Then remove the liquidity, collect everything and burn the NFT in one multicall:
+
+```bash
+MAX128=340282366920938463463374607431768211455
+DECREASE=$(cast calldata "decreaseLiquidity((uint256,uint128,uint256,uint256,uint256))" "($TOKEN_ID,$LIQ,$(( OUT_USDC * 995 / 1000 )),$(( OUT_WETH * 995 / 1000 )),$DEADLINE)")
+COLLECT=$(cast calldata "collect((uint256,address,uint128,uint128))" "($TOKEN_ID,$ME,$MAX128,$MAX128)")
+BURN=$(cast calldata "burn(uint256)" $TOKEN_ID)
+cast call $NFPM "multicall(bytes[])(bytes[])" "[$DECREASE,$COLLECT,$BURN]" --from $ME --rpc-url $FORK
+cast send $NFPM "multicall(bytes[])" "[$DECREASE,$COLLECT,$BURN]" --unlocked --from $ME --rpc-url $FORK
+cast call $NFPM "balanceOf(address)(uint256)" $ME --rpc-url $FORK
+```
+
+As in Lab 6, the ETH side comes back as WETH. Afterwards you hold 0 position NFTs, and asking for the burned NFT's owner reverts.
+
+### Sending on Sepolia for real
+
+Only when a rehearsal works. First store your **test** wallet in an encrypted keystore. The tool asks for the private key and a password without showing them:
+
+```bash
+cast wallet import lab-test --interactive
+cast wallet list
+```
+
+Then run the same commands on Sepolia with two changes: use `--rpc-url $RPC` instead of `--rpc-url $FORK`, and use `--account lab-test` instead of `--unlocked --from $ME`. Keep every simulation step. For example, the exact approval from Rehearsal 2:
+
+```bash
+cast send $USDC "approve(address,uint256)" $SR02 1000000 --account lab-test --rpc-url $RPC
+```
+
+`cast` asks for the keystore password each time. Before you press Enter, check the URL, the contract, the amount and the minimum. After the transaction, look up its hash on Sepolia Etherscan and check that your allowances are back to 0.
+
 ## Safety checklist
 
 1. Use only the testnet and test tokens. Test tokens have no value.
@@ -406,7 +676,7 @@ The table compares account A's balances just before the first swap with the bala
 
 </T>
 
-Amounts are rounded to each token's display precision. If you add them up, the total can differ from the end value by one smallest unit (0.000001 USDC).
+Nothing in the table is rounded. Each amount is the on-chain integer converted with the token's decimals, so start + change = end exactly. In the SepETH row, 0.001 + 0.000163376950048133 + the gas line also add up exactly to the change.
 
 **Once more: these are test tokens with no real value.** "Over a thousand extra USDC" only shows that the odd pool's provider set a wrong price. It does not show that DeFi makes money.
 

@@ -501,6 +501,11 @@
     "zh": { "term": "Permit / Permit2 签名", "def": "一种「只签名、不发交易」就能授权的方式：你在钱包里签一段消息，对方拿着签名就能动用你的代币。钓鱼网站常用它骗签名，所以要像对待授权交易一样小心。" },
     "en": { "term": "Permit / Permit2 signature", "def": "A way to grant an allowance by signing a message instead of sending a transaction. Whoever holds the signature can move your tokens. Phishing sites often trick people into signing one, so treat it like an approval." }
   },
+  "keystore": {
+    "chapter": "19-next-p1-defi",
+    "zh": { "term": "Keystore（加密密钥文件）", "def": "把私钥用你设的密码加密后存成的文件。工具要签名时先问密码，解开后再用，私钥不必出现在命令行或环境变量里。忘了密码就再也解不开；文件泄露而密码又弱，同样危险。" },
+    "en": { "term": "keystore", "def": "A file holding a private key encrypted with a password you choose. A tool asks for the password when it needs to sign, so the key never appears on the command line or in an environment variable. Forget the password and the key is gone. A leaked file with a weak password is still dangerous." }
+  },
   "router": {
     "chapter": "19-next-p1-defi",
     "zh": { "term": "路由合约（router）", "def": "帮你把一次兑换拆成具体步骤（收款、换币、转给你）的合约，例如 Uniswap 的 SwapRouter02。它是中转站，不应该在里面留下任何钱。" },

@@ -377,6 +377,276 @@ Kang 指定：卖 1 EURC 时最低到账设为 **130 USDC**。每组都是「精
 - **一次授权就要 137,757 gas。** 在 Sepolia 上实测，USDC 和 EURC 的授权都用了 137,757 gas，比常见教程里说的几万 gas 高得多；原因没有深入核实。**以当时的估算和 fork 实测为准，不要照搬教程里的数字。**
 - **别人留下的 1 wei 被我们取走**，见上面的安全提醒。
 
+## 动手复现：可以复制的命令
+
+前面的实验用的是脚本。下面用 <Term id="foundry">Foundry</Term> 的 `cast` 和 `anvil` 工具手动走一遍同样的步骤，方便你核对结果或自己练习。**命令分三个层级：**
+
+1. **只读核对**：通过 <Term id="eth-call">eth_call</Term> 调用合约，不签名、不花钱。
+2. **在本地 Fork 上演练**：真的执行交易，但只发生在你电脑上的一份 Sepolia 副本里。不会碰到真实的链，也不需要<Term id="private-key">私钥</Term>。
+3. **在 Sepolia 上真的发送**：放在最后，而且只在演练成功之后。用加密的 <Term id="keystore">keystore</Term> 保存测试钱包。
+
+<Callout type="danger" title="只用测试网，只用测试钱包">
+
+- 这里每条命令都只针对 **Sepolia（链 ID 11155111）**，不要把它们指向主网。
+- 用一个**专门新建的测试钱包**。绝不要导入任何装有真实资产的钱包的私钥或助记词。
+- 绝不要把私钥直接写在命令行里，它会留在终端历史记录中。用 `--interactive`，让工具来问你。
+
+</Callout>
+
+### 准备：安装 Foundry，设好地址
+
+在 macOS 或 Linux 的终端里运行，Windows 可以用 WSL。官方安装脚本会下载并安装 Foundry（这些命令用 1.9.0 版测试过）：
+
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+cast --version
+```
+
+打开一个新终端，然后把下面整块复制进去。第一行用的是本书一直在用的免费公共 <Term id="rpc">RPC</Term>。把 `0x你的测试地址` 换成你测试钱包的地址，其他地址都是本章用过的：
+
+```bash
+export RPC=https://ethereum-sepolia-rpc.publicnode.com
+export ME=0x你的测试地址
+export USDC=0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+export EURC=0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4
+export WETH=0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14
+export SR02=0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E
+export QUOTER=0xEd1f6473345F45b75F8179591dd5bA1888cf2FB3
+export V2R=0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3
+export V2PAIR=0x1E22A91dd582f2b69D8c375a08578314399058D0
+export NFPM=0x1238536071E1c677A632429e3655c799b22cDA52
+export POOL=0x3289680dD4d6C10bb19b899729cda5eEF58AEfF1
+```
+
+在依赖任何地址之前，先对照官方文档核对，并确认 Etherscan 上显示已验证源码。这些变量只在当前终端窗口里有效，换了新窗口要重新复制一遍。
+
+### 只读核对（不签名、不花钱）
+
+核对网络的 <Term id="chainid">chainId</Term>、你的余额，以及你给 SwapRouter02 的授权额度：
+
+```bash
+cast chain-id --rpc-url $RPC
+cast balance $ME --ether --rpc-url $RPC
+cast call $USDC "balanceOf(address)(uint256)" $ME --rpc-url $RPC
+cast call $USDC "allowance(address,address)(uint256)" $ME $SR02 --rpc-url $RPC
+```
+
+第一行必须输出 `11155111`。代币数量是原始整数：USDC 和 EURC 都是 6 位小数，`1000000` 就是 1 USDC。`cast` 会在方括号里附一个简写，例如 `[1.086e9]`。
+
+确认路由和池子是你以为的那个。SwapRouter02 应该报出官方的 WETH 地址；池子的 `token0` 应该是 USDC，费率档位是 500（0.05%）：
+
+```bash
+cast call $SR02 "WETH9()(address)" --rpc-url $RPC
+cast call $POOL "token0()(address)" --rpc-url $RPC
+cast call $POOL "fee()(uint24)" --rpc-url $RPC
+cast call $POOL "slot0()(uint160,int24,uint16,uint16,uint16,uint8,bool)" --rpc-url $RPC
+cast call $POOL "liquidity()(uint128)" --rpc-url $RPC
+```
+
+`slot0` 输出的第二行是当前 tick（实验 6 开始时是 173058）。
+
+问 QuoterV2：现在用 0.001 WETH 在这个池子里能换多少 USDC。结果第一行就是 USDC 数量。2026-11-19 下午读到的是 30561086，约 30.56 USDC：
+
+```bash
+cast call $QUOTER "quoteExactInputSingle((address,address,uint256,uint24,uint160))(uint256,uint160,uint32,uint256)" "($WETH,$USDC,1000000000000000,500,0)" --rpc-url $RPC
+```
+
+查一笔本章的交易，例如实验 1 的第一次兑换。`status` 输出 `true` 表示成功：
+
+```bash
+cast receipt 0x6ab6dc967d89a4103ef34919f2f06d5bbd5158449210eeb05e4d6371709c5814 status --rpc-url $RPC
+cast receipt 0x6ab6dc967d89a4103ef34919f2f06d5bbd5158449210eeb05e4d6371709c5814 blockNumber --rpc-url $RPC
+cast tx 0x6ab6dc967d89a4103ef34919f2f06d5bbd5158449210eeb05e4d6371709c5814 value --rpc-url $RPC
+```
+
+预期输出：`true`、`12165362` 和 `1000000000000000`（0.001 ETH，以 wei 计）。
+
+### 在本地 Fork 上演练（不碰真实的链）
+
+打开**第二个终端**，启动一份本地的 Sepolia 副本，让它一直运行：
+
+```bash
+anvil --fork-url https://ethereum-sepolia-rpc.publicnode.com --port 8545
+```
+
+回到第一个终端：指向这份副本，让它不用私钥也能以 `$ME` 的身份发送，再给 `$ME` 0.1 个假 ETH。这两条 `anvil_` 命令只在本地 Fork 上有效：
+
+```bash
+export FORK=http://127.0.0.1:8545
+cast chain-id --rpc-url $FORK
+cast rpc anvil_impersonateAccount $ME --rpc-url $FORK
+cast rpc anvil_setBalance $ME 0x16345785D8A0000 --rpc-url $FORK
+cast balance $ME --ether --rpc-url $FORK
+```
+
+副本报出的链 ID 也是 `11155111`，所以每条命令都要看清用的是哪个 URL。如果你的测试钱包还没有 USDC 或 EURC，可以**只在 Fork 上**把 `ME` 设成本书的账户 A（`0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC`），借用它的测试余额。在真实的链上，没有私钥谁也不能替别的地址发送交易。
+
+想从头再来：在第二个终端按 Ctrl+C 停掉 `anvil`，重新启动，再把上面这块复制一遍。
+
+### 演练 1：用 0.001 ETH 兑换 USDC（先模拟，再发送）
+
+这一步重做实验 1。先拿一个新报价，把最少收到设为报价 −0.5%，截止时间设为 10 分钟后，然后模拟：
+
+```bash
+AMOUNT_IN=1000000000000000
+QUOTE=$(cast call $QUOTER "quoteExactInputSingle((address,address,uint256,uint24,uint160))(uint256,uint160,uint32,uint256)" "($WETH,$USDC,$AMOUNT_IN,500,0)" --rpc-url $FORK | head -n1 | cut -d' ' -f1)
+MIN_OUT=$(( QUOTE * 995 / 1000 ))
+DEADLINE=$(( $(date +%s) + 600 ))
+echo "quote=$QUOTE minimum=$MIN_OUT"
+SWAP=$(cast calldata "exactInputSingle((address,address,uint24,address,uint256,uint256,uint160))" "($WETH,$USDC,500,$ME,$AMOUNT_IN,$MIN_OUT,0)")
+cast call $SR02 "multicall(uint256,bytes[])(bytes[])" $DEADLINE "[$SWAP]" --value $AMOUNT_IN --from $ME --rpc-url $FORK
+cast estimate $SR02 "multicall(uint256,bytes[])" $DEADLINE "[$SWAP]" --value $AMOUNT_IN --from $ME --rpc-url $FORK
+```
+
+用 ETH 付款不需要授权：路由会把 `--value` 的金额原样包装成 WETH。模拟返回编码后的 USDC 数量，`cast estimate` 输出 gas。两条都成功，就在 Fork 上发送，再看 USDC 余额：
+
+```bash
+cast send $SR02 "multicall(uint256,bytes[])" $DEADLINE "[$SWAP]" --value $AMOUNT_IN --unlocked --from $ME --rpc-url $FORK
+cast call $USDC "balanceOf(address)(uint256)" $ME --rpc-url $FORK
+```
+
+回执里会显示 `status 1 (success)`。我们演练时报价是 30561086，到账正好 30561086，高于最少收到的 30408280。
+
+### 演练 2：精确授权、兑换、撤销授权
+
+这一步重做实验 2 的 1 USDC → WETH。只授权正好 1 USDC，模拟、发送，再确认授权额度回到 0：
+
+```bash
+AMOUNT_IN=1000000
+cast send $USDC "approve(address,uint256)" $SR02 $AMOUNT_IN --unlocked --from $ME --rpc-url $FORK
+QUOTE=$(cast call $QUOTER "quoteExactInputSingle((address,address,uint256,uint24,uint160))(uint256,uint160,uint32,uint256)" "($USDC,$WETH,$AMOUNT_IN,500,0)" --rpc-url $FORK | head -n1 | cut -d' ' -f1)
+MIN_OUT=$(( QUOTE * 995 / 1000 ))
+DEADLINE=$(( $(date +%s) + 600 ))
+SWAP=$(cast calldata "exactInputSingle((address,address,uint24,address,uint256,uint256,uint160))" "($USDC,$WETH,500,$ME,$AMOUNT_IN,$MIN_OUT,0)")
+cast call $SR02 "multicall(uint256,bytes[])(bytes[])" $DEADLINE "[$SWAP]" --from $ME --rpc-url $FORK
+cast send $SR02 "multicall(uint256,bytes[])" $DEADLINE "[$SWAP]" --unlocked --from $ME --rpc-url $FORK
+cast call $USDC "allowance(address,address)(uint256)" $ME $SR02 --rpc-url $FORK
+```
+
+最后一行输出 `0`：兑换正好用完了授权。如果某个授权额度不是 0，把它改成 0 就是撤销。同样的命令换个代币和被授权方也适用：
+
+```bash
+cast send $USDC "approve(address,uint256)" $SR02 0 --unlocked --from $ME --rpc-url $FORK
+```
+
+### 演练 3：v2 存入和撤出流动性
+
+这一步重做实验 5，但不做自买自卖。这个交易对的 `token0` 是 EURC，`token1` 是 USDC。读出储备，让 V2Router02 算出 10 USDC 要配多少 EURC：
+
+```bash
+AMOUNT_USDC=10000000
+RES=$(cast call $V2PAIR "getReserves()(uint112,uint112,uint32)" --rpc-url $FORK)
+RES_EURC=$(echo "$RES" | sed -n 1p | cut -d' ' -f1)
+RES_USDC=$(echo "$RES" | sed -n 2p | cut -d' ' -f1)
+AMOUNT_EURC=$(cast call $V2R "quote(uint256,uint256,uint256)(uint256)" $AMOUNT_USDC $RES_USDC $RES_EURC --rpc-url $FORK | cut -d' ' -f1)
+MIN_USDC=$(( AMOUNT_USDC * 995 / 1000 ))
+MIN_EURC=$(( AMOUNT_EURC * 995 / 1000 ))
+DEADLINE=$(( $(date +%s) + 600 ))
+echo "deposit $AMOUNT_USDC USDC + $AMOUNT_EURC EURC"
+```
+
+两种代币都精确授权，先模拟，再存入，之后看你的 LP 代币余额：
+
+```bash
+cast send $USDC "approve(address,uint256)" $V2R $AMOUNT_USDC --unlocked --from $ME --rpc-url $FORK
+cast send $EURC "approve(address,uint256)" $V2R $AMOUNT_EURC --unlocked --from $ME --rpc-url $FORK
+cast call $V2R "addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)(uint256,uint256,uint256)" $USDC $EURC $AMOUNT_USDC $AMOUNT_EURC $MIN_USDC $MIN_EURC $ME $DEADLINE --from $ME --rpc-url $FORK
+cast send $V2R "addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)" $USDC $EURC $AMOUNT_USDC $AMOUNT_EURC $MIN_USDC $MIN_EURC $ME $DEADLINE --unlocked --from $ME --rpc-url $FORK
+LP=$(cast call $V2PAIR "balanceOf(address)(uint256)" $ME --rpc-url $FORK | cut -d' ' -f1)
+echo "LP tokens: $LP"
+```
+
+撤出时，把你的 LP 代币正好授权给路由，先模拟，再全部取出：
+
+```bash
+cast send $V2PAIR "approve(address,uint256)" $V2R $LP --unlocked --from $ME --rpc-url $FORK
+cast call $V2R "removeLiquidity(address,address,uint256,uint256,uint256,address,uint256)(uint256,uint256)" $USDC $EURC $LP $MIN_USDC $MIN_EURC $ME $DEADLINE --from $ME --rpc-url $FORK
+cast send $V2R "removeLiquidity(address,address,uint256,uint256,uint256,address,uint256)" $USDC $EURC $LP $MIN_USDC $MIN_EURC $ME $DEADLINE --unlocked --from $ME --rpc-url $FORK
+cast call $V2PAIR "balanceOf(address)(uint256)" $ME --rpc-url $FORK
+```
+
+我们演练时存入 10 USDC + 2.768894 EURC，取回 9.999998 USDC + 2.768893 EURC，那一点差额是取整。最后 LP 余额和两个授权额度都是 0。
+
+### 演练 4：v3 仓位，同一笔交易里带上 refundETH
+
+这一步重做实验 6。这个池子的 `token0` 是 USDC，`token1` 是 WETH，tick 必须是 10 的倍数。在当前 tick 上下各约 10% 设定区间，最多付 0.0002 ETH，再给 NFPM 精确授权 5 USDC：
+
+```bash
+TICK=$(cast call $POOL "slot0()(uint160,int24,uint16,uint16,uint16,uint8,bool)" --rpc-url $FORK | sed -n 2p | cut -d' ' -f1)
+LOWER=$(( (TICK - 1000) / 10 * 10 ))
+UPPER=$(( (TICK + 1000) / 10 * 10 ))
+AMOUNT_USDC=5000000
+ETH_MAX=200000000000000
+DEADLINE=$(( $(date +%s) + 600 ))
+echo "tick=$TICK range=$LOWER..$UPPER"
+cast send $USDC "approve(address,uint256)" $NFPM $AMOUNT_USDC --unlocked --from $ME --rpc-url $FORK
+```
+
+把 `mint` 和 `refundETH` 放在一起模拟。解码出来的四行依次是 NFT 编号、流动性、用掉的 USDC 和用掉的 ETH：
+
+```bash
+REFUND=$(cast calldata "refundETH()")
+MINT=$(cast calldata "mint((address,address,uint24,int24,int24,uint256,uint256,uint256,uint256,address,uint256))" "($USDC,$WETH,500,$LOWER,$UPPER,$AMOUNT_USDC,$ETH_MAX,0,0,$ME,$DEADLINE)")
+SIM=$(cast call $NFPM "multicall(bytes[])(bytes[])" "[$MINT,$REFUND]" --value $ETH_MAX --from $ME --rpc-url $FORK | tr -d '[] ' | cut -d, -f1)
+cast decode-abi "mint()(uint256,uint128,uint256,uint256)" $SIM
+```
+
+把模拟出的数量 −0.5% 设为最低数量，铸造就不会在没有保护的情况下执行。然后把两个调用放进**同一个** multicall 发送，仓位用不到的 ETH 会在同一笔交易里退回：
+
+```bash
+USED_USDC=$(cast decode-abi "mint()(uint256,uint128,uint256,uint256)" $SIM | sed -n 3p | cut -d' ' -f1)
+USED_ETH=$(cast decode-abi "mint()(uint256,uint128,uint256,uint256)" $SIM | sed -n 4p | cut -d' ' -f1)
+MINT=$(cast calldata "mint((address,address,uint24,int24,int24,uint256,uint256,uint256,uint256,address,uint256))" "($USDC,$WETH,500,$LOWER,$UPPER,$AMOUNT_USDC,$ETH_MAX,$(( USED_USDC * 995 / 1000 )),$(( USED_ETH * 995 / 1000 )),$ME,$DEADLINE)")
+cast send $NFPM "multicall(bytes[])" "[$MINT,$REFUND]" --value $ETH_MAX --unlocked --from $ME --rpc-url $FORK
+cast balance $NFPM --rpc-url $FORK
+```
+
+最后一行是留在 NFPM 里的 ETH。我们演练时是 `0`：约 0.000166 ETH 进了仓位，0.0002 里剩下的都退了回来。如果漏掉 `$REFUND`，这笔找零就会留在合约里，谁都能拿走。
+
+关闭仓位：先找到你最新的 NFT 和它的流动性，再模拟撤出，得到最低数量：
+
+```bash
+N=$(cast call $NFPM "balanceOf(address)(uint256)" $ME --rpc-url $FORK | cut -d' ' -f1)
+TOKEN_ID=$(cast call $NFPM "tokenOfOwnerByIndex(address,uint256)(uint256)" $ME $(( N - 1 )) --rpc-url $FORK | cut -d' ' -f1)
+LIQ=$(cast call $NFPM "positions(uint256)(uint96,address,address,address,uint24,int24,int24,uint128,uint256,uint256,uint128,uint128)" $TOKEN_ID --rpc-url $FORK | sed -n 8p | cut -d' ' -f1)
+OUT=$(cast call $NFPM "decreaseLiquidity((uint256,uint128,uint256,uint256,uint256))(uint256,uint256)" "($TOKEN_ID,$LIQ,0,0,$DEADLINE)" --from $ME --rpc-url $FORK)
+OUT_USDC=$(echo "$OUT" | sed -n 1p | cut -d' ' -f1)
+OUT_WETH=$(echo "$OUT" | sed -n 2p | cut -d' ' -f1)
+echo "NFT #$TOKEN_ID, liquidity $LIQ, back: $OUT_USDC USDC units + $OUT_WETH WETH wei"
+```
+
+然后在一个 multicall 里撤出流动性、领取全部、销毁 NFT：
+
+```bash
+MAX128=340282366920938463463374607431768211455
+DECREASE=$(cast calldata "decreaseLiquidity((uint256,uint128,uint256,uint256,uint256))" "($TOKEN_ID,$LIQ,$(( OUT_USDC * 995 / 1000 )),$(( OUT_WETH * 995 / 1000 )),$DEADLINE)")
+COLLECT=$(cast calldata "collect((uint256,address,uint128,uint128))" "($TOKEN_ID,$ME,$MAX128,$MAX128)")
+BURN=$(cast calldata "burn(uint256)" $TOKEN_ID)
+cast call $NFPM "multicall(bytes[])(bytes[])" "[$DECREASE,$COLLECT,$BURN]" --from $ME --rpc-url $FORK
+cast send $NFPM "multicall(bytes[])" "[$DECREASE,$COLLECT,$BURN]" --unlocked --from $ME --rpc-url $FORK
+cast call $NFPM "balanceOf(address)(uint256)" $ME --rpc-url $FORK
+```
+
+和实验 6 一样，ETH 那一侧以 WETH 的形式回来。之后你持有的仓位 NFT 是 0 个，查询已销毁 NFT 的所有者会报错（revert）。
+
+### 真的在 Sepolia 上发送
+
+只在演练成功之后再做。先把你的**测试**钱包存进加密的 keystore。工具会询问私钥和密码，输入时不显示：
+
+```bash
+cast wallet import lab-test --interactive
+cast wallet list
+```
+
+然后在 Sepolia 上运行同样的命令，只改两处：把 `--rpc-url $FORK` 换成 `--rpc-url $RPC`，把 `--unlocked --from $ME` 换成 `--account lab-test`。所有模拟步骤都保留。例如演练 2 里的精确授权：
+
+```bash
+cast send $USDC "approve(address,uint256)" $SR02 1000000 --account lab-test --rpc-url $RPC
+```
+
+`cast` 每次都会询问 keystore 密码。按回车之前，核对 URL、合约、金额和最少收到。交易完成后，在 Sepolia Etherscan 上查这笔交易的哈希，并确认你的授权额度都回到了 0。
+
 ## 安全清单
 
 1. 只用测试网和测试币；测试币没有价值。
@@ -406,7 +676,7 @@ Kang 指定：卖 1 EURC 时最低到账设为 **130 USDC**。每组都是「精
 
 </T>
 
-表内金额按各代币的显示精度四舍五入。逐项相加，可能与末值相差 1 个最小单位（USDC 为 0.000001）。
+表内金额都没有四舍五入：每个数都是链上的原始整数按代币小数位换算出来的，所以「开始 + 变化 = 结束」完全成立。SepETH 一行里，0.001 + 0.000163376950048133 + Gas 一行，相加也正好等于变化。
 
 **再次提醒：这些都是测试币，没有任何真实价值。** 「多出一千多 USDC」只说明那个怪价池的 LP 设错了价格，不说明 DeFi 能赚钱。
 
