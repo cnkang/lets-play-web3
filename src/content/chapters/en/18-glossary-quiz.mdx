@@ -1,6 +1,6 @@
 ---
 title: "Appendix C · Glossary and self-check"
-description: "One-line explanations of the terms in this book, plus 12 self-check questions with answers - shared ledgers, private-key signing, approve, proxy upgrades, tests vs bugs, V4 not on-chain, keyless addresses, non-unique names, burn, atomicity, historical events and fees for failed transactions."
+description: "One-line explanations of the terms in this book, plus 19 self-check questions with answers - shared ledgers, private-key signing, approve, proxy upgrades, tests vs bugs, V4 not on-chain, keyless addresses, non-unique names, burn, atomicity, historical events, fees for failed transactions, and DeFi questions on minimum received, slippage, exact approvals, Permit2, refundETH, arbitrage and verified source."
 navTitle: "Appendix C · Glossary and self-check"
 part: wrapup
 order: 180
@@ -44,6 +44,12 @@ status: published
 | Source verification / exact match / match | Proving source compiles to the on-chain bytecode; metadata also matches / only bytecode matches |
 | GUID | A queue ID returned after submitting verification, not a success mark |
 | Faucet | A service that gives out free test coins |
+| Swap / liquidity pool | Trading one token for another / a contract that holds two tokens and quotes by formula |
+| Slippage / minimum received | Gap between quote and fill / the floor below which the whole transaction rolls back |
+| Exact / infinite approval | Approve only what this trade needs / a lasting approval for the whole balance, risky |
+| Permit2 signature | A fee-free signature that lets someone move your tokens; common in phishing |
+| refundETH | Returns overpaid ETH left in a contract; put it in the same transaction |
+| Arbitrage / impermanent loss | Profiting from a price gap / the relative loss a liquidity provider takes when prices move |
 
 </T>
 
@@ -55,6 +61,6 @@ Every explanation used in the book's "?" pop-ups, generated from the glossary da
 
 ## Self-check (try before looking at the answers)
 
-The first 6 questions come from the original study notes; the last 6 come from the experiments this book adds.
+The first 6 questions come from the original study notes; questions 7–12 come from the experiments this book adds; questions 13–19 come from the Chapter 19 DeFi labs.
 
 <Quiz lang="en" />
