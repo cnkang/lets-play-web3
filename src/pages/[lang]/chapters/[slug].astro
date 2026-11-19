@@ -37,6 +37,8 @@ const next = idx < book.pages.length - 1 ? book.pages[idx + 1] : undefined
 const part = partOf(book, slug)
 const isDraft = entry.data.status === 'draft'
 const modified = entry.data.updated ?? PUBLISHED
+const snap = entry.data.snapshot ?? { at: SNAPSHOT_ISO, block: 12117419 }
+const snapLabel = `${snap.at.slice(0, 10)} ${snap.at.slice(11, 19)} (UTC+8)`
 const author = authorLd(lang)
 const byline = authorFor(lang)
 const title = entry.data.title
@@ -68,7 +70,7 @@ const jsonLd: object[] = [
     learningResourceType: lang === 'zh' ? '教材章节' : 'Textbook chapter',
     educationalLevel: lang === 'zh' ? '初学者' : 'Beginner',
     isAccessibleForFree: true,
-    temporalCoverage: SNAPSHOT_ISO,
+    temporalCoverage: snap.at,
     about: ['Ethereum Sepolia testnet', 'smart contracts', 'ERC-20'],
     isPartOf: { '@type': 'WebSite', name: t.siteTitle, url: absolute(`${lang}/`) }
   },
@@ -106,7 +108,7 @@ const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz,
         <p class="meta-line">
           <span>{lang === 'zh' ? `整理：${byline}` : `By ${byline}`}</span>
           <span>{lang === 'zh' ? '页面发布：' : 'Published: '}<time class="nw" datetime={PUBLISHED}>{PUBLISHED}</time>{modified !== PUBLISHED && <> · <span class="nw">{lang === 'zh' ? '更新：' : 'Updated: '}<time datetime={modified}>{modified}</time></span></>}</span>
-          <span>{lang === 'zh' ? '链上快照：' : 'Chain snapshot: '}<time datetime={SNAPSHOT_ISO}>2026-11-12 15:39:55 (UTC+8)</time>{lang === 'zh' ? <>，<span class="nw">区块 12117419</span></> : <>, <span class="nw">block 12117419</span></>}</span>
+          <span>{lang === 'zh' ? '链上快照：' : 'Chain snapshot: '}<time datetime={snap.at}>{snapLabel}</time>{lang === 'zh' ? <>，<span class="nw">区块 {snap.block}</span></> : <>, <span class="nw">block {snap.block}</span></>}</span>
         </p>
       </header>
       <div class="prose">

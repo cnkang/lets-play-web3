@@ -36,6 +36,7 @@ updated: "2026-12-01"
 | `order` | Required number; identical in both files; multiples of 10 leave room for additions |
 | `status` | Keep identical: `published`, `upcoming` or `draft` (omitted means `published`) |
 | `updated` | Optional content date used on-page, in sitemap and JSON-LD; use the actual date of the change |
+| `snapshot` | Optional chapter-specific chain snapshot, `{ at: "YYYY-MM-DDTHH:MM:SS+08:00", block: N }`; shown in the page header and JSON-LD instead of the book snapshot (Chapter 19 uses it) |
 
 `draft` appears only in development with a noindex banner. `upcoming` needs both files but may have an empty body: it appears without a link in the contents and in the “Coming soon” list in `llms.txt`; it has no page, search entry or sitemap URL. `published` is built and indexed. Chapter 19 records the completed Phase-1 DeFi labs (2026-11-19) with its own snapshot, block 12165973.
 
