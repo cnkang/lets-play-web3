@@ -13,7 +13,7 @@ status: published
 
 V3's job: make **10,000 old UBOX = 1 new UBOX**.
 
-The difficulty is that <Term id="erc20">ERC-20</Term> **has no list of holders you can enumerate**. Hard-coding "divide A's and B's balances by 10,000" would miss any future holder and could easily break the <Term id="invariant">invariant</Term> "sum of balances = total supply".
+The <Term id="erc20">ERC-20</Term> standard lets you ask “How many tokens does this address hold?” It does not require a way to ask “Which addresses hold tokens?” Updating only A and B could miss another holder. One rule must hold before and after the conversion: the balances must add up to the total supply. A rule like that is called an <Term id="invariant">invariant</Term>.
 
 ## Design: a global scale
 

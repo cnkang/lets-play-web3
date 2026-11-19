@@ -36,7 +36,7 @@ The review found no Critical or High issue that could let current test assets be
 ## Test layers: each answers a different question
 
 <Figure name="test-layers" n="7" alt="Three layers: unit tests 49/49 pass. Fuzz: 9 tests times 1000 runs pass. Invariant: 256 runs times 100 calls = 25,600 calls, with 4 invariants passing. Side note: beyond tests, check on-chain evidence and source matching. Bottom: all green does not mean no bugs. 1 Medium, 3 Low, 6 Info remain.">
-Phase-0 used several layers of tests, and every layer has limits and blind spots.
+Imagine testing a token transfer. A unit test might try sending 10 tokens. A fuzz test could repeat the check with many different amounts. An invariant test could try whole sequences of transfers and check after each step that the balances still add up to the total supply.
 </Figure>
 
 <T label="Phase-0 Foundry test results">

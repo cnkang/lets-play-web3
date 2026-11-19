@@ -7,7 +7,7 @@ order: 120
 status: published
 ---
 
-<p class="lead">"Two calls" are not "one transaction". All-or-nothing behaviour is called <Term id="atomicity">atomicity</Term>.</p>
+<p class="lead">Suppose you want to make two transfers. If you send each as a separate transaction, the first can succeed even if the second fails. In this lab you also see a batch that puts both transfers in one transaction and rolls both back if either fails. This all-or-nothing property is called <Term id="atomicity">atomicity</Term>.</p>
 
 ## Lab 1: two separate transferFrom calls (not atomic)
 

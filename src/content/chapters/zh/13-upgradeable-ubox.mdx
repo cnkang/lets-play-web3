@@ -25,7 +25,7 @@ status: published
 
 ## initialize 不是构造函数
 
-<Term id="constructor">构造函数</Term>只会写进**实现合约自己的存储**，不会写进代理。所以可升级合约改用一个普通的<Term id="initialize">初始化函数</Term> `initialize()` 来设定名称、供应和 owner，并通过代理调用一次。它必须**只能执行一次**——再执行一次，可能重新<Term id="mint">铸币</Term>或改掉 owner。
+<Term id="constructor">构造函数</Term>在创建合约时运行。创建实现合约时，它能设置的是实现合约自己的存储。可是用户会去代理地址查询 UBOX 的名称、供应量和所有者，所以这些值要记在代理里。通过代理调用<Term id="initialize">初始化函数</Term> `initialize()`，就能把值写到那里。UBOX 只允许这样设置一次；如果能重复执行，就可能再次<Term id="mint">铸币</Term>或改掉所有者。
 
 ## 第一步：部署 V1 与代理（当时不部署 V2）
 

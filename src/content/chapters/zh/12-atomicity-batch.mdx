@@ -7,7 +7,7 @@ order: 120
 status: published
 ---
 
-<p class="lead">「两次调用」不是「一笔交易」。要么全部成功、要么全部不发生，叫做<Term id="atomicity">原子性</Term>。</p>
+<p class="lead">假设你要转两次账。如果分两笔交易发送，即使第二笔失败，第一笔也可能已经到账。本章还会看另一种做法：把两次转账放进同一笔交易，任何一次失败，两次转账都撤回。这种「要么都成功，要么都撤回」的性质叫<Term id="atomicity">原子性</Term>。</p>
 
 ## 实验一：两笔独立的 transferFrom（不是原子的）
 

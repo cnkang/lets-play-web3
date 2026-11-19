@@ -13,7 +13,7 @@ status: published
 
 Bind each day's records into a book: every page lists that day's <Term id="transaction">transactions</Term> and time, and **copies a summary of the previous page**.
 
-A **hash** works like a content fingerprint: the same content always gives the same fingerprint, and changing even one character usually gives a completely different one. Because each page records the previous page's fingerprint, editing any page in the past makes every later fingerprint stop matching, so the edit is easy to detect.
+A **hash** works like a fingerprint for a page’s contents. Change “10 points” to “100 points” on page 2 and its fingerprint changes. Page 3 still holds the old fingerprint for page 2. To hide the edit, you would have to update page 3. That changes its fingerprint too, so you would have to update page 4, and so on.
 
 <Figure name="blocks" n="1" alt="Three blocks left to right; each holds the previous block's fingerprint, its transactions and its own fingerprint, with arrows linking each fingerprint into the next block.">
 <Term id="block">Blocks</Term> hold transaction data and are linked by the previous block's hash. H(…) in the figure is a symbol, not a real value.
