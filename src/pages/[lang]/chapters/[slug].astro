@@ -1,4 +1,5 @@
 ---
+import Nw from '../../../components/Nw.astro'
 import { render } from 'astro:content'
 import BaseLayout from '../../../layouts/BaseLayout.astro'
 import BookToc from '../../../components/BookToc.astro'
@@ -101,10 +102,10 @@ const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz,
       <header class="article-head">
         <p class="eyebrow">{part?.[lang]}</p>
         {isDraft && <p class="callout warn">{lang === 'zh' ? '草稿：只在本地开发模式可见，正式构建不会包含本章。' : 'Draft: visible in local dev only; production builds leave this chapter out.'}</p>}
-        <h1 id="chapter-title">{title}</h1>
+        <h1 id="chapter-title"><Nw text={title} /></h1>
         <p class="meta-line">
           <span>{lang === 'zh' ? `整理：${byline}` : `By ${byline}`}</span>
-          <span>{lang === 'zh' ? '页面发布：' : 'Published: '}<time datetime={PUBLISHED}>{PUBLISHED}</time>{modified !== PUBLISHED && <>{lang === 'zh' ? ' · 更新：' : ' · Updated: '}<time datetime={modified}>{modified}</time></>}</span>
+          <span>{lang === 'zh' ? '页面发布：' : 'Published: '}<time class="nw" datetime={PUBLISHED}>{PUBLISHED}</time>{modified !== PUBLISHED && <> · <span class="nw">{lang === 'zh' ? '更新：' : 'Updated: '}<time datetime={modified}>{modified}</time></span></>}</span>
           <span>{lang === 'zh' ? '链上快照：' : 'Chain snapshot: '}<time datetime={SNAPSHOT_ISO}>2026-11-12 15:39:55 (UTC+8)</time>{lang === 'zh' ? <>，<span class="nw">区块 12117419</span></> : <>, <span class="nw">block 12117419</span></>}</span>
         </p>
       </header>
