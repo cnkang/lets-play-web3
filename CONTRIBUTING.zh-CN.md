@@ -13,14 +13,14 @@
 **方法 A：用脚本生成（推荐）**
 
 ```bash
-npm run new:chapter -- 20-p1-dex-amm --part p1-defi --order 200
+npm run new:chapter -- 17-p1-dex-amm --part p1-defi --order 170
 ```
 
 会生成两个草稿文件：
 
 ```
-src/content/chapters/zh/20-p1-dex-amm.mdx
-src/content/chapters/en/20-p1-dex-amm.mdx
+src/content/chapters/zh/17-p1-dex-amm.mdx
+src/content/chapters/en/17-p1-dex-amm.mdx
 ```
 
 **方法 B：手动复制模板**：把 `templates/chapter.zh.mdx` 和 `templates/chapter.en.mdx` 复制到上面两个位置，删掉开头的 `#` 注释行。
@@ -32,7 +32,7 @@ src/content/chapters/en/20-p1-dex-amm.mdx
 3. 写好后把**两份文件**的 `status` 都改成 `published`。
 4. 运行 `npm run check:content`、`npm run check:facts`、`npm run build`，都通过再提交。
 
-**slug（文件名）规则**：小写字母、数字和连字符，例如 `20-p1-dex-amm`。中英文必须完全相同，因为右上角的语言切换就是靠同名文件对应的。slug 一旦发布就不要再改（会改变网址）。
+**slug（文件名）规则**：小写字母、数字和连字符，例如 `17-p1-dex-amm`。中英文必须完全相同，因为右上角的语言切换就是靠同名文件对应的。改动已发布的 slug 会改变网址；确需改名时，要为旧地址配置跳转，并更新站内引用。
 
 ## 二、frontmatter 字段
 
@@ -45,7 +45,7 @@ part: tokens                        # 属于哪个「部分」，取 src/content
 order: 100                          # 排序数字；建议用 10 的倍数，以后好在中间插章
 status: published                   # published / upcoming / draft
 updated: "2026-12-01"               # 可选：内容更新日期，会显示在页面并写进 sitemap 和 JSON-LD
-# snapshot:                         # 可选：本章自己的链上快照（如第 19 章），页头和 JSON-LD 会用它代替全书快照
+# snapshot:                         # 可选：本章自己的链上快照（如第 16 章），页头和 JSON-LD 会用它代替全书快照
 #   at: "2026-11-19T11:58:12+08:00"
 #   block: 12165973
 ---
@@ -74,7 +74,7 @@ updated: "2026-12-01"               # 可选：内容更新日期，会显示在
   { "id": "p1-dex", "order": 70, "phase": "p1", "zh": "第七部分 · 去中心化交易", "en": "Part VII · Decentralised exchanges" }
   ```
 - 目录按「阶段 → 部分 → 章节 order」排序；有多个阶段时，目录里会显示阶段小标签。没有任何章节的部分不会显示。
-- 附录放在所有正文内容之后。当前 `appendices` 是 Phase-1 最后一部分（order 80），排在第 19 章之后；新增部分或阶段时，也要让它保持在最后。
+- 附录放在所有正文内容之后。当前 `appendices` 是 Phase-1 最后一部分（order 80），排在第 16 章之后；新增部分或阶段时，也要让它保持在最后。章节号只用于正文章节；附录标为 A、B、C，不占章节号。
 
 ## 四、中英配对检查
 
@@ -128,7 +128,7 @@ updated: "2026-12-01"               # 可选：内容更新日期，会显示在
 
 ```json
 "slippage": {
-  "chapter": "20-p1-dex-amm",
+  "chapter": "17-p1-dex-amm",
   "zh": { "term": "滑点", "def": "下单时看到的价格和最终成交价之间的差。就像排队买菜，轮到你时菜价可能已经变了。" },
   "en": { "term": "slippage", "def": "The gap between the price you saw and the price you finally got, like a market stall changing its price while you queue." }
 }
@@ -169,7 +169,7 @@ Every fee is paid in <Term id="eth">ETH</Term>.
 
 ## 六、追加实验到附录 A
 
-附录 A（`16-appendix-addresses-txs.mdx`，中英两份）是由脚本从实验记录**自动生成**的，不要手改。新做了实验时：
+附录 A（`appendix-a-addresses-txs.mdx`，中英两份）是由脚本从实验记录**自动生成**的，不要手改。新做了实验时：
 
 1. 在实验仓库的 `实验记录.md` §5.2 交易表末尾按原格式追加新交易行：
    `| nonce | A/B | 用途 | success/**reverted** | 手续费 | [交易](https://sepolia.etherscan.io/tx/0x…) |`
@@ -185,7 +185,7 @@ Every fee is paid in <Term id="eth">ETH</Term>.
    ```
    如果缺区块号、英文说明，或者缺 Phase-1 的交易文件，脚本会停下并说明要设置哪个目录。
 
-Phase-1（第 19 章）的交易来自 `$P1_SOURCES_DIR/out/p19-appendix-txs.json`（账户 A 从 nonce 20 起的所有交易，以及水龙头转入，附中英文说明）；第 19 章的合约地址写在生成脚本的 `p1_contracts` 里。以后追加 Phase-1 实验时，扩充这两处即可；nonce 要从 20 起连续，`total_fee_wei` 要等于各行之和。
+Phase-1（第 16 章）的交易来自 `$P1_SOURCES_DIR/out/p19-appendix-txs.json`（账户 A 从 nonce 20 起的所有交易，以及水龙头转入，附中英文说明）；第 16 章的合约地址写在生成脚本的 `p1_contracts` 里。外部实验仓库保留了 `p19-...` 这个旧输入文件名；它只是实验数据文件名，不代表本书的章节号。以后追加 Phase-1 实验时，扩充这两处即可；nonce 要从 20 起连续，`total_fee_wei` 要等于各行之和。
 4. 保留 `2026-11-12 15:39:55 UTC+8 / Sepolia block 12117419` 历史快照。后续证据另加日期、网络、区块、来源和适用范围，不直接改全书的快照常量，也不要用早期笔记覆盖较晚的复核。
 
 ### 区分原理、链上结果、本地测试和计划
@@ -193,7 +193,7 @@ Phase-1（第 19 章）的交易来自 `$P1_SOURCES_DIR/out/p19-appendix-txs.jso
 - 通用原理和生活类比用于解释概念，不声称每句话都有链上证明。
 - 链上结果写清网络、交易、目标区块和当时状态；浏览器当前读数可能已经变化。MBox-Burn 剩余授权已由 D-01 撤销。
 - 单元测试、Fuzz、Invariant 和 fork 模拟单列为本地证据。UBOX V4 从未部署到 Sepolia，不能给它编交易哈希。
-- Phase-0 指基础实验与复核，已经收尾；Phase-1 指第 19 章的 DeFi 实验（2026-11-19 完成，使用自己的快照：区块 12165973）。Sourcify 8/8 匹配中只有 5 个 exact；Etherscan 快照时仍排队；PASS WITH FINDINGS 不等于没有漏洞。以第 15 章和相应原始证据为准。
+- Phase-0 指基础实验与复核，已经收尾；Phase-1 指第 16 章的 DeFi 实验（2026-11-19 完成，使用自己的快照：区块 12165973）。Sourcify 8/8 匹配中只有 5 个 exact；Etherscan 快照时仍排队；PASS WITH FINDINGS 不等于没有漏洞。以第 15 章和相应原始证据为准。
 
 ## 七、新示意图
 

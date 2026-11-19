@@ -83,7 +83,7 @@ const jsonLd: object[] = [
     ]
   }
 ]
-if (slug === '18-glossary-quiz') {
+if (slug === 'appendix-c-glossary-quiz') {
   jsonLd.push({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -95,7 +95,7 @@ if (slug === '18-glossary-quiz') {
 const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz, Lab, Term, Glossary }
 ---
 <BaseLayout lang={lang} title={title} description={entry.data.description} path={path} jsonLd={jsonLd} ogType="article" currentSlug={slug} noindex={isDraft}
-  navKey={slug === '16-appendix-addresses-txs' ? 'appendix' : slug === '18-glossary-quiz' ? 'glossary' : slug === '01-how-to-read' ? 'start' : undefined}>
+  navKey={slug === 'appendix-a-addresses-txs' ? 'appendix' : slug === 'appendix-c-glossary-quiz' ? 'glossary' : slug === '01-how-to-read' ? 'start' : undefined}>
   <div class="shell chapter-grid">
     <aside class="sidebar">
       <BookToc lang={lang} current={slug} idPrefix="side-toc" />

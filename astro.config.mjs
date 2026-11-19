@@ -23,6 +23,16 @@ const site = (process.env.SITE_URL || 'http://localhost:4321').replace(/\/+$/, '
 export default defineConfig({
   site,
   base,
+  redirects: {
+    '/zh/chapters/19-next-p1-defi/': `${base}zh/chapters/16-defi-labs/`,
+    '/en/chapters/19-next-p1-defi/': `${base}en/chapters/16-defi-labs/`,
+    '/zh/chapters/16-appendix-addresses-txs/': `${base}zh/chapters/appendix-a-addresses-txs/`,
+    '/en/chapters/16-appendix-addresses-txs/': `${base}en/chapters/appendix-a-addresses-txs/`,
+    '/zh/chapters/17-credentials-api-keys/': `${base}zh/chapters/appendix-b-credentials-api-keys/`,
+    '/en/chapters/17-credentials-api-keys/': `${base}en/chapters/appendix-b-credentials-api-keys/`,
+    '/zh/chapters/18-glossary-quiz/': `${base}zh/chapters/appendix-c-glossary-quiz/`,
+    '/en/chapters/18-glossary-quiz/': `${base}en/chapters/appendix-c-glossary-quiz/`
+  },
   trailingSlash: 'always',
   output: 'static',
   build: { format: 'directory' },

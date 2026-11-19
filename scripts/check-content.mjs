@@ -140,4 +140,6 @@ if (errors.length) {
   console.error(`✖ content check failed (${errors.length}):\n- ${errors.join('\n- ')}`)
   process.exit(1)
 }
-console.log(`content: ${slugs.size} chapters × ${langs.length} languages OK; glossary: ${Object.keys(glossary).length} terms, ${termUses} <Term> uses${unused.length ? ` (listed in Appendix C only: ${unused.join(', ')})` : ''}`)
+const appendixCount = [...slugs].filter((slug) => slug.startsWith('appendix-')).length
+const chapterCount = slugs.size - appendixCount
+console.log(`content: ${chapterCount} chapters + ${appendixCount} appendices × ${langs.length} languages OK; glossary: ${Object.keys(glossary).length} terms, ${termUses} <Term> uses${unused.length ? ` (listed in Appendix C only: ${unused.join(', ')})` : ''}`)

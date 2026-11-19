@@ -59,8 +59,8 @@ for (const [mods, label] of [[['Alt'], 'Alt'], [['Control'], 'Ctrl'], [['Meta'],
   await ctx.close()
 }
 {
-  const { p, ctx } = await open('/en/chapters/19-next-p1-defi/')
-  ok((await pressNav(p, 'ArrowRight')) === '/en/chapters/19-next-p1-defi/', 'last chapter: → does nothing')
+  const { p, ctx } = await open('/en/chapters/appendix-c-glossary-quiz/')
+  ok((await pressNav(p, 'ArrowRight')) === '/en/chapters/appendix-c-glossary-quiz/', 'last entry: → does nothing')
   await ctx.close()
 }
 {
@@ -191,7 +191,7 @@ for (const [init, label] of [[{ isComposing: true }, 'IME composing (isComposing
 
 // ---------- 3. skip link, menu, popover
 for (const lang of ['zh', 'en']) {
-  const { p, ctx } = await open(`/${lang}/chapters/16-appendix-addresses-txs/`, { width: 375 })
+  const { p, ctx } = await open(`/${lang}/chapters/appendix-a-addresses-txs/`, { width: 375 })
   await p.keyboard.press('Tab')
   ok(await p.evaluate(() => document.activeElement.classList.contains('skip-link')), `${lang}: first Tab = skip link`)
   await p.keyboard.press('Enter'); await sleep(150)
@@ -218,7 +218,7 @@ for (const lang of ['zh', 'en']) {
   await ctx.close()
 }
 {
-  const { p, ctx } = await open('/en/chapters/18-glossary-quiz/')
+  const { p, ctx } = await open('/en/chapters/appendix-c-glossary-quiz/')
   await p.focus('.quiz summary'); await p.keyboard.press('Enter'); await sleep(100)
   const o1 = await p.evaluate(() => document.querySelector('.quiz details').open)
   await p.keyboard.press('Space'); await sleep(100)
@@ -228,7 +228,7 @@ for (const lang of ['zh', 'en']) {
 }
 
 // ---------- 4. Tab stops: ring, not obscured, on screen
-const pages = ['/zh/', '/en/', CH, '/zh/chapters/16-appendix-addresses-txs/', '/en/chapters/18-glossary-quiz/', '/zh/search/', '/en/accessibility/']
+const pages = ['/zh/', '/en/', CH, '/zh/chapters/appendix-a-addresses-txs/', '/en/chapters/appendix-c-glossary-quiz/', '/zh/search/', '/en/accessibility/']
 for (const theme of ['light', 'dark']) for (const width of [1280, 390]) for (const u of pages) {
   const { p, ctx } = await open(u, { width, theme })
   const bad = []; let n = 0; const seen = new Set()
@@ -260,7 +260,7 @@ for (const theme of ['light', 'dark']) for (const width of [1280, 390]) for (con
   const cdp = await p.createCDPSession()
   await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 })
   await p.setViewport({ width: 375, height: 800, hasTouch: true, isMobile: true })
-  await p.goto(`${B}/zh/chapters/16-appendix-addresses-txs/`, { waitUntil: 'networkidle0' })
+  await p.goto(`${B}/zh/chapters/appendix-a-addresses-txs/`, { waitUntil: 'networkidle0' })
   const m = await p.evaluate(() => Math.min(...[...document.querySelectorAll('.copy-btn, .site-footer .link-btn')].map((b) => Math.min(b.getBoundingClientRect().height, b.getBoundingClientRect().width))))
   ok(m >= 44, `coarse pointer: copy / footer buttons ≥ 44px (${m})`)
   await ctx.close()

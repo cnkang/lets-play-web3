@@ -90,6 +90,14 @@ for (const file of html) {
     for (const key of ['href', 'src']) if (a[key]) checkRef(a[key], page, rel)
     if (['og:url', 'og:image', 'twitter:image'].includes(a.property || a.name)) checkRef(a.content, page, rel)
   }
+  const refresh = tags.find(({ tag, a }) => tag === 'meta' && a['http-equiv']?.toLowerCase() === 'refresh')
+  if (refresh) {
+    const target = refresh.a.content?.match(/^\s*\d+(?:\.\d+)?\s*;\s*url\s*=\s*(?:"([^"]+)"|'([^']+)'|(.+))$/i)
+    const destination = target?.[1] ?? target?.[2] ?? target?.[3]?.trim()
+    if (!destination) fail(rel, 'redirect page must include a valid meta refresh target')
+    else checkRef(destination, page, `${rel} redirect`)
+    continue
+  }
   // Keep the existing Chinese x-default and root canonical policy unchanged.
   if (rel !== '404.html') {
     const route = path.replace(/^(zh|en)\//, '')

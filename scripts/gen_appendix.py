@@ -14,13 +14,14 @@ Adding a new experiment (see CONTRIBUTING.zh-CN.md「追加实验到附录 A」)
   4. New contract / account addresses go into `contracts` / `accounts`.
   5. Run `npm run appendix`, then `npm run check:facts` and `npm run build`.
 The script stops with a clear message if a row has no block number or label.
-Only zh/en 16-appendix-addresses-txs.mdx are written; never edit them by hand.
+Only zh/en appendix-a-addresses-txs.mdx are written; never edit them by hand.
 
-Chapter 19 (Phase-1 DeFi labs) rows come from a second source:
+Chapter 16 (Phase-1 DeFi labs) rows come from a second source:
   $P1_SOURCES_DIR/out/p19-appendix-txs.json  (default P1_SOURCES_DIR=/workspace/web3-p1a-swap)
+The external lab repo retains this legacy artifact filename; "p19" is not the book chapter number.
 That file holds account A's transactions from nonce 20 onwards and the faucet transfers,
-read from Blockscout, with zh/en labels. Contract rows for Chapter 19 are in `p1_contracts`
-below. Because Appendix A now includes the Chapter 19 section, this file is required to
+read from Blockscout, with zh/en labels. Contract rows for Chapter 16 are in `p1_contracts`
+below. Because Appendix A now includes the Chapter 16 section, this file is required to
 regenerate the appendix; if it is missing, the script stops and says which folder to set.
 Add later Phase-1 transactions to the same JSON: the nonces must start at 20 and have no
 gaps, and `total_fee_wei` must equal the sum of the rows.
@@ -34,7 +35,7 @@ def load_p1():
     if not path.exists():
         sys.exit(
             f'✖ missing {path}\n'
-            '  Appendix A now includes the Chapter 19 section, so this file is required.\n'
+            '  Appendix A now includes the Chapter 16 section, so this file is required.\n'
             '  Set P1_SOURCES_DIR to the Phase-1 lab folder, for example:\n'
             '    P1_SOURCES_DIR=/path/to/web3-p1a-swap python3 scripts/gen_appendix.py /path/to/实验记录.md\n'
             '  See CONTRIBUTING.md, section "Appendix A is generated".'
@@ -174,10 +175,10 @@ def table(items, lang):
 
 ZH = f'''---
 title: "附录 A　地址与交易总表"
-description: "本书提到的全部 Sepolia 合约地址、账户地址，以及账户 A（nonce 0–19）和账户 B（nonce 0–2）的全部已广播交易，附完整哈希、区块号、手续费和 Sepolia Etherscan 链接；另附实验环境参数，以及第 19 章 DeFi 实验（账户 A nonce 20–42）的地址与交易。"
+description: "本书提到的全部 Sepolia 合约地址、账户地址，以及账户 A（nonce 0–19）和账户 B（nonce 0–2）的全部已广播交易，附完整哈希、区块号、手续费和 Sepolia Etherscan 链接；另附实验环境参数，以及第 16 章 DeFi 实验（账户 A nonce 20–42）的地址与交易。"
 navTitle: "附录 A　地址与交易总表"
-part: wrapup
-order: 160
+part: appendices
+order: 200
 status: published
 ---
 
@@ -267,11 +268,11 @@ status: published
 
 </T>
 
-## 第 19 章：DeFi 实验的地址与交易
+## 第 16 章：DeFi 实验的地址与交易
 
-第 19 章用自己的快照：2026-11-19 11:58:12（新加坡时间），区块 **12165973**。上面各表是 2026-11-12 的历史快照，不受影响。
+第 16 章用自己的快照：2026-11-19 11:58:12（新加坡时间），区块 **12165973**。上面各表是 2026-11-12 的历史快照，不受影响。
 
-<T label="第 19 章用到的合约地址">
+<T label="第 16 章用到的合约地址">
 
 | 名称 | 地址 | 说明 |
 | --- | --- | --- |
@@ -281,7 +282,7 @@ status: published
 
 免费测试资金（转入，不占 A 的 nonce；测试币没有任何真实价值）：
 
-<T label="第 19 章的测试资金转入">
+<T label="第 16 章的测试资金转入">
 
 | 日期（UTC） | 区块 | 内容 | 交易哈希 |
 | --- | ---: | --- | --- |
@@ -289,9 +290,9 @@ status: published
 
 </T>
 
-账户 A 在第 19 章的全部交易（nonce 20–42，共 23 笔，全部成功）。手续费单位为 wei。
+账户 A 在第 16 章的全部交易（nonce 20–42，共 23 笔，全部成功）。手续费单位为 wei。
 
-<T label="第 19 章的全部已广播交易">
+<T label="第 16 章的全部已广播交易">
 
 | 发送者 | nonce | 实验 | 目的 | 状态 | 区块 | 手续费（wei） | 交易哈希 |
 | --- | ---: | --- | --- | --- | ---: | ---: | --- |
@@ -299,16 +300,16 @@ status: published
 
 </T>
 
-- 23 笔交易的手续费合计 **{fmt(p1['total_fee_wei'])} wei**（{sepeth(p1['total_fee_wei'])} SepETH），与第 19 章的总账一致。
+- 23 笔交易的手续费合计 **{fmt(p1['total_fee_wei'])} wei**（{sepeth(p1['total_fee_wei'])} SepETH），与第 16 章的总账一致。
 - 快照时 A 的 nonce 为 **43**。
 '''
 
 EN = f'''---
 title: "Appendix A · Addresses and transactions"
-description: "Every Sepolia contract address and account address mentioned in this book, plus every broadcast transaction from account A (nonces 0–19) and account B (nonces 0–2), with full hashes, block numbers, fees and Sepolia Etherscan links, the lab environment, and Chapter 19's DeFi lab addresses and transactions (account A nonces 20–42)."
+description: "Every Sepolia contract address and account address mentioned in this book, plus every broadcast transaction from account A (nonces 0–19) and account B (nonces 0–2), with full hashes, block numbers, fees and Sepolia Etherscan links, the lab environment, and Chapter 16's DeFi lab addresses and transactions (account A nonces 20–42)."
 navTitle: "Appendix A · Addresses and transactions"
-part: wrapup
-order: 160
+part: appendices
+order: 200
 status: published
 ---
 
@@ -398,11 +399,11 @@ The table lists every transaction from account A (nonces 0–19) and from accoun
 
 </T>
 
-## Chapter 19: DeFi lab addresses and transactions
+## Chapter 16: DeFi lab addresses and transactions
 
-Chapter 19 uses its own snapshot: 2026-11-19 11:58:12 Singapore time, block **12165973**. The tables above are the 2026-11-12 historical snapshot and are unchanged.
+Chapter 16 uses its own snapshot: 2026-11-19 11:58:12 Singapore time, block **12165973**. The tables above are the 2026-11-12 historical snapshot and are unchanged.
 
-<T label="Contract addresses used in Chapter 19">
+<T label="Contract addresses used in Chapter 16">
 
 | Name | Address | Notes |
 | --- | --- | --- |
@@ -412,7 +413,7 @@ Chapter 19 uses its own snapshot: 2026-11-19 11:58:12 Singapore time, block **12
 
 Free test funds (incoming transfers, not using A's nonces; test tokens have no real value):
 
-<T label="Chapter 19 test-fund transfers">
+<T label="Chapter 16 test-fund transfers">
 
 | Date (UTC) | Block | What | Transaction hash |
 | --- | ---: | --- | --- |
@@ -420,9 +421,9 @@ Free test funds (incoming transfers, not using A's nonces; test tokens have no r
 
 </T>
 
-Every transaction account A sent in Chapter 19 (nonces 20–42, 23 in total, all successful). Fees are in wei.
+Every transaction account A sent in Chapter 16 (nonces 20–42, 23 in total, all successful). Fees are in wei.
 
-<T label="Every Chapter 19 broadcast transaction">
+<T label="Every Chapter 16 broadcast transaction">
 
 | Sender | Nonce | Lab | Purpose | Status | Block | Fee (wei) | Transaction hash |
 | --- | ---: | --- | --- | --- | ---: | ---: | --- |
@@ -430,10 +431,10 @@ Every transaction account A sent in Chapter 19 (nonces 20–42, 23 in total, all
 
 </T>
 
-- The 23 transactions' fees total **{fmt(p1['total_fee_wei'])} wei** ({sepeth(p1['total_fee_wei'])} SepETH), matching Chapter 19's ledger.
+- The 23 transactions' fees total **{fmt(p1['total_fee_wei'])} wei** ({sepeth(p1['total_fee_wei'])} SepETH), matching Chapter 16's ledger.
 - At that snapshot, A's nonce was **43**.
 '''
 base = Path(__file__).resolve().parent.parent / 'src' / 'content' / 'chapters'
-(base / 'zh' / '16-appendix-addresses-txs.mdx').write_text(ZH, encoding='utf-8')
-(base / 'en' / '16-appendix-addresses-txs.mdx').write_text(EN, encoding='utf-8')
+(base / 'zh' / 'appendix-a-addresses-txs.mdx').write_text(ZH, encoding='utf-8')
+(base / 'en' / 'appendix-a-addresses-txs.mdx').write_text(EN, encoding='utf-8')
 print('appendix written')

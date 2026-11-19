@@ -49,7 +49,7 @@ function audit(rootSel) {
   return { n: roots.length, out }
 }
 
-const pages = [['home', ''], ['ch10', 'chapters/10-approve-vs-payment/'], ['ch12', 'chapters/12-atomicity-batch/'], ['app-a', 'chapters/16-appendix-addresses-txs/']]
+const pages = [['home', ''], ['ch10', 'chapters/10-approve-vs-payment/'], ['ch12', 'chapters/12-atomicity-batch/'], ['app-a', 'chapters/appendix-a-addresses-txs/']]
 for (const theme of ['light', 'dark']) for (const width of [1280, 1024, 390, 320]) for (const lang of ['zh', 'en']) for (const [name, path] of pages) {
   const p = await browser.newPage()
   await p.setViewport({ width, height: 900 })

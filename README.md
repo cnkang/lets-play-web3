@@ -12,9 +12,9 @@ Prefer to look first? [Inspect a testnet transaction in Chapter 8](https://letsp
 
 ## What is ready
 
-- 19 chapters in English and Simplified Chinese: everyday examples, Counter, ERC-20 tokens, allowances, atomicity and upgradeable contracts. Appendices collect addresses, transactions, credentials guidance, a glossary and a self-check.
-- **Phase-0 basics, experiments and review are complete. The Phase-1 DeFi labs ran on Sepolia on 2026-11-19.** Chapter 19 records them (swaps, arbitrage, v2 and v3 liquidity) with its own snapshot, block 12165973. Test tokens have no real value.
-- On-chain figures preserve the historical snapshot **2026-11-12 15:39:55 UTC+8 / Sepolia block 12117419**, except Chapter 19, which states its own (2026-11-19 / block 12165973). MBox-Burn’s leftover allowance was revoked during the Phase-0 wrap-up. Sourcify matched 8/8 addresses (5 `exact_match`, 3 `match`); Etherscan was still queued at the snapshot. UBOX V4 was tested and simulated locally, never deployed on-chain. [Chapter 15](https://letsplayweb3.liukang.com/en/chapters/15-evidence-p0/) explains the evidence and limits.
+- 16 numbered chapters in English and Simplified Chinese, followed by 3 unnumbered appendices covering addresses, transactions, credentials guidance, the glossary and a self-check.
+- **Phase-0 basics, experiments and review are complete. The Phase-1 DeFi labs ran on Sepolia on 2026-11-19.** Chapter 16 records them (swaps, arbitrage, v2 and v3 liquidity) with its own snapshot, block 12165973. Test tokens have no real value.
+- On-chain figures preserve the historical snapshot **2026-11-12 15:39:55 UTC+8 / Sepolia block 12117419**, except Chapter 16, which states its own (2026-11-19 / block 12165973). MBox-Burn’s leftover allowance was revoked during the Phase-0 wrap-up. Sourcify matched 8/8 addresses (5 `exact_match`, 3 `match`); Etherscan was still queued at the snapshot. UBOX V4 was tested and simulated locally, never deployed on-chain. [Chapter 15](https://letsplayweb3.liukang.com/en/chapters/15-evidence-p0/) explains the evidence and limits.
 - The Phase-0 review concluded **PASS WITH FINDINGS**, not “no vulnerabilities”. This is personal learning material compiled by Kang, not a professional audit or an official Ethereum/Etherscan publication.
 
 **Sepolia only · Phase-0 budget $0 · test coins have no market value · no investment guidance.** Never import a real wallet’s seed phrase or private key into a lab.

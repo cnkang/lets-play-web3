@@ -39,7 +39,7 @@ const chapterSchema = z.object({
   /** Optional date of the last significant edit to this translation. */
   updated: z.iso.date().optional(),
   /**
-   * Optional chapter-specific chain snapshot (e.g. Chapter 19, Phase-1). Defaults to the
+   * Optional chapter-specific chain snapshot (e.g. Chapter 16, Phase-1). Defaults to the
    * book snapshot in src/data/site.ts. `at` is ISO 8601 with a +08:00 offset.
    */
   snapshot: z.object({ at: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+08:00$/), block: z.number().int() }).optional()

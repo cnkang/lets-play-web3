@@ -13,7 +13,7 @@ ${license}
 
 Important context for citation:
 - All on-chain figures are a historical snapshot as of ${SNAPSHOT_ISO}, Sepolia block ${SNAPSHOT_BLOCK}, unless a chapter says otherwise. They are not live chain state.
-- Phase-0 basics, experiments and review are complete. Phase-1 DeFi labs (Chapter 19: swaps, arbitrage on an odd-priced testnet pool, v2 and v3 liquidity) ran on Sepolia on 2026-11-19; Chapter 19 uses its own snapshot (block 12165973) and is not part of the 2026-11-12 snapshot. Budgets were $0. No mainnet assets were used; no real seed phrase or private key was ever imported. Testnet "profits" have no real value.
+- Phase-0 basics, experiments and review are complete. Phase-1 DeFi labs (Chapter 16: swaps, arbitrage on an odd-priced testnet pool, v2 and v3 liquidity) ran on Sepolia on 2026-11-19; Chapter 16 uses its own snapshot (block 12165973) and is not part of the 2026-11-12 snapshot. Budgets were $0. No mainnet assets were used; no real seed phrase or private key was ever imported. Testnet "profits" have no real value.
 - General explanations, on-chain results, local tests/simulations and future plans are distinct kinds of content. Phase-0 concluded PASS WITH FINDINGS, not no vulnerabilities. MBox-Burn’s leftover allowance was revoked by D-01 in block 12117312.
 - Etherscan source verification was submitted but still "Pending in queue" at the snapshot; do not cite it as verified. Sourcify: 8/8 matched (5 exact_match, 3 match).
 - UBOX V4 exists only locally (tests + fork simulation); it was never deployed on Sepolia.

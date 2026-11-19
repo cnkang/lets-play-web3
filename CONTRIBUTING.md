@@ -11,10 +11,10 @@ Use Sepolia only. Never commit private keys, seed phrases, API keys, `.env` file
 Use Node 24 (`nvm use`), then `npm ci`. Scaffold a draft pair:
 
 ```bash
-npm run new:chapter -- 20-p1-dex-amm --part p1-defi --order 200
+npm run new:chapter -- 17-p1-dex-amm --part p1-defi --order 170
 ```
 
-This creates `src/content/chapters/zh/20-p1-dex-amm.mdx` and the matching file under `en/`. Alternatively copy `templates/chapter.{zh,en}.mdx` to those paths and remove the introductory comment lines. Slugs use lowercase letters, numbers and hyphens. Keep the same filename in both languages; do not change a published slug, because it changes the URL.
+This creates `src/content/chapters/zh/17-p1-dex-amm.mdx` and the matching file under `en/`. Alternatively copy `templates/chapter.{zh,en}.mdx` to those paths and remove the introductory comment lines. Slugs use lowercase letters, numbers and hyphens. Keep the same filename in both languages. Changing a published slug changes its URL; if a rename is necessary, add a redirect for the old route and update internal references.
 
 ```yaml
 ---
@@ -36,9 +36,9 @@ updated: "2026-12-01"
 | `order` | Required number; identical in both files; multiples of 10 leave room for additions |
 | `status` | Keep identical: `published`, `upcoming` or `draft` (omitted means `published`) |
 | `updated` | Optional content date used on-page, in sitemap and JSON-LD; use the actual date of the change |
-| `snapshot` | Optional chapter-specific chain snapshot, `{ at: "YYYY-MM-DDTHH:MM:SS+08:00", block: N }`; shown in the page header and JSON-LD instead of the book snapshot (Chapter 19 uses it) |
+| `snapshot` | Optional chapter-specific chain snapshot, `{ at: "YYYY-MM-DDTHH:MM:SS+08:00", block: N }`; shown in the page header and JSON-LD instead of the book snapshot (Chapter 16 uses it) |
 
-`draft` appears only in development with a noindex banner. `upcoming` needs both files but may have an empty body: it appears without a link in the contents and in the “Coming soon” list in `llms.txt`; it has no page, search entry or sitemap URL. `published` is built and indexed. Chapter 19 records the completed Phase-1 DeFi labs (2026-11-19) with its own snapshot, block 12165973.
+`draft` appears only in development with a noindex banner. `upcoming` needs both files but may have an empty body: it appears without a link in the contents and in the “Coming soon” list in `llms.txt`; it has no page, search entry or sitemap URL. `published` is built and indexed. Chapter 16 records the completed Phase-1 DeFi labs (2026-11-19) with its own snapshot, block 12165973.
 
 Run `npm run dev` and preview **both** `http://localhost:4321/en/` and `http://localhost:4321/zh/`. Change both statuses to `published` only when ready. Search requires `npm run build` followed by `npm run preview`.
 
@@ -46,7 +46,7 @@ The content check and Astro both enforce pairing and shared fields. `ALLOW_UNPAI
 
 ## Parts and phases
 
-Phases live in `src/content/phases.json`; parts in `src/content/parts.json`. A phase has `id`, `order`, `zh`, `en`; a part also has `phase`, pointing to a phase ID. Contents sort by phase, part and chapter order; empty parts stay hidden. Add both language labels when adding either. Use **Phase-0** for the completed basics, experiments and review, and **Phase-1** for the DeFi labs in Chapter 19. Keep the `appendices` part after all content parts (currently order 80 in Phase-1); if you add another phase or part, keep the appendices last.
+Phases live in `src/content/phases.json`; parts in `src/content/parts.json`. A phase has `id`, `order`, `zh`, `en`; a part also has `phase`, pointing to a phase ID. Contents sort by phase, part and chapter order; empty parts stay hidden. Add both language labels when adding either. Use **Phase-0** for the completed basics, experiments and review, and **Phase-1** for the DeFi labs in Chapter 16. Keep the `appendices` part after all content parts (currently order 80 in Phase-1); if you add another phase or part, keep the appendices last. Chapter numbers apply only to chapters; label appendices A, B and C without chapter numbers.
 
 ## Write and illustrate
 
@@ -94,7 +94,7 @@ Preserve **2026-11-12 15:39:55 UTC+8 / Sepolia block 12117419**. Add later evide
 - **Principles and analogies** explain ideas; they are not experimental results.
 - **On-chain results** identify the network, transaction and target block. A current explorer read may differ from the snapshot. MBox-Burn’s leftover allowance was revoked by D-01.
 - **Local tests and simulations** need their own label. UBOX V4 was never deployed to Sepolia and has no broadcast transaction hash.
-- **Plans** stay explicit, and Phase-1 results keep their own date and block (Chapter 19: 2026-11-19, block 12165973). Sourcify matched 8/8 addresses, but only 5 were exact; Etherscan was queued at the snapshot. PASS WITH FINDINGS does not mean no vulnerabilities. Use Chapter 15 and the corresponding original evidence.
+- **Plans** stay explicit, and Phase-1 results keep their own date and block (Chapter 16: 2026-11-19, block 12165973). Sourcify matched 8/8 addresses, but only 5 were exact; Etherscan was queued at the snapshot. PASS WITH FINDINGS does not mean no vulnerabilities. Use Chapter 15 and the corresponding original evidence.
 
 Appendix A is generated; edit its generator rather than the two MDX tables. When a separately authorised experiment is complete:
 
@@ -103,7 +103,7 @@ Appendix A is generated; edit its generator rather than the two MDX tables. When
 3. Run `P1_SOURCES_DIR=/absolute/path/to/web3-p1a-swap python3 scripts/gen_appendix.py /absolute/path/to/实验记录.md` (without arguments it uses `/workspace/web3-sandbox/实验记录.md` and `/workspace/web3-p1a-swap`), then `SOURCES_DIR=/absolute/path/to/web3-sandbox P1_SOURCES_DIR=/absolute/path/to/web3-p1a-swap npm run check:facts` and `npm run build`. Missing blocks, English labels or the Phase-1 transaction file stop generation with a message that says which folder to set.
 4. Add subsequent evidence as dated additions; retain the historical snapshot. Check the generator’s output diff before committing.
 
-Phase-1 (Chapter 19) rows come from `$P1_SOURCES_DIR/out/p19-appendix-txs.json` (account A's transactions from nonce 20 onwards and the faucet transfers, with zh/en labels); Chapter 19 contracts live in `p1_contracts` in the generator. Extend that file and list for later Phase-1 experiments; nonces must start at 20 and have no gaps, and `total_fee_wei` must equal the sum of the rows.
+Phase-1 (Chapter 16) rows come from `$P1_SOURCES_DIR/out/p19-appendix-txs.json` (account A's transactions from nonce 20 onwards and the faucet transfers, with zh/en labels); Chapter 16 contracts live in `p1_contracts` in the generator. The external lab repository retains the `p19-...` artifact filename; it is a legacy source filename, not this book's chapter number. Extend that file and list for later Phase-1 experiments; nonces must start at 20 and have no gaps, and `total_fee_wei` must equal the sum of the rows.
 
 `check:facts` always scans for suspected secrets. Without external source files it skips address/hash provenance; report that skip. Its default source directory is `/workspace/web3-sandbox`. It verifies literal presence, not the semantics of a claim; see [deployment docs](docs/DEPLOYMENT.md).
 

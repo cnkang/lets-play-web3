@@ -33,7 +33,7 @@
     "en": { "term": "Sepolia", "def": "The name of one of Ethereum's public test networks. Its ETH (SepETH) is handed out free by “faucets” and cannot be exchanged for real money, which makes it a safe place for beginners to practise." }
   },
   "chainid": {
-    "chapter": "17-credentials-api-keys",
+    "chapter": "appendix-b-credentials-api-keys",
     "zh": { "term": "chainId（链 ID）", "def": "每条以太坊类网络的身份证号码。以太坊主网是 1，Sepolia 是 11155111。钱包和程序靠它确认「我现在连的是哪条链」，避免把测试网和主网搞混。" },
     "en": { "term": "chainId", "def": "An ID number for each Ethereum-style network: Ethereum mainnet is 1, Sepolia is 11155111. Wallets and scripts check it to be sure which chain they are talking to, so testnet and mainnet never get mixed up." }
   },
@@ -198,7 +198,7 @@
     "en": { "term": "block explorer", "def": "A website that turns chain data into searchable pages. Type an address, transaction hash or block number to see balances, status and history, like a parcel-tracking site for the chain." }
   },
   "etherscan": {
-    "chapter": "17-credentials-api-keys",
+    "chapter": "appendix-b-credentials-api-keys",
     "zh": { "term": "Etherscan", "def": "最常用的以太坊区块浏览器。Sepolia 测试网有自己的版本：sepolia.etherscan.io，本书的每个链接都指向那里。" },
     "en": { "term": "Etherscan", "def": "The most widely used Ethereum block explorer. The Sepolia testnet has its own edition at sepolia.etherscan.io, and every link in this book points there." }
   },
@@ -428,7 +428,7 @@
     "en": { "term": "audit", "def": "A systematic security review of contract code by an independent professional team. This book's Phase-0 review was done in-house; it is not a third-party audit." }
   },
   "api-key": {
-    "chapter": "17-credentials-api-keys",
+    "chapter": "appendix-b-credentials-api-keys",
     "zh": { "term": "API 密钥", "def": "网站发给你、让程序代表你调用它的服务的口令。泄露后一般不能转走币，但会被别人冒用额度，所以也要保密。它和私钥完全不是一回事。" },
     "en": { "term": "API key", "def": "A password-like token a website issues so your programs can use its service as you. A leak usually cannot move coins but lets others burn your quota, so keep it secret too. It is nothing like a private key." }
   },
@@ -437,122 +437,122 @@
     "en": { "term": "viem", "def": "A free, open-source JavaScript/TypeScript library for talking to Ethereum nodes: reading data, simulating and sending transactions. This book's scripts used it to work with Sepolia." }
   },
   "defi": {
-    "chapter": "19-next-p1-defi",
-    "zh": { "term": "DeFi（去中心化金融）", "def": "用智能合约实现的金融服务，例如兑换、借贷，没有传统意义上的柜台或银行。本书只在测试网上学习它的原理（第 19 章），不涉及投资。" },
-    "en": { "term": "DeFi (decentralised finance)", "def": "Financial services such as swaps and lending run by smart contracts instead of a bank counter. This guide studies how they work on a testnet only (Chapter 19) and does not cover investing." }
+    "chapter": "16-defi-labs",
+    "zh": { "term": "DeFi（去中心化金融）", "def": "用智能合约实现的金融服务，例如兑换、借贷，没有传统意义上的柜台或银行。本书只在测试网上学习它的原理（第 16 章），不涉及投资。" },
+    "en": { "term": "DeFi (decentralised finance)", "def": "Financial services such as swaps and lending run by smart contracts instead of a bank counter. This guide studies how they work on a testnet only (Chapter 16) and does not cover investing." }
   },
   "dex-amm": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "DEX / AMM", "def": "DEX 是去中心化交易所；AMM（自动做市商）是其中常见的一种，用一个装着两种代币的「资金池」和公式自动给出兑换价格，不需要人挂单。" },
     "en": { "term": "DEX / AMM", "def": "A DEX is a decentralised exchange; an AMM (automated market maker) is a common kind that prices swaps automatically from a pool holding two tokens and a formula, with no one placing orders." }
   },
   "swap": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "兑换（swap）", "def": "把一种代币换成另一种代币。在 DEX 上，你的对手是一个池子合约，而不是某个人。" },
     "en": { "term": "swap", "def": "Exchanging one token for another. On a DEX the other side is a pool contract, not a person." }
   },
   "stablecoin": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "稳定币", "def": "设计成跟某种法币（例如美元、欧元）保持 1:1 价值的代币，例如 USDC、EURC。测试网上的稳定币没有任何价值。" },
     "en": { "term": "stablecoin", "def": "A token designed to stay worth one unit of a currency such as the US dollar or the euro, for example USDC and EURC. Testnet stablecoins have no value." }
   },
   "weth": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "WETH（包装的 ETH）", "def": "把 ETH 按 1:1 「包装」成的 ERC-20 代币，方便和其他代币放进同一种合约里交易。可以随时 1:1 换回 ETH。" },
     "en": { "term": "WETH (wrapped ETH)", "def": "ETH wrapped 1:1 into an ERC-20 token so it can be traded in the same contracts as other tokens. You can unwrap it back to ETH 1:1 at any time." }
   },
   "liquidity-pool": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "资金池（流动性池）", "def": "一个装着两种代币的合约，按公式自动给出兑换价格。池子越「深」（钱越多），一笔兑换对价格的影响越小。" },
     "en": { "term": "liquidity pool", "def": "A contract holding two tokens that prices swaps with a formula. The deeper the pool (the more it holds), the less one swap moves the price." }
   },
   "fee-tier": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "费率档", "def": "每个池子收取的兑换手续费比例，例如 0.05%、0.3%、1%。同一对代币可以有好几个不同费率的池子，价格也可能各不相同。" },
     "en": { "term": "fee tier", "def": "The swap fee a pool charges, for example 0.05%, 0.3% or 1%. One token pair can have several pools with different fees, and their prices can differ." }
   },
   "price-impact": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "价格影响", "def": "你自己的这笔兑换把池子价格推动了多少。单子相对池子越大，价格影响越大，成交均价越差。" },
     "en": { "term": "price impact", "def": "How much your own swap moves the pool's price. The bigger your order is compared with the pool, the bigger the impact and the worse your average price." }
   },
   "slippage": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "滑点", "def": "预计到账和实际到账之间的差。报价已经考虑了兑换数量。如果有人在你之前成交，实际到账就可能变化。" },
     "en": { "term": "slippage", "def": "The gap between the amount you were quoted and the amount you finally receive. The quote already accounts for your order size. If someone trades before you, the amount can change." }
   },
   "min-received": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "最低到账（amountOutMinimum）", "def": "你愿意接受的最少到账数量。交易上链那一刻如果达不到，整笔交易回退，只损失手续费。它是底线，不是价格预测；设成 0 等于没有保护。" },
     "en": { "term": "minimum received (amountOutMinimum)", "def": "The smallest amount you accept from a swap. If the swap would give less when it runs, the whole transaction reverts and you only lose the fee. It is a floor, not a forecast; setting it to 0 removes the protection." }
   },
   "deadline": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "截止时间（deadline）", "def": "交易必须在这个时间之前被打包，过时就作废并回退。它能防止一笔迟迟没上链的旧交易在价格变了很久之后才成交。" },
     "en": { "term": "deadline", "def": "The time by which a transaction must be included in a block; after that it reverts. It stops an old, stuck transaction from executing long after prices have changed." }
   },
   "infinite-approval": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "无限授权", "def": "把授权额度设成最大值（type(uint256).max），让对方以后可以不限量地动用你的代币。很方便，但合约一旦出问题或被骗，钱包里的这种代币可能被全部转走。" },
     "en": { "term": "infinite approval", "def": "Setting an allowance to the maximum value (type(uint256).max) so the spender can take any amount later. It is convenient, but if the contract is buggy or malicious, all of that token can be drained." }
   },
   "permit2": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "Permit / Permit2 签名", "def": "一种「只签名、不发交易」就能授权的方式：你在钱包里签一段消息，对方拿着签名就能动用你的代币。钓鱼网站常用它骗签名，所以要像对待授权交易一样小心。" },
     "en": { "term": "Permit / Permit2 signature", "def": "A way to grant an allowance by signing a message instead of sending a transaction. Whoever holds the signature can move your tokens. Phishing sites often trick people into signing one, so treat it like an approval." }
   },
   "keystore": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "Keystore（加密密钥文件）", "def": "把私钥用你设的密码加密后存成的文件。工具要签名时先问密码，解开后再用，私钥不必出现在命令行或环境变量里。忘了密码就再也解不开；文件泄露而密码又弱，同样危险。" },
     "en": { "term": "keystore", "def": "A file holding a private key encrypted with a password you choose. A tool asks for the password when it needs to sign, so the key never appears on the command line or in an environment variable. Forget the password and the key is gone. A leaked file with a weak password is still dangerous." }
   },
   "router": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "路由合约（router）", "def": "帮你把一次兑换拆成具体步骤（收款、换币、转给你）的合约，例如 Uniswap 的 SwapRouter02。它是中转站，不应该在里面留下任何钱。" },
     "en": { "term": "router", "def": "A contract that carries out a swap step by step for you (collect, swap, pay out), such as Uniswap's SwapRouter02. It is a pass-through and should never be left holding funds." }
   },
   "multicall": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "multicall（一笔打包多步）", "def": "把几个合约调用打包进同一笔交易：要么全部成功，要么全部回退。常用来把「付款 + 兑换 + 退款」放在一起。" },
     "en": { "term": "multicall", "def": "Bundling several contract calls into one transaction so they all succeed or all revert together. Often used to keep pay, swap and refund in one step." }
   },
   "arbitrage": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "套利", "def": "在价格便宜的地方买、在价格贵的地方卖，赚取差价。套利会把不同地方的价格拉近。" },
     "en": { "term": "arbitrage", "def": "Buying where a price is low and selling where it is high to capture the gap. Arbitrage pulls prices in different places back together." }
   },
   "mev": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "MEV（最大可提取价值）", "def": "机器人通过安排交易顺序（抢在你前面、夹住你的交易，或者捡走合约里的零钱）获取的利润。主网上大量机器人在实时竞争这些机会。" },
     "en": { "term": "MEV (maximal extractable value)", "def": "Profit that bots take by ordering transactions: trading just before you, sandwiching your trade, or sweeping leftover funds out of contracts. On mainnet, many bots compete for this in real time." }
   },
   "liquidity-provider": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "流动性提供者（LP）", "def": "把两种代币一起存进池子、供别人兑换的人。别人每兑换一次付的手续费，按份额分给全体 LP。" },
     "en": { "term": "liquidity provider (LP)", "def": "Someone who deposits two tokens into a pool so others can swap. The fees from every swap are shared among all LPs by their share." }
   },
   "lp-token": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "LP 代币", "def": "v2 池发给 LP 的「存款凭证」，代表你占池子的份额。凭它把份额连同累积的手续费一起赎回。" },
     "en": { "term": "LP token", "def": "A receipt a v2 pool gives a liquidity provider. It represents your share of the pool, and you redeem it to withdraw your share plus accumulated fees." }
   },
   "impermanent-loss": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "无常损失", "def": "价格变化后，把币存在池子里比「放在钱包里不动」少的那部分价值。价格回到原点时它会消失，所以叫「无常」；在价格偏离时撤出，它就变成真实的损失。" },
     "en": { "term": "impermanent loss", "def": "The value you lose by keeping tokens in a pool instead of just holding them, after the price moves. It disappears if the price returns, hence “impermanent”; withdraw while the price is off and the loss becomes real." }
   },
   "concentrated-liquidity": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "集中流动性", "def": "Uniswap v3 的做法：LP 只在自己选的一个价格区间里提供流动性。同样的钱在区间内更「深」、赚的手续费更多，但无常损失也更大，价格出了区间就不再赚手续费。" },
     "en": { "term": "concentrated liquidity", "def": "Uniswap v3's design: a liquidity provider supplies liquidity only inside a price range they choose. The same money is deeper and earns more fees in range, but impermanent loss is larger, and outside the range it earns nothing." }
   },
   "tick": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "tick（价格刻度）", "def": "v3 把价格切成很细的刻度，每格大约 0.01%（价格 = 1.0001 的 tick 次方）。仓位的价格区间用两个 tick 表示。" },
     "en": { "term": "tick", "def": "v3 divides prices into fine steps of about 0.01% each (price = 1.0001 to the power of the tick). A position's price range is given by two ticks." }
   },
   "nft": {
-    "chapter": "19-next-p1-defi",
+    "chapter": "16-defi-labs",
     "zh": { "term": "NFT（不可替代代币）", "def": "每一个都独一无二的代币。Uniswap v3 用一个 NFT 代表一个流动性仓位，因为每个仓位的区间都不一样；撤出后可以把它销毁（burn）。" },
     "en": { "term": "NFT (non-fungible token)", "def": "A token where every item is unique. Uniswap v3 uses one NFT to represent one liquidity position, because every position has its own range; after closing it you can burn it." }
   }
