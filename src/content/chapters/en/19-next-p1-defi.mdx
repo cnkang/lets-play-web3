@@ -11,7 +11,7 @@ snapshot:
   block: 12165973
 ---
 
-<p class="lead">How much USDC did account A get for 0.001 SepETH? Start with Lab 1. Compare the quote with the amount on the transaction receipt. You can follow the <Term id="defi">DeFi</Term> labs by opening the transaction links, even without a wallet. Later labs show what changes when you supply the tokens other people swap.</p>
+<p class="lead">How much USDC did account A get for 0.001 SepETH? Start with Lab 1. Compare the quote with the amount on the transaction receipt. You can follow the <Term id="defi">DeFi</Term> labs by opening the transaction links, even without a wallet. Later labs show what changes when you supply the tokens <span class="nw">other people swap.</span></p>
 
 <Callout type="note" title="Snapshot and scope of this chapter">
 
@@ -57,7 +57,7 @@ A real counter-example: the WETH/USDC 0.05% pool address held 121.46 WETH and 53
 ### Price impact, slippage, minimum received and deadline
 
 - **<Term id="price-impact">Price impact</Term>**: how much your own order moves the price. The odd pool in this chapter held only about 1,630 USDC. Selling a single EURC moved its price from about 152.75 to about 123.9.
-- **<Term id="slippage">Slippage</Term>** is the difference between the amount quoted for your swap and the amount you receive. The quote already accounts for the size of your order. If someone trades before you, the pool can give you a different amount.
+- **<Term id="slippage">Slippage</Term>**: the difference between the amount quoted for your swap and the amount you receive. The quote already accounts for the size of your order. If someone trades before you, the pool can give you a different amount.
 - **<Term id="min-received">Minimum received</Term>**: the floor you set. If the swap would pay less when it runs, the whole transaction reverts and you lose only the fee. It is a floor, not a forecast, and not a limit order. Setting it to 0 removes the protection.
 - **<Term id="deadline">Deadline</Term>**: after this time the transaction is void. Every swap here used a deadline of about 20 minutes.
 
@@ -122,7 +122,7 @@ After the faucet, a script made **read-only** quotes on every USDC/EURC pool (bl
 
 The odd 0.05% pool’s address: <Addr a="0x68adf381B8F9e9e100bb6E13d50b14094e3b6a9d" short />.
 
-The same 1 EURC got 137 USDC in one pool and 0.014 USDC in another, almost ten thousand times apart. USDC and EURC are designed to track the US dollar and the euro respectively. These testnet quotes come from individual pools. The 0.05% pool's price then meant "1 EURC ≈ 152.75 USDC", and it held only about 1,630.72 USDC and 10.17 EURC.
+The same 1 EURC got 137 USDC in one pool and 0.014 USDC in another, almost ten thousand times apart. USDC and EURC are designed to track the US dollar and the euro respectively. Each testnet pool sets its own price, so these quotes can be far from the real exchange rate. The 0.05% pool's price then meant "1 EURC ≈ 152.75 USDC", and it held only about 1,630.72 USDC and 10.17 EURC.
 
 <Lab title="Sell 1 EURC into the odd pool, then swap 1 USDC for WETH" goal="Check that the odd price really executes, and observe slippage">
 
@@ -639,13 +639,20 @@ cast wallet import lab-test --interactive
 cast wallet list
 ```
 
-Set `ME` back to the public address of your own `lab-test` wallet. Check its Sepolia balance for gas. Use `--rpc-url $RPC` for fresh quotes and simulations, then rebuild the transaction with that address, the new minimum and a fresh deadline. Sign with `--account lab-test`. For example, this approves the router to spend 1 USDC:
+Set `ME` back to the public address of your own `lab-test` wallet, and check its Sepolia balance for gas. `cast` asks for the keystore password:
+
+```bash
+export ME=$(cast wallet address --account lab-test)
+cast balance $ME --ether --rpc-url $RPC
+```
+
+Use `--rpc-url $RPC` for fresh quotes and simulations, then rebuild the transaction with that address, the new minimum and a fresh deadline. Sign with `--account lab-test`. For example, this approves the router to spend 1 USDC:
 
 ```bash
 cast send $USDC "approve(address,uint256)" $SR02 1000000 --account lab-test --rpc-url $RPC
 ```
 
-Look up the transaction hash on Sepolia Etherscan. After the approval alone, the allowance should be `1000000` (1 USDC). After the router spends that amount, check that the allowance is zero. If you stop after approving, revoke it by approving zero for the same router.
+`cast` asks for the keystore password. Before you press Enter, check the URL, the contract, the amount and the minimum. Then look up the transaction hash on Sepolia Etherscan. After the approval alone, the allowance should be `1000000` (1 USDC). After the router spends that amount, check that the allowance is zero. If you stop after approving, revoke it by approving zero for the same router.
 
 ## Safety checklist
 

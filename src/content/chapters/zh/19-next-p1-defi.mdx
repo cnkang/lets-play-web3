@@ -57,7 +57,7 @@ snapshot:
 ### 价格影响、滑点、最低到账和截止时间
 
 - **<Term id="price-impact">价格影响</Term>**：你自己的单子把价格推动了多少。在本章的怪价池里，池子只有约 1,630 USDC，只卖 1 个 EURC，价格就从约 152.75 掉到约 123.9。
-- **<Term id="slippage">滑点</Term>**是这笔兑换的预计到账和实际到账之间的差。报价时已经算进了你的兑换数量对价格的影响。如果有人在你之前成交，池子实际给你的数量就可能变化。
+- **<Term id="slippage">滑点</Term>**：这笔兑换的预计到账和实际到账之间的差。报价时已经算进了你的兑换数量对价格的影响。如果有人在你之前成交，池子实际给你的数量就可能变化。
 - **<Term id="min-received">最低到账</Term>**：你给交易设的「底线」。交易上链那一刻达不到，就整笔回退，只损失手续费。它不是价格预测，也不是挂单。设成 0 等于没有保护。
 - **<Term id="deadline">截止时间</Term>**：过了这个时间，交易就作废。本章每笔兑换都设了 20 分钟左右的截止时间。
 
@@ -122,7 +122,7 @@ snapshot:
 
 0.05% 怪价池的地址：<Addr a="0x68adf381B8F9e9e100bb6E13d50b14094e3b6a9d" short />。
 
-同样是 1 个 EURC，一个池子给 137 USDC，另一个只给 0.014 USDC，差了将近一万倍。USDC 和 EURC 的设计目标是分别跟踪美元和欧元。表里的测试网报价由各个池子单独给出。0.05% 池当时的价格对应「1 EURC ≈ 152.75 USDC」，池里只有约 1,630.72 USDC 和 10.17 EURC。
+同样是 1 个 EURC，一个池子给 137 USDC，另一个只给 0.014 USDC，差了将近一万倍。USDC 和 EURC 的设计目标是分别跟踪美元和欧元。测试网上每个池子各自定价，这些报价可能和真实汇率相差很远。0.05% 池当时的价格对应「1 EURC ≈ 152.75 USDC」，池里只有约 1,630.72 USDC 和 10.17 EURC。
 
 <Lab title="把 1 EURC 卖进怪价池，再用 1 USDC 换 WETH" goal="验证怪价能否真的成交，观察滑点">
 
@@ -639,13 +639,20 @@ cast wallet import lab-test --interactive
 cast wallet list
 ```
 
-先把 `ME` 改回自己的 `lab-test` 测试钱包公开地址，检查里面是否有支付手续费的 SepETH。用 `--rpc-url $RPC` 重新报价和模拟，用自己的地址、新的最低到账和截止时间重新生成交易参数。发送时用 `--account lab-test` 签名。例如，下面这笔交易允许路由花费 1 USDC：
+先把 `ME` 改回自己的 `lab-test` 测试钱包公开地址，检查里面是否有支付手续费的 SepETH。`cast` 会询问 keystore 密码：
+
+```bash
+export ME=$(cast wallet address --account lab-test)
+cast balance $ME --ether --rpc-url $RPC
+```
+
+用 `--rpc-url $RPC` 重新报价和模拟，用自己的地址、新的最低到账和截止时间重新生成交易参数。发送时用 `--account lab-test` 签名。例如，下面这笔交易允许路由花费 1 USDC：
 
 ```bash
 cast send $USDC "approve(address,uint256)" $SR02 1000000 --account lab-test --rpc-url $RPC
 ```
 
-在 Sepolia Etherscan 上查这笔交易的哈希。只做完授权时，剩余额度应该是 `1000000`（1 USDC）。等路由用完这 1 USDC，再检查额度是否归零。如果决定停在授权这一步，就给同一个路由重新授权 0 来撤销额度。
+`cast` 会询问 keystore 密码。按回车之前，核对 URL、合约、金额和最少收到。然后在 Sepolia Etherscan 上查这笔交易的哈希。只做完授权时，剩余额度应该是 `1000000`（1 USDC）。等路由用完这 1 USDC，再检查额度是否归零。如果决定停在授权这一步，就给同一个路由重新授权 0 来撤销额度。
 
 ## 安全清单
 
