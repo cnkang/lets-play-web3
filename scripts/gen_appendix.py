@@ -18,17 +18,50 @@ Only zh/en 16-appendix-addresses-txs.mdx are written; never edit them by hand.
 
 Chapter 19 (Phase-1 DeFi labs) rows come from a second source:
   $P1_SOURCES_DIR/out/p19-appendix-txs.json  (default P1_SOURCES_DIR=/workspace/web3-p1a-swap)
-That file holds account A's nonce 20-42 transactions and the faucet transfers, read from
-Blockscout, with zh/en labels. Contract rows for Chapter 19 are in `p1_contracts` below.
+That file holds account A's transactions from nonce 20 onwards and the faucet transfers,
+read from Blockscout, with zh/en labels. Contract rows for Chapter 19 are in `p1_contracts`
+below. Because Appendix A now includes the Chapter 19 section, this file is required to
+regenerate the appendix; if it is missing, the script stops and says which folder to set.
+Add later Phase-1 transactions to the same JSON: the nonces must start at 20 and have no
+gaps, and `total_fee_wei` must equal the sum of the rows.
 """
 import json, os, re, sys
 from pathlib import Path
 
-p1 = json.loads((Path(os.environ.get('P1_SOURCES_DIR', '/workspace/web3-p1a-swap')) / 'out' / 'p19-appendix-txs.json').read_text(encoding='utf-8'))
-assert [t['nonce'] for t in p1['txs']] == list(range(20, 43)), 'p19-appendix-txs.json must list nonces 20-42'
-assert sum(t['fee_wei'] for t in p1['txs']) == p1['total_fee_wei'] == 6936564251954
-nb = Path(sys.argv[1] if len(sys.argv) > 1 else '/workspace/web3-sandbox/实验记录.md').read_text(encoding='utf-8')
-sec = nb[nb.index('### 5.2'):nb.index('## 6.')]
+
+def load_p1():
+    path = Path(os.environ.get('P1_SOURCES_DIR', '/workspace/web3-p1a-swap')) / 'out' / 'p19-appendix-txs.json'
+    if not path.exists():
+        sys.exit(
+            f'✖ missing {path}\n'
+            '  Appendix A now includes the Chapter 19 section, so this file is required.\n'
+            '  Set P1_SOURCES_DIR to the Phase-1 lab folder, for example:\n'
+            '    P1_SOURCES_DIR=/path/to/web3-p1a-swap python3 scripts/gen_appendix.py /path/to/实验记录.md\n'
+            '  See CONTRIBUTING.md, section "Appendix A is generated".'
+        )
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def sepeth(wei):
+    """wei -> exact SepETH text with 18 decimals (no float rounding)."""
+    return f'{wei // 10**18}.{wei % 10**18:018d}'
+
+
+p1 = load_p1()
+nonces = [t['nonce'] for t in p1['txs']]
+if nonces != list(range(20, 20 + len(nonces))):
+    sys.exit(f'✖ p19-appendix-txs.json: nonces must start at 20 and have no gaps; got {nonces}')
+fee_sum = sum(t['fee_wei'] for t in p1['txs'])
+if fee_sum != p1['total_fee_wei']:
+    sys.exit(f'✖ p19-appendix-txs.json: total_fee_wei is {p1["total_fee_wei"]}, but the rows add up to {fee_sum}')
+nb_path = Path(sys.argv[1] if len(sys.argv) > 1 else '/workspace/web3-sandbox/实验记录.md')
+if not nb_path.is_file():
+    sys.exit(f'✖ missing notebook {nb_path}\n  Pass the path to 实验记录.md as the first argument, or put it at /workspace/web3-sandbox/实验记录.md.')
+nb = nb_path.read_text(encoding='utf-8')
+try:
+    sec = nb[nb.index('### 5.2'):nb.index('## 6.')]
+except ValueError:
+    sys.exit(f'✖ {nb_path}: no "### 5.2" … "## 6." transaction section — check the notebook headings')
 rows = []
 for line in sec.splitlines():
     m = re.match(r'\| (\d+|—) \| (A|B) \| (.+?) \| (\*\*reverted\*\*|success) \| (\d+) \| \[交易\]\(https://sepolia.etherscan.io/tx/(0x[0-9a-f]{64})\) \|', line)
@@ -266,7 +299,7 @@ status: published
 
 </T>
 
-- 23 笔交易的手续费合计 **{fmt(p1['total_fee_wei'])} wei**（0.000006936564251954 SepETH），与第 19 章的总账一致。
+- 23 笔交易的手续费合计 **{fmt(p1['total_fee_wei'])} wei**（{sepeth(p1['total_fee_wei'])} SepETH），与第 19 章的总账一致。
 - 快照时 A 的 nonce 为 **43**。
 '''
 
@@ -397,7 +430,7 @@ Every transaction account A sent in Chapter 19 (nonces 20–42, 23 in total, all
 
 </T>
 
-- The 23 transactions' fees total **{fmt(p1['total_fee_wei'])} wei** (0.000006936564251954 SepETH), matching Chapter 19's ledger.
+- The 23 transactions' fees total **{fmt(p1['total_fee_wei'])} wei** ({sepeth(p1['total_fee_wei'])} SepETH), matching Chapter 19's ledger.
 - At that snapshot, A's nonce was **43**.
 '''
 base = Path(__file__).resolve().parent.parent / 'src' / 'content' / 'chapters'
