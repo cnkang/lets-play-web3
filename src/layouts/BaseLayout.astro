@@ -393,6 +393,15 @@ const ga4Enabled = /^G-[A-Z0-9]+$/.test(ga4MeasurementId)
         if (returnFocus) btn.focus()
       }
       btn?.addEventListener('click', () => (panel?.hidden ? openMenu() : closeMenu()))
+      // A table taller than the screen can land with its top under the sticky header when
+      // reached by Tab (the browser scrolls only as far as needed). Keyboard focus only:
+      // align it to the top, below the header (scroll-padding-top). WCAG 2.4.11.
+      document.addEventListener('focusin', (e) => {
+        const el = e.target
+        if (!(el instanceof HTMLElement) || !el.classList.contains('table-wrap') || !el.matches(':focus-visible')) return
+        const hdr = document.querySelector('.site-header')
+        if (hdr && el.getBoundingClientRect().top < hdr.getBoundingClientRect().bottom) el.scrollIntoView({ block: 'start' })
+      })
       panel?.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', () => closeMenu()))
       document.addEventListener('keydown', (e) => {
         if (!panel || panel.hidden) return

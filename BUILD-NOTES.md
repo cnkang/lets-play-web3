@@ -328,3 +328,4 @@ Tools: axe-core 4.14.0 via puppeteer-core in Google Chrome 156 (headless), tags 
 - Content-level fixes: en ch1 lead, ch5 account B line (address first), ch12 Lab 2 heading ("(it is atomic)"; its anchor id changed, and nothing linked to it), ch17 env-var sentence, Appendix A reconciliation line (generator), ch19 reference link text.
 - Remaining: `/en/accessibility/` "Accessibility statement" at 320px. Two long words cannot share one line at that width, so `text-wrap: balance` puts one on each line. Accepted.
 - New optional frontmatter `snapshot: { at, block }` so Chapter 19's header and JSON-LD show its own snapshot (2026-11-19 11:58:12 UTC+8, block 12165973) instead of the book's.
+- Keyboard focus: a `.table-wrap` reached by Tab whose top lands under the sticky header is scrolled to `block: 'start'` (keyboard focus only, `:focus-visible`). Found by `keyboard-check.mjs` on Appendix A's new Chapter 19 tables at 800px height (WCAG 2.4.11).
