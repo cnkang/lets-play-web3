@@ -1,6 +1,6 @@
 ---
 title: "DeFi labs: swaps, arbitrage and liquidity"
-description: "Phase-1 on the Sepolia testnet: a first swap, exact approvals, an odd-priced pool and arbitrage, two plans to win back the starting tokens, a paper model of impermanent loss, a v2 liquidity position and a v3 concentrated-liquidity NFT position. On-chain results match their transactions. Paper models are labelled as such. Test tokens have no real value."
+description: "Follow a swap on Sepolia from quote to receipt. Compare prices across pools, see how liquidity providers earn fees, and use a paper model to explore what happens when prices change. The labs use free test tokens."
 navTitle: "19 · DeFi labs: swaps, arbitrage and liquidity"
 part: p1-defi
 order: 190
@@ -11,7 +11,7 @@ snapshot:
   block: 12165973
 ---
 
-<p class="lead">This chapter records the Phase-1 <Term id="defi">DeFi</Term> labs from start to finish. Everything ran on the Sepolia testnet with free test tokens. You will see what one swap really does, and why a price that looks too good deserves suspicion. You will also see what you earn and lose when you put money into a pool.</p>
+<p class="lead">How much USDC did account A get for 0.001 SepETH? Start with Lab 1. Compare the quote with the amount on the transaction receipt. You can follow the <Term id="defi">DeFi</Term> labs by opening the transaction links, even without a wallet. Later labs show what changes when you supply the tokens other people swap.</p>
 
 <Callout type="note" title="Snapshot and scope of this chapter">
 
@@ -57,7 +57,7 @@ A real counter-example: the WETH/USDC 0.05% pool address held 121.46 WETH and 53
 ### Price impact, slippage, minimum received and deadline
 
 - **<Term id="price-impact">Price impact</Term>**: how much your own order moves the price. The odd pool in this chapter held only about 1,630 USDC. Selling a single EURC moved its price from about 152.75 to about 123.9.
-- **<Term id="slippage">Slippage</Term>**: the gap between the quote and the final result. Your own order may have moved the price, or someone else traded first.
+- **<Term id="slippage">Slippage</Term>** is the difference between the amount quoted for your swap and the amount you receive. The quote already accounts for the size of your order. If someone trades before you, the pool can give you a different amount.
 - **<Term id="min-received">Minimum received</Term>**: the floor you set. If the swap would pay less when it runs, the whole transaction reverts and you lose only the fee. It is a floor, not a forecast, and not a limit order. Setting it to 0 removes the protection.
 - **<Term id="deadline">Deadline</Term>**: after this time the transaction is void. Every swap here used a deadline of about 20 minutes.
 
@@ -122,7 +122,7 @@ After the faucet, a script made **read-only** quotes on every USDC/EURC pool (bl
 
 The odd 0.05% pool’s address: <Addr a="0x68adf381B8F9e9e100bb6E13d50b14094e3b6a9d" short />.
 
-The same 1 EURC got 137 USDC in one pool and 0.014 USDC in another, almost ten thousand times apart. In reality 1 EURC is worth about 1.05–1.2 USDC. The 0.05% pool's price then meant "1 EURC ≈ 152.75 USDC", and it held only about 1,630.72 USDC and 10.17 EURC.
+The same 1 EURC got 137 USDC in one pool and 0.014 USDC in another, almost ten thousand times apart. USDC and EURC are designed to track the US dollar and the euro respectively. These testnet quotes come from individual pools. The 0.05% pool's price then meant "1 EURC ≈ 152.75 USDC", and it held only about 1,630.72 USDC and 10.17 EURC.
 
 <Lab title="Sell 1 EURC into the odd pool, then swap 1 USDC for WETH" goal="Check that the odd price really executes, and observe slippage">
 
@@ -278,7 +278,7 @@ Paper set-up: starting price 1.10 USDC/EURC, deposit 10 USDC + 9.090909 EURC (wo
 
 - If the price doubles or halves, the loss is about 5.7%. At 5× or one fifth, it is about 25.5%. The loss depends only on how many times the price moved, not on the direction.
 - At 2×, the provider needs 1.715729 USDC of fees to break even. If they own the whole pool, the pool must trade 571.91 USDC. If they own 1%, it must trade 57,190.96 USDC.
-- In v3, put the same money only in the range [p0÷1.2, p0×1.2]. Inside that range the liquidity is **11.477226 times** the full-range amount, and so are the fees. But at 2× the impermanent loss grows to **−30.151829%**. Once the price leaves the range, the position turns entirely into one token and earns no fees.
+- In v3, put the same money only in the range from the starting price divided by 1.2 to the starting price multiplied by 1.2. Inside that range the liquidity is **11.477226 times** the full-range amount. Fees depend on how much people swap while the price is in range and how much liquidity other providers supply. But at 2× the impermanent loss grows to **−30.151829%**. Once the price leaves the range, the position turns entirely into one token and earns no fees.
 
 ## Lab 5: v2 liquidity: deposit, self-swap, withdraw
 
@@ -294,12 +294,12 @@ The pool is the v2 USDC/EURC pair <Addr a="0x1E22A91dd582f2b69D8c375a08578314399
 | 2 | Approve V2Router02 for exactly 2.833328 EURC | <Tx h="0xe8c6efdf5beb582e5446b409f1223621f678f93902630818a0b012863bba5cac" short /> |
 | 3 | Deposit 10 USDC + 2.833328 EURC (minimums −0.5%) | <Tx h="0x4e5027efac4661e5df366b6832535cc556e0fa714c87ca402ea7e9517b3a2c46" short /> |
 | 4 | Self-swap 5 USDC → 1.396285 EURC | <Tx h="0xb1b77ebf81de939357c0461658b9ebbd6e2c0aea0804e2d71cbb0ece10b1afe4" short /> |
-| 5 | Approve V2Router02 for exactly 5,239,894 LP tokens | <Tx h="0xcefa63297927d4bc7cbba43f2d727dfbc9e829f3941a1b86887db65126c0c720" short /> |
+| 5 | Approve V2Router02 for exactly 5,239,894 raw units of the LP token | <Tx h="0xcefa63297927d4bc7cbba43f2d727dfbc9e829f3941a1b86887db65126c0c720" short /> |
 | 6 | Withdraw everything (minimums −0.5%) | <Tx h="0x02d4514c5f5fb5989fc9e244879956743aed2c82ae7acb91c5249c3cdcb591a2" short /> |
 
 </T>
 
-- **Deposit**: v2 takes tokens at the pool's current ratio, so 10 USDC needed 2.833328 EURC. A received 5,239,894 LP tokens (raw units), a **2.3172%** share of the pool.
+- **Deposit**: v2 takes tokens at the pool's current ratio, so 10 USDC needed 2.833328 EURC. A received 5,239,894 raw units of the LP token, a **2.3172%** share of the pool.
 - **Who gets the fee**: the self-swap paid a 0.015 USDC fee, out of A's own pocket. With a 2.3172% share, only about **0.000348 USDC** came back to A. The rest went to the other providers. **Swapping against your own position to earn fees always loses.**
 - **Withdraw**: A got back **10.115856 USDC + 2.800973 EURC**.
 - **Against HODL**: the price moved from 3.52942 to 3.61155. At the final price, HODL = 20.232706 USDC and the LP withdrawal = 20.231711 USDC, **0.000996 USDC less**. About −0.001338 was impermanent loss, and about +0.000343 was the fee share and rounding.
@@ -311,7 +311,7 @@ While the deposited EURC sat in the pool, A's wallet held only about 17.37 EURC,
 
 ## Lab 6: a v3 concentrated-liquidity position (NFT)
 
-The pool is WETH/USDC 0.05%: deep, close to a realistic price, and it leaves EURC alone. The NonfungiblePositionManager (NFPM) <Addr a="0x1238536071E1c677A632429e3655c799b22cDA52" short /> matches the Uniswap docs, and the factory and WETH addresses it reports were checked on-chain.
+The pool is WETH/USDC 0.05%: it has enough liquidity for this small deposit, and A can keep the EURC from Lab 4. The NonfungiblePositionManager (NFPM) <Addr a="0x1238536071E1c677A632429e3655c799b22cDA52" short /> matches the Uniswap docs, and the factory and WETH addresses it reports were checked on-chain.
 
 <Lab title="v3: mint a ±10% range → close it and burn the NFT (3 transactions)" goal="Understand tick ranges, NFT positions and where fees come from">
 
@@ -480,7 +480,7 @@ cast rpc anvil_setBalance $ME 0x16345785D8A0000 --rpc-url $FORK
 cast balance $ME --ether --rpc-url $FORK
 ```
 
-The fork also reports chain ID `11155111`, so always check which URL a command uses. If your test wallet has no USDC or EURC yet, you can set `ME` to the book's account A (`0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC`) **on the fork only** and borrow its test balances. On the real chain nobody can send from another address without its key.
+The fork also reports chain ID `11155111`, so always check which URL a command uses. If your test wallet has no USDC or EURC yet, you can set `ME` to the book's account A (`0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC`) **on the fork only** and borrow its test balances. If you switch addresses, rerun the block above so Anvil uses and funds the new address. On the real chain nobody can send from another address without its key.
 
 To start over, stop `anvil` with Ctrl+C, start it again, and copy the block above again.
 
@@ -639,13 +639,13 @@ cast wallet import lab-test --interactive
 cast wallet list
 ```
 
-Then run the same commands on Sepolia with two changes: use `--rpc-url $RPC` instead of `--rpc-url $FORK`, and use `--account lab-test` instead of `--unlocked --from $ME`. Keep every simulation step. For example, the exact approval from Rehearsal 2:
+Set `ME` back to the public address of your own `lab-test` wallet. Check its Sepolia balance for gas. Use `--rpc-url $RPC` for fresh quotes and simulations, then rebuild the transaction with that address, the new minimum and a fresh deadline. Sign with `--account lab-test`. For example, this approves the router to spend 1 USDC:
 
 ```bash
 cast send $USDC "approve(address,uint256)" $SR02 1000000 --account lab-test --rpc-url $RPC
 ```
 
-`cast` asks for the keystore password each time. Before you press Enter, check the URL, the contract, the amount and the minimum. After the transaction, look up its hash on Sepolia Etherscan and check that your allowances are back to 0.
+Look up the transaction hash on Sepolia Etherscan. After the approval alone, the allowance should be `1000000` (1 USDC). After the router spends that amount, check that the allowance is zero. If you stop after approving, revoke it by approving zero for the same router.
 
 ## Safety checklist
 
@@ -678,12 +678,12 @@ The table compares account A's balances just before the first swap with the bala
 
 Nothing in the table is rounded. Each amount is the on-chain integer converted with the token's decimals, so start + change = end exactly. In the SepETH row, 0.001 + 0.000163376950048133 + the gas line also add up exactly to the change.
 
-**Once more: these are test tokens with no real value.** "Over a thousand extra USDC" only shows that the odd pool's provider set a wrong price. It does not show that DeFi makes money.
+**These test tokens have no real value.** The extra USDC came from selling EURC into a pool that offered much more than other pools. The transactions show what it paid. How its price first got there is unknown.
 
 ## Summary
 
 - On a DEX your counterparty is a pool contract. v2 prices with `x·y=k`. v3 lets providers concentrate money in a price range.
-- Price impact comes from your own order. Slippage also includes others trading first. The minimum received is your floor, and the deadline stops a stale transaction.
+- Your quote accounts for the price impact of your order. Compare the quote with what you received to measure slippage. The minimum received is your floor, and the deadline stops a stale transaction.
 - Approve exact amounts and reset them to 0. Avoid infinite approvals and unknown Permit signatures. Only use contracts with verified source.
 - Odd testnet pools can be arbitraged. On mainnet, bots take such chances within seconds.
 - Providing liquidity earns fees and carries impermanent loss. v3 magnifies both and earns nothing out of range.
