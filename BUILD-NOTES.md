@@ -317,3 +317,5 @@ Tools: axe-core 4.14.0 via puppeteer-core in Google Chrome 156 (headless), tags 
 - The older row above that calls Chapter 19 "not started yet" is kept as dated history.
 
 - `Lab.astro` now keeps the last 4 CJK characters of a `goal` together (`<span class="nw">`), because `rehype-no-orphans` cannot see component props. Chapter 19's transaction tables are wrapped in `<T>` (fixes a 320/375px horizontal scroll), and its table headers and checklist no longer trigger axe `empty-table-header` / `label`.
+- SepETH source: Kang confirmed (2026-11-19) that both 0.05 SepETH transfers came from Google Cloud's Sepolia faucet; chapter 19 and Appendix A now say so.
+- Appendix A gains a generated "Chapter 19" section (10 contracts, 5 faucet transfers, A's nonces 20–42; fees total 6,936,564,251,954 wei) from `$P1_SOURCES_DIR/out/p19-appendix-txs.json`. Appendix C gains 7 DeFi self-check questions (19 in total) and 6 quick-reference rows.
