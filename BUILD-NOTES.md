@@ -319,3 +319,12 @@ Tools: axe-core 4.14.0 via puppeteer-core in Google Chrome 156 (headless), tags 
 - `Lab.astro` now keeps the last 4 CJK characters of a `goal` together (`<span class="nw">`), because `rehype-no-orphans` cannot see component props. Chapter 19's transaction tables are wrapped in `<T>` (fixes a 320/375px horizontal scroll), and its table headers and checklist no longer trigger axe `empty-table-header` / `label`.
 - SepETH source: Kang confirmed (2026-11-19) that both 0.05 SepETH transfers came from Google Cloud's Sepolia faucet; chapter 19 and Appendix A now say so.
 - Appendix A gains a generated "Chapter 19" section (10 contracts, 5 faucet transfers, A's nonces 20–42; fees total 6,936,564,251,954 wei) from `$P1_SOURCES_DIR/out/p19-appendix-txs.json`. Appendix C gains 7 DeFi self-check questions (19 in total) and 6 quick-reference rows.
+
+## 2026-11-19 · Orphan last lines, site-wide (follow-up)
+
+- `orphan-check.mjs` before → after (Chrome, 1280/1024/768/390/320): 0/0/1/2/11 → 0/0/0/0/1; with `--no-pretty`: 0/1/3/5/18 → 0/0/0/0/1.
+- Template text now goes through `<Nw>`: chapter / search / accessibility `<h1>`, the home subtitle, the search fallback link, and Lab titles and goals (replacing the CJK-only glue added earlier today). In the meta line, the dates are `nowrap` and "Updated: date" is glued together so a date no longer breaks at its hyphens.
+- `.article h1` is 1.65rem below 360px, so "ERC-20 approve and allowance explained" no longer leaves "explained" alone at 320px.
+- Content-level fixes: en ch1 lead, ch5 account B line (address first), ch12 Lab 2 heading ("(it is atomic)"; its anchor id changed, and nothing linked to it), ch17 env-var sentence, Appendix A reconciliation line (generator), ch19 reference link text.
+- Remaining: `/en/accessibility/` "Accessibility statement" at 320px. Two long words cannot share one line at that width, so `text-wrap: balance` puts one on each line. Accepted.
+- New optional frontmatter `snapshot: { at, block }` so Chapter 19's header and JSON-LD show its own snapshot (2026-11-19 11:58:12 UTC+8, block 12165973) instead of the book's.
