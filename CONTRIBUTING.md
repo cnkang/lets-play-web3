@@ -37,7 +37,7 @@ updated: "2026-12-01"
 | `status` | Keep identical: `published`, `upcoming` or `draft` (omitted means `published`) |
 | `updated` | Optional content date used on-page, in sitemap and JSON-LD; use the actual date of the change |
 
-`draft` appears only in development with a noindex banner. `upcoming` needs both files but may have an empty body: it appears without a link in the contents and in the “Coming soon” list in `llms.txt`; it has no page, search entry or sitemap URL. `published` is built and indexed. Chapter 19 is a published explanation of future plans; that does not mean Phase-1 experiments are complete.
+`draft` appears only in development with a noindex banner. `upcoming` needs both files but may have an empty body: it appears without a link in the contents and in the “Coming soon” list in `llms.txt`; it has no page, search entry or sitemap URL. `published` is built and indexed. Chapter 19 records the completed Phase-1 DeFi labs (2026-11-19) with its own snapshot, block 12165973.
 
 Run `npm run dev` and preview **both** `http://localhost:4321/en/` and `http://localhost:4321/zh/`. Change both statuses to `published` only when ready. Search requires `npm run build` followed by `npm run preview`.
 
@@ -45,7 +45,7 @@ The content check and Astro both enforce pairing and shared fields. `ALLOW_UNPAI
 
 ## Parts and phases
 
-Phases live in `src/content/phases.json`; parts in `src/content/parts.json`. A phase has `id`, `order`, `zh`, `en`; a part also has `phase`, pointing to a phase ID. Contents sort by phase, part and chapter order; empty parts stay hidden. Add both language labels when adding either. Use **Phase-0** for the completed basics, experiments and review, and **Phase-1** for the DeFi work that has not started.
+Phases live in `src/content/phases.json`; parts in `src/content/parts.json`. A phase has `id`, `order`, `zh`, `en`; a part also has `phase`, pointing to a phase ID. Contents sort by phase, part and chapter order; empty parts stay hidden. Add both language labels when adding either. Use **Phase-0** for the completed basics, experiments and review, and **Phase-1** for the DeFi labs in Chapter 19.
 
 ## Write and illustrate
 
@@ -93,13 +93,13 @@ Preserve **2026-11-12 15:39:55 UTC+8 / Sepolia block 12117419**. Add later evide
 - **Principles and analogies** explain ideas; they are not experimental results.
 - **On-chain results** identify the network, transaction and target block. A current explorer read may differ from the snapshot. MBox-Burn’s leftover allowance was revoked by D-01.
 - **Local tests and simulations** need their own label. UBOX V4 was never deployed to Sepolia and has no broadcast transaction hash.
-- **Plans** stay explicit: Phase-1 DeFi has not started. Sourcify matched 8/8 addresses, but only 5 were exact; Etherscan was queued at the snapshot. PASS WITH FINDINGS does not mean no vulnerabilities. Use Chapter 15 and the corresponding original evidence.
+- **Plans** stay explicit, and Phase-1 results keep their own date and block (Chapter 19: 2026-11-19, block 12165973). Sourcify matched 8/8 addresses, but only 5 were exact; Etherscan was queued at the snapshot. PASS WITH FINDINGS does not mean no vulnerabilities. Use Chapter 15 and the corresponding original evidence.
 
 Appendix A is generated; edit its generator rather than the two MDX tables. When a separately authorised experiment is complete:
 
 1. Append the transaction to §5.2 of the external `实验记录.md`, retaining the existing nonce / account / purpose / status / fee / transaction-link format.
 2. Add its block to `blocks` (key: first 10 hash characters), its English purpose to `en_purpose` (optional Chinese wording in `zh_purpose`), and new addresses to `contracts` / `accounts` in `scripts/gen_appendix.py`.
-3. Run `python3 scripts/gen_appendix.py /absolute/path/to/实验记录.md` (without an argument it uses `/workspace/web3-sandbox/实验记录.md`), then `SOURCES_DIR=/absolute/path/to/web3-sandbox npm run check:facts` and `npm run build`. Missing blocks or English labels stop generation with a list.
+3. Run `python3 scripts/gen_appendix.py /absolute/path/to/实验记录.md` (without an argument it uses `/workspace/web3-sandbox/实验记录.md`), then `SOURCES_DIR=/absolute/path/to/web3-sandbox P1_SOURCES_DIR=/absolute/path/to/web3-p1a-swap npm run check:facts` and `npm run build`. Missing blocks or English labels stop generation with a list.
 4. Add subsequent evidence as dated additions; retain the historical snapshot. Check the generator’s output diff before committing.
 
 `check:facts` always scans for suspected secrets. Without external source files it skips address/hash provenance; report that skip. Its default source directory is `/workspace/web3-sandbox`. It verifies literal presence, not the semantics of a claim; see [deployment docs](docs/DEPLOYMENT.md).
@@ -108,7 +108,7 @@ Appendix A is generated; edit its generator rather than the two MDX tables. When
 
 ```bash
 npm run check:content
-SOURCES_DIR=/absolute/path/to/web3-sandbox npm run check:facts
+SOURCES_DIR=/absolute/path/to/web3-sandbox P1_SOURCES_DIR=/absolute/path/to/web3-p1a-swap npm run check:facts
 SITE_URL=https://letsplayweb3.liukang.com BASE=/ npm run build
 SITE_URL=https://letsplayweb3.liukang.com BASE=/ npm run check:build
 SITE_URL=https://example.github.io BASE=/lets-play-web3/ npm run build
