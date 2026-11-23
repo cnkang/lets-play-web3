@@ -25,7 +25,7 @@ const selfUrl = absolute(`${lang}/${path}`)
 const zhUrl = absolute(`zh/${path}`)
 const enUrl = absolute(`en/${path}`)
 const otherHref = href(`${other}/${path}`)
-const fullTitle = path === '' ? `${t.siteTitle} · ${t.siteTagline}` : `${title} · ${t.siteTitle}`
+const fullTitle = path === '' ? `${t.siteTitle} · ${t.seoTagline}` : `${title} · ${t.siteTitle}`
 const ogImage = absolute(`og/${lang}.png`)
 const ogAlt = lang === 'zh' ? '一起玩 Web3：从生活理解区块链，再在 Sepolia 测试网上亲手验证' : 'Let’s Play Web3: understand blockchains through everyday life, then verify on the Sepolia testnet'
 const author = authorFor(lang)
@@ -36,7 +36,7 @@ const nav = [
   { key: 'search', text: t.search, href: href(`${lang}/search/`) }
 ]
 const a11yHref = href(`${lang}/accessibility/`)
-const ga4MeasurementId = process.env.GA4_MEASUREMENT_ID?.trim() || ''
+const ga4MeasurementId = import.meta.env.GA4_MEASUREMENT_ID?.trim() || ''
 const ga4Enabled = /^G-[A-Z0-9]+$/.test(ga4MeasurementId)
 ---
 <!doctype html>

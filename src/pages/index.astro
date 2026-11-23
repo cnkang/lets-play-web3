@@ -3,9 +3,9 @@
 //   1. an explicit choice saved by the language switcher (localStorage 'lang'),
 //   2. otherwise the first zh*/en* tag in navigator.languages,
 //   3. otherwise English (readers whose browser is neither zh nor en).
-// Without JS (and for crawlers that don't run it) a <noscript> meta refresh
-// sends visitors to the default Chinese edition, and the page keeps visible links
-// to both. Language pages themselves never auto-redirect.
+// Without JS (and for crawlers that don't run it), the page remains a neutral
+// language chooser with visible links to both editions. Language pages themselves
+// never auto-redirect.
 import '../styles/global.css'
 import { href, absolute } from '../data/site'
 const zh = href('zh/')
@@ -38,7 +38,6 @@ const routes = JSON.stringify({ zh, en })
         location.replace(r[pick || 'en'] + location.search + location.hash)
       })()
     </script>
-    <noscript><meta http-equiv="refresh" content={`0; url=${zh}`} /></noscript>
     <link rel="icon" type="image/svg+xml" href={href('favicon.svg')} />
   </head>
   <body>
