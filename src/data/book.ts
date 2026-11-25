@@ -13,8 +13,8 @@ export const ui = {
     /** wordmark: lead text + accented part */
     brandLead: '一起玩',
     brandAccent: 'Web3',
-    siteTagline: '用日常例子弄懂区块链，再在测试网核对',
-    seoTagline: '中英双语的区块链入门',
+    siteTagline: '动手玩，轻松学懂 Web3',
+    seoTagline: 'Web3 零基础入门：区块链与 DeFi 免费互动教程',
 
     contents: '目录',
     start: '开始阅读',
@@ -38,8 +38,8 @@ export const ui = {
     siteTitle: 'Let’s Play Web3',
     brandLead: 'Let’s Play',
     brandAccent: 'Web3',
-    siteTagline: 'See how blockchains work, then check it yourself on a testnet.',
-    seoTagline: 'A beginner blockchain guide in two languages',
+    siteTagline: 'Learn Web3 by playing with it',
+    seoTagline: 'Learn Web3 for Free: Interactive Blockchain & DeFi Tutorials',
 
     contents: 'Contents',
     start: 'Start reading',

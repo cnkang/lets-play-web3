@@ -19,7 +19,7 @@ export const GUIDE_IDS = [
   'why-loans-can-be-liquidated',
   'learn-without-real-money'
 ]
-export const PATHS = ['start', 'play', 'ai']
+export const PATHS = ['start', 'play', 'ai', 'track-5m', 'track-30m', 'track-60m', 'track-defi']
 export const CHALLENGE_IDS = [
   'main',
   'unlimited',

@@ -27,7 +27,9 @@ const enUrl = absolute(`en/${path}`)
 const otherHref = href(`${other}/${path}`)
 const fullTitle = path === '' ? `${t.siteTitle} · ${t.seoTagline}` : `${title} · ${t.siteTitle}`
 const ogImage = absolute(`og/${lang}.png`)
-const ogAlt = lang === 'zh' ? '一起玩 Web3：从生活理解区块链，再在 Sepolia 测试网上亲手验证' : 'Let’s Play Web3: understand blockchains through everyday life, then verify on the Sepolia testnet'
+const ogAlt = lang === 'zh'
+  ? '一起玩 Web3：互动实验与测试网案例，不用钱包也能开始学区块链与 DeFi'
+  : 'Let’s Play Web3: interactive labs and testnet examples—learn blockchains and DeFi without a wallet'
 const author = authorFor(lang)
 const nav = [
   { key: 'start', text: t.start, href: href(`${lang}/chapters/01-how-to-read/`) },

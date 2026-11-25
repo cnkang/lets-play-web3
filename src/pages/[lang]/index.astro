@@ -7,6 +7,7 @@ import SafetyNotice from '../../components/SafetyNotice.astro'
 import Snapshot from '../../components/Snapshot.astro'
 import { ui, langs, type Lang } from '../../data/book'
 import { href, absolute, htmlLang, authorLd } from '../../data/site'
+import { learningTracks } from '../../data/learning-tracks.mjs'
 
 export function getStaticPaths() {
   return langs.map((lang) => ({ params: { lang } }))
@@ -15,22 +16,22 @@ const { lang } = Astro.params as { lang: Lang }
 const t = ui[lang]
 const zh = lang === 'zh'
 const description = zh
-  ? '在浏览器里练习 Web3：授权、兑换和哈希链实验，外加一本中英入门教材。阅读和实验都不需要钱包，也不花真钱。'
-  : 'Practice Web3 in the browser: allowance, swap, and hash-chain labs, plus a beginner book in Chinese and English. No wallet and no real money.'
+  ? '通过互动实验和真实测试网案例，理解区块链、智能合约和 DeFi。入门阅读与浏览器实验不用钱包、不花真钱，零编程基础也能开始。'
+  : 'Explore blockchains, smart contracts, and DeFi through interactive experiments and real testnet examples. Reading and browser labs need no wallet, no real money, and no coding to get started.'
 const cards = zh
   ? [
       { t: '先想「为什么需要」', d: '用社区积分、商场联合收银、自动售货机这些日常场景，判断区块链什么时候有用、什么时候多余。', s: '02-who-needs-blockchain' },
       { t: '读懂一笔以太坊交易', d: '在 Sepolia Etherscan 打开 Counter 例子，核对交易是否成功、代币怎么转、日志记了什么。', s: '08-lab-counter' },
       { t: '看懂 ERC-20 授权额度', d: '用链上记录分清：批准额度、对方代扣、以及把额度改回零。', s: '10-approve-vs-payment' },
       { t: '在测试网上试 DeFi', d: '看 0.001 SepETH 换到了多少 USDC，再顺着交易记录，看往资金池存币的人怎样分到手续费。用的都是没有真实价值的测试币。', s: '16-defi-labs' },
-      { t: '看懂借贷和价格从哪来', d: '价格下跌本身不会先拿走抵押品。闪电贷必须在同一笔交易里还清。很薄的池子里的现价，不适合直接当抵押估值。这些是本机实验，不是新的 Sepolia 交易。', s: '17-lending-liquidation' }
+      { t: '看懂借贷和价格从哪来', d: '价格下跌本身不会先拿走抵押品。闪电贷必须在同一笔交易里还清。流动性不足的资金池现价，不适合直接当抵押估值。这些是本机实验，不是新的 Sepolia 交易。', s: '17-lending-liquidation' }
     ]
   : [
       { t: 'Ask why you need a chain', d: 'Community points, a shared mall checkout, a vending machine: everyday scenes that show when a blockchain helps and when a normal database is enough.', s: '02-who-needs-blockchain' },
       { t: 'Read an Ethereum transaction', d: 'Open the Counter example on Sepolia Etherscan and check whether it succeeded, how tokens moved, and what the logs say.', s: '08-lab-counter' },
       { t: 'See an ERC-20 allowance', d: 'Follow on-chain records for approve, a later spend against that allowance, and setting the allowance back to zero.', s: '10-approve-vs-payment' },
       { t: 'Try DeFi on a testnet', d: 'See how much USDC 0.001 SepETH bought in one swap. Then follow the transactions that show how people who supply a pool share the fees. The labs use test tokens with no real value.', s: '16-defi-labs' },
-      { t: 'See loans and where a price comes from', d: 'A price drop does not take collateral by itself. A flash loan must be repaid inside one transaction. A thin pool\'s spot price is a poor collateral value. These are local labs, not new Sepolia transactions.', s: '17-lending-liquidation' }
+      { t: 'See loans and where a price comes from', d: 'A price drop does not take collateral by itself. A flash loan must be repaid inside one transaction. A spot price from a pool with little liquidity is a poor collateral value. These are local labs, not new Sepolia transactions.', s: '17-lending-liquidation' }
     ]
 const jsonLd = [
   {
@@ -66,20 +67,23 @@ const jsonLd = [
    <div class="hero-deco" aria-hidden="true"><span class="glow"></span><span class="d1"></span><span class="d2"></span><span class="d3"></span><span class="d4"></span></div>
    <div class="hero">
     <div>
-      <p class="kicker"><span class="pill">{zh ? '在浏览器里亲手试 Web3。' : 'Try Web3 in the browser.'}</span></p>
+      <p class="kicker"><span class="pill">{zh ? '动手玩，轻松学懂 Web3' : 'Learn Web3 by playing with it'}</span></p>
       <h1 id="hero-title">{t.siteTagline}</h1>
       <p class="sub">
         <Nw text={zh
-          ? '写给会用电脑的初学者。先弄清什么时候需要区块链，再在浏览器里改授权、试兑换、看哈希链。阅读和这三个实验都不需要钱包，也不花真钱。书里的 Sepolia 记录是证据；实验页只是本地模拟。'
-          : 'For beginners who can use a computer. First see when a blockchain helps, then change an allowance, try a swap, and follow a hash chain in the browser. Reading and these three labs need no wallet and no real money. The Sepolia records in the book are evidence; the lab pages are local simulations.'} />
+          ? '通过互动实验和真实测试网案例，理解区块链、智能合约和 DeFi。入门阅读与浏览器里的三个实验：不用钱包、不花真钱，零编程基础也能开始。书里的 Sepolia 记录是证据；实验页只是本机模拟。进阶复现可能需要开发工具，和入门路径分开。'
+          : 'Explore blockchains, smart contracts, and DeFi through interactive experiments and real testnet examples. Reading and the three browser labs need no wallet, no real money, and no coding to get started. Sepolia records in the book are evidence; lab pages are local simulations. Advanced reproduction may need developer tools; that path is separate from getting started.'} />
       </p>
       <div class="btn-row">
-        <a class="btn primary" data-track="curriculum_start" href={href(`${lang}/chapters/01-how-to-read/`)}>{zh ? '开始学习' : 'Start learning'}</a>
-        <a class="btn ghost" data-track="learning_path_start" data-path="play" href={href(`${lang}/labs/`)}>{zh ? '做互动实验' : 'Try an interactive lab'}</a>
-        <a class="btn ghost" data-track="learning_path_start" data-path="ai" href={href(`${lang}/learn-with-ai/`)}>{zh ? '请 AI 带练' : 'Learn with an AI agent'}</a>
-        <a class="btn ghost" href="#contents-title">{zh ? '查看目录' : 'Browse the contents'}</a>
+        <a class="btn primary" data-track="learning_path_start" data-path="track-5m" href={href(`${lang}/labs/hash-chain/`)}>{zh ? '做第一次实验' : 'Try your first experiment'}</a>
+        <a class="btn ghost" data-track="curriculum_start" href={href(`${lang}/chapters/01-how-to-read/`)}>{zh ? '开始阅读' : 'Start learning'}</a>
+        <a class="btn ghost" data-track="learning_path_start" data-path="ai" href={href(`${lang}/learn-with-ai/`)}>{zh ? '请 AI 带练' : 'Learn with AI'}</a>
+        <a class="btn ghost" href="#contents-title">{zh ? '浏览全部章节' : 'Browse all chapters'}</a>
       </div>
-      <p><Nw text={zh ? '三条路都可以从零开始。实验页不会签名，也不会发交易。' : 'You can start from zero on any path. A lab page never signs or sends a transaction.'} /></p>
+      <p><Nw text={zh
+        ? '推荐从「哈希链」实验开始：不用钱包术语，几分钟内就能看到改一个区块怎样弄断后面的链接。实验页不会签名，也不会发交易。'
+        : 'Start with the hash-chain lab: no wallet jargon, and in a few minutes you see how editing one block breaks the later links. A lab page never signs or sends a transaction.'} />
+      </p>
     </div>
     <div class="hero-art">
       <img src={href(`diagrams/${lang}/counter.svg`)} width="960" height="540"
@@ -93,16 +97,42 @@ const jsonLd = [
     <Snapshot lang={lang} />
   </div>
 
+  <section class="home-section" aria-labelledby="tracks-title">
+    <h2 id="tracks-title">{zh ? '按时间选一条学习路径' : 'Pick a path by time'}</h2>
+    <p class="sub tracks-note"><Nw text={zh
+      ? '时长是方便安排的粗估，不是实测学习时间。每条路径都链到现有章节或实验。'
+      : 'Times are rough planning estimates, not measured study durations. Each path links to existing chapters or labs.'} /></p>
+    <ul class="cards path-grid track-grid">
+      {learningTracks.map((track) => {
+        const copy = track[lang]
+        return (
+          <li class="card">
+            <p class="track-label">{copy.label}</p>
+            <h3><a data-track="learning_path_start" data-path={track.id} href={href(`${lang}/${copy.links[0].href}`)}>{copy.title}</a></h3>
+            <p><Nw text={copy.goal} /></p>
+            <p><Nw text={`${zh ? '前置：' : 'Needs: '}${copy.requires}`} /></p>
+            <p><Nw text={`${zh ? '完成后：' : 'Afterward: '}${copy.after}`} /></p>
+            <ul class="track-links">
+              {copy.links.map((link) => (
+                <li><a href={href(`${lang}/${link.href}`)}>{link.text}</a></li>
+              ))}
+            </ul>
+          </li>
+        )
+      })}
+    </ul>
+  </section>
+
   <section class="home-section" aria-labelledby="paths-title">
-    <h2 id="paths-title">{zh ? '三条入门路径' : 'Three ways to start'}</h2>
+    <h2 id="paths-title">{zh ? '三条入门方式' : 'Three ways to start'}</h2>
     <ul class="cards path-grid">
       <li class="card">
-        <h3><a data-track="learning_path_start" data-path="start" href={href(`${lang}/chapters/02-who-needs-blockchain/`)}>{zh ? '从零开始' : 'Start from zero'}</a></h3>
-        <p><Nw text={zh ? '还没有区块链背景也没关系。先用日常例子判断什么时候需要共享账本，再从第 1 章看怎么读这本书。' : 'No blockchain background needed. Use an everyday example to decide when a shared ledger helps, then read Chapter 1 on how to use this book.'} /></p>
+        <h3><a data-track="learning_path_start" data-path="play" href={href(`${lang}/labs/`)}>{zh ? '做互动实验' : 'Play with an experiment'}</a></h3>
+        <p><Nw text={zh ? '想亲手看哈希链、授权额度和兑换价格。三个实验都在浏览器里跑，可以随时重置。它们不是链上交易。' : 'See a hash chain, an allowance, and a swap price yourself. All three labs run in the browser and can be reset. They are not on-chain transactions.'} /></p>
       </li>
       <li class="card">
-        <h3><a data-track="learning_path_start" data-path="play" href={href(`${lang}/labs/`)}>{zh ? '做互动实验' : 'Try an experiment'}</a></h3>
-        <p><Nw text={zh ? '想亲手看授权、兑换价格和哈希链。三个实验都在浏览器里跑，可以随时重置。它们不是链上交易。' : 'See an allowance, a swap price, and a hash chain yourself. All three labs run in the browser and can be reset. They are not on-chain transactions.'} /></p>
+        <h3><a data-track="learning_path_start" data-path="start" href={href(`${lang}/chapters/02-who-needs-blockchain/`)}>{zh ? '从零开始阅读' : 'Start from zero'}</a></h3>
+        <p><Nw text={zh ? '还没有区块链背景也没关系。先用日常例子判断什么时候需要共享账本，再从第 1 章看怎么读这本书。' : 'No blockchain background needed. Use an everyday example to decide when a shared ledger helps, then read Chapter 1 on how to use this book.'} /></p>
       </li>
       <li class="card">
         <h3><a data-track="learning_path_start" data-path="ai" href={href(`${lang}/learn-with-ai/`)}>{zh ? '请 AI 带练' : 'Learn with an AI agent'}</a></h3>
@@ -130,3 +160,18 @@ const jsonLd = [
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .tracks-note { margin: 0 0 1rem; max-width: 42rem; }
+  .track-label {
+    margin: 0 0 0.35rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    opacity: 0.8;
+  }
+  .track-links {
+    margin: 0.75rem 0 0;
+    padding-left: 1.1rem;
+  }
+  .track-links li { margin: 0.25rem 0; }
+</style>
