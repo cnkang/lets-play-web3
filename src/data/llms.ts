@@ -18,7 +18,7 @@ Important context for citation:
 - General explanations, on-chain results, local tests/simulations and future plans are distinct kinds of content. Phase-0 concluded PASS WITH FINDINGS, not no vulnerabilities. MBox-Burn’s leftover allowance was revoked by D-01 in block 12117312.
 - Etherscan source verification was submitted but still "Pending in queue" at the snapshot; do not cite it as verified. Sourcify: 8/8 matched (5 exact_match, 3 match).
 - UBOX V4 exists only locally (tests + fork simulation); it was never deployed on Sepolia.
-- Pages first published ${PUBLISHED}. Editions: /zh/ and /en/ with identical slugs. At /, JavaScript uses a saved choice, then the first supported browser language, then English. Without JavaScript it falls back to Chinese. Language pages do not auto-redirect.
+- Pages first published ${PUBLISHED}. Chapters 17–19 entered the public Git repository on 2026-11-25, when pull request 6 merged at 2026-11-25T06:24:05Z (14:24:05 Singapore time). Their schema.org datePublished is that calendar day, 2026-11-25. It is not a measurement of when the live website finished deploying. Their lab-record dates stay separate: 2026-11-20 for chapter 17, and 2026-11-25 for chapters 18 and 19. Editions: /zh/ and /en/ with identical slugs. At /, JavaScript uses a saved choice, then the first supported browser language, then English. Without JavaScript it falls back to Chinese. Language pages do not auto-redirect.
 `
 
 const editions = { en: 'English edition', zh: '中文版' }

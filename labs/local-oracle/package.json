@@ -1,0 +1,9 @@
+{
+  "name": "web3-local-oracle-lab",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "viem": "^2.58.2"
+  }
+}

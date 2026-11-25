@@ -1,0 +1,57 @@
+{
+  "kind": "saved-historical-receipts",
+  "restoresChainState": false,
+  "anvilStateDump": "absent",
+  "chainId": 31337,
+  "loopback": "http://127.0.0.1:18549",
+  "fork": false,
+  "note": "Saved local no-fork teaching model. Not Aave and not Uniswap. A fresh run of labs/local-oracle creates new hashes. Compare integers, not hashes. This file is not an Anvil state dump. opening-state.json in the private archive is a balance reading, not a chain dump.",
+  "integers": {
+    "debt": "8000000000000000000000",
+    "anchorShortfall": "5000000000000000000000",
+    "exitQuoteShortfall": "3714031198495643589346",
+    "profitAfterFeesBeforeGas": "3678345270534929823185",
+    "peakPrice": "3604869999999999999",
+    "endPrice": "2045236389923581453",
+    "initialPrice": "1000000000000000000",
+    "peakBorrowLimit": "8110957499999999997750",
+    "safeBorrowLimit": "2250000000000000000000",
+    "executableAMMQuoteRecovery": "4285968801504356410654"
+  },
+  "assertions": {
+    "noFork": true,
+    "sourceOnlyDifference": true,
+    "controlFailureExact": "BorrowLimit(8000e18,2250e18,1e18)",
+    "gasAndNonceChargedOnFailure": true,
+    "controlZeroReceiptLogs": true,
+    "conservationBothTokensAllHolders": true
+  },
+  "balances": {
+    "vulnerableDebt": "8000000000000000000000",
+    "vulnerableDeposited": "3000000000000000000000",
+    "vulnerableReceiverStable": "3678345270534929823185",
+    "controlDebt": "0",
+    "controlStatus": "reverted",
+    "controlLogs": 0
+  },
+  "transactions": [
+    {
+      "label": "vulnerable atomic scenario",
+      "hash": "0xc00659ac6179fcb69292949ea0c90b16a7d45890ae8520405c85da8fd8cf4438",
+      "status": "success",
+      "gasUsed": "312342",
+      "effectiveGasPrice": "1000000000",
+      "logs": 25,
+      "chainId": 31337
+    },
+    {
+      "label": "fixed-source rejected scenario",
+      "hash": "0x0983452c237884324c860ac1ee1b5563bed2718cb6136fc16f5225cccbcddcc6",
+      "status": "reverted",
+      "gasUsed": "258899",
+      "effectiveGasPrice": "1000000000",
+      "logs": 0,
+      "chainId": 31337
+    }
+  ]
+}

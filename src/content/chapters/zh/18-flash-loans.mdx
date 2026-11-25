@@ -6,7 +6,7 @@ part: p2-credit
 order: 180
 status: published
 updated: "2026-11-25"
-unreleased: true
+released: "2026-11-25"
 experiment: "2026-11-25"
 lab: anvil-fork
 snapshot:
@@ -19,6 +19,8 @@ snapshot:
 <Callout type="warn" title="仍然是本地副本，而且数字和第 17 章不同">
 
 这一章的写操作在本机 Anvil 的另一个端口上，`127.0.0.1:8547`，chainId **31337**。只读分叉源还是 Sepolia 区块 **12165973**。运行时间是 **2026-11-25 10:56:13–11:00:23**（新加坡时间）。没有向公共链广播。
+
+实验记录和仓库公开是同一天里的两件事。文字在当天 14:24（新加坡时间）随 pull request 6 进入公开 Git 仓库。页面发布日期只写 **2026-11-25** 这一天，不是网站部署完成的时刻。
 
 它也是 1 WETH 抵押、请求借 2,500 枚 Aave 测试 USDC，再把报价改到 2,800。但开仓更晚。开仓债务是 **2,499.999999**，比整数 2,500 少 1 个最小单位。跌到 2,800 之后、清算前，债务是 **2,500.000608**，健康因子大约是 **0.924**（精确值 **0.923999775283254651**）。抵押余额仍是 1。不要改用第 17 章的 0.923999549827419324 或 0.9375009135。
 
@@ -146,7 +148,9 @@ V3 有的费档当时活跃流动性是 0。那不能推出「任何数量都换
 - 合理定价的深池：<LocalRef value="0x480526575d393ae820396acaa2b958faa0311948ce152614368514d87549ca7f" env="fork" short />
 - 最低到账保护回退：<LocalRef value="0x0f2b185a3de3fa4bec34815588c820d2ac05e7e07547ca1693e5fcfe592ec5a5" env="fork" short />
 
-这一轮的启动使用了 `--accounts 0 --silent`，避免把 Anvil 自带测试账户写进日志。第 17 章对应的旧启动方式没有这些参数。两种历史都不要改写。本书不附带实验脚本，也不建议对着真实协议照搬。
+这一轮的启动使用了 `--accounts 0 --silent`，避免把 Anvil 自带测试账户写进日志。第 17 章对应的旧启动方式没有这些参数。两种历史都不要改写。
+
+已保存的回执摘录在 [p2b-readings.json](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/p2b-readings.json)。仓库不附带调用真实 Aave 资金池的脚本，避免把它做成可改目标的工具。新的一次运行需要能读到区块 12165973 的归档 Sepolia 节点，而且会得到新哈希。它不能离线完成。说明见 [证据目录](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/README.zh-CN.md)。
 
 </details>
 

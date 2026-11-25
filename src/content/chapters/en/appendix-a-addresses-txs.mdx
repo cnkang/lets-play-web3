@@ -198,11 +198,13 @@ Every transaction account A sent in Chapter 16 (nonces 20–42, 23 in total, all
 
 ## Chapters 17–19: local evidence, not new Sepolia transactions
 
-The tables above stay as they were. This section only marks the boundary. The figures live in the chapters and in the [public digest](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2-public-digest.json).
+The tables above stay as they were. This section only marks the boundary. The figures live in the chapters, in the [public digest](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2-public-digest.json), and in the [saved readings](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/README.md).
 
 - Writes in chapters 17 and 18 ran on local Anvil (chainId 31337). The read-only fork source is Sepolia block **12165973**. The pool is <Addr a="0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951" short />. That is the real Aave contract at that historical block. A local transaction hash is not a new Sepolia transaction to it.
 - One local receipt for Chapter 17’s full liquidation: <LocalRef value="0x73f963d97d0fe20b67c859a76f0cd4cb766d08c7ce687a38a211bbd242e92cca" env="fork" short />
 - One local receipt for Chapter 18’s real V2 branch: <LocalRef value="0x2c23365730935cf83b164494eaef65978ad0168b725eb000a28d7b77167e46f2" env="fork" short />
 - Chapter 19 has no fork. One local receipt for the fragile branch: <LocalRef value="0xc00659ac6179fcb69292949ea0c90b16a7d45890ae8520405c85da8fd8cf4438" env="local" short />
 
-The fork-source block’s own hash is `0x38d7b288efbc2cf0d80ebbc2b897329be18fa5c7aa4f3e1aaf5830eeb783d526`. You can open block 12165973 for that historical state. Do not paste the three local hashes above into a transaction search. A rerun draws new temporary accounts, so these hashes identify the saved run only. The raw receipt bundle is not in this repository. The P2A node log contained Anvil’s built-in test keys and is excluded. Those keys do not appear here.
+The fork-source block’s own hash is `0x38d7b288efbc2cf0d80ebbc2b897329be18fa5c7aa4f3e1aaf5830eeb783d526`. You can open block 12165973 for that historical state. Do not paste the three local hashes above into a transaction search. A rerun draws new temporary accounts, so these hashes identify the saved run only.
+
+The offline receipt excerpts are [p2a-readings.json](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/p2a-readings.json), [p2b-readings.json](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/p2b-readings.json) and [oracle-readings.json](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/oracle-readings.json). They are not an Anvil state dump. The sanitized archive contained no state dump. The chapter 19 toy can be run again locally, and the new hashes differ from the saved hashes. Replay scripts for chapters 17 and 18 are not published. The P2A node log contained Anvil’s built-in test keys and is excluded. Those keys do not appear here.

@@ -22,6 +22,16 @@ accounts.secret*.json
 # (runs automatically before dev/build/preview); the .b64 files are tracked.
 public/og/*.png
 
+# local oracle replay output (a new run is not the saved historical evidence)
+/labs/local-oracle/node_modules/
+/labs/local-oracle/artifacts/
+/labs/local-oracle/compiler-cache/
+/labs/local-oracle/out/
+/labs/local-oracle/evidence/
+/labs/local-oracle/evidence-*/
+/labs/local-oracle/LOCAL-ORACLE-LAB-REPORT.md
+/labs/local-oracle/MANIFEST.sha256
+
 # local tooling / OS noise
 /IDEA.md
 .DS_Store

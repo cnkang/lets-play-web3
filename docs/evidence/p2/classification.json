@@ -1,0 +1,25 @@
+{
+  "archiveSha256": "d5e801918f6333ecd4c80d192af6939d0601bdcbeea581b406ecc2897ebaf6e3",
+  "anvilStateDump": "absent",
+  "searchedFor": [
+    "filenames containing dump",
+    "anvil_dumpState",
+    "rlp state files",
+    "anvil.log"
+  ],
+  "foundInstead": "The sanitized archive has web3-local-oracle-lab/evidence/opening-state.json. That file is a balance reading at the start of the toy lab. It is not an Anvil chain dump, and it is not copied into this folder.",
+  "whatADumpWouldNotDo": "An Anvil state dump, even if one had been saved, would not restore the full historical block history, receipts or traces, and it would not remove the need for an archival Sepolia node when replaying the fork labs.",
+  "tiers": {
+    "historicalReceipts": "p2a-readings.json, p2b-readings.json and oracle-readings.json are excerpts from one saved run. They let a reader check the cited hashes, status, gas and balances offline. They do not restart that chain.",
+    "freshReplay": "labs/local-oracle can run the no-fork toy again on 127.0.0.1:18549. The new run has new transaction hashes. P2A and P2B replay scripts are not published.",
+    "stateDump": "No state dump was in the sanitized archive. None is published here."
+  },
+  "excluded": [
+    "Anvil logs, including the P2A log that contained Anvil's built-in test mnemonic and keys",
+    ".env files, private keys, mnemonics, API tokens and keystores",
+    "raw traces and the full run.json files",
+    "transaction signature fields r, s and v",
+    "Aave and OpenZeppelin source trees",
+    "P2A and P2B runners that call the real Aave pool on a fork"
+  ]
+}

@@ -6,7 +6,7 @@ part: p2-credit
 order: 170
 status: published
 updated: "2026-11-25"
-unreleased: true
+released: "2026-11-25"
 experiment: "2026-11-20"
 lab: anvil-fork
 snapshot:
@@ -21,6 +21,8 @@ snapshot:
 The writes in this chapter ran on the author’s local Anvil node, at loopback `127.0.0.1:8546`, chainId **31337**. The node copied Sepolia block **12165973** (2026-11-19 11:58:12, Singapore time) and then changed only that copy. The run was **2026-11-20 10:26:53–10:26:58** Singapore time.
 
 These transactions are not new Sepolia transactions. Do not open the local hashes on Etherscan. A new run draws new temporary accounts, so the hashes change. With the same block and the same order, the amounts stay stable. The next chapter forks the same block, but its debt and health factor differ. Do not copy numbers from one chapter into the other.
+
+This chapter’s text entered the public Git repository on **2026-11-25** (pull request 6 merged at 2026-11-25 14:24 Singapore time). The page date is that calendar day. It is not the minute the live website finished deploying. The lab record remains 2026-11-20.
 
 </Callout>
 
@@ -145,7 +147,9 @@ A rerun draws new temporary accounts. These hashes identify one saved run. The 0
 
 The public hash of the fork-source block is `0x38d7b288efbc2cf0d80ebbc2b897329be18fa5c7aa4f3e1aaf5830eeb783d526`. That hash is Sepolia block 12165973 itself. You can open that block number in an explorer. The five local transactions are not inside it.
 
-The historical P2A launcher did not disable Anvil’s built-in test accounts, so a node log printed Anvil’s own test keys. Those were not a reader’s wallet. The log is not published. If you repeat the idea on your own computer, start Anvil with `--accounts 0 --silent`, and do not commit the node log. This book does not ship that lab’s scripts.
+The historical P2A launcher did not disable Anvil’s built-in test accounts, so a node log printed Anvil’s own test keys. Those were not a reader’s wallet. The log is not published. If you repeat the idea on your own computer, start Anvil with `--accounts 0 --silent`, and do not commit the node log.
+
+The saved receipt excerpt is [p2a-readings.json](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/p2a-readings.json). It can check the hashes, state and gas above while offline. It is not an Anvil state dump. It cannot restore that run’s blocks, receipts or traces, and it does not remove the need for a historical Sepolia read node. This repository does not ship a replay script for the fork lab. A new run gets new hashes. See the [evidence folder](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/README.md).
 
 </details>
 
