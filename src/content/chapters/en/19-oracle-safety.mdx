@@ -11,13 +11,31 @@ experiment: "2026-11-25"
 lab: anvil-local
 ---
 
-<p class="lead">The prices in the last two chapters came from the lender’s own <Term id="oracle">oracle</Term>. In that test, the source stored a fixed 4,000. This chapter asks a different question. What collateral value appears if another contract ignores an independent quote and reads only the spot price it just pushed up in a thin pool?</p>
+<p class="lead">The prices in the last two chapters came from the lender’s own <Term id="oracle">oracle</Term>. In that test, the source stored a fixed 4,000. This chapter asks a different question. What collateral value appears if another contract ignores an independent quote and reads only the spot price it just pushed up in a pool with little liquidity (a thin pool)?</p>
 
 <Callout type="warn" title="This demo has no fork, and it is not Aave">
 
-- **A fresh local chain.** Anvil is Foundry’s local chain simulator. The run around 2026-11-25 11:31 used a fresh local Anvil node. The interface was `127.0.0.1:18549`, chainId **31337**, starting at the genesis block. There was no public RPC, no Sepolia state, and no call to real Aave or Uniswap.
-- **Page date.** The lab record and the public repository are two events on the same calendar day. The text entered the public Git repository at 14:24 Singapore time, when pull request 6 merged. The page date is only **2026-11-25**, separate from when the live site finished deploying.
-- **Teaching tokens.** The tokens are tUSD and tCOL. The price unit is tUSD per tCOL. The shortfall and the gap below are readings inside a teaching model that shows a bad valuation.
+- **A fresh local chain, not Sepolia and not Aave.** Writes ran on a local Anvil node that started at the genesis block. There was no public RPC, no Sepolia state, and no call to real Aave or Uniswap. Do not open the local hashes on Etherscan.
+- **Teaching tokens** are tUSD and tCOL. The shortfall and the gap below are readings inside a teaching model that shows a bad valuation.
+- **Lab and publication are both 2026-11-25**, as two events on the same day.
+
+</Callout>
+
+<details>
+<summary>Technical details and verification evidence (expand)</summary>
+
+- Anvil is Foundry’s local chain simulator. The run around 2026-11-25 11:31 used interface `127.0.0.1:18549`, chainId **31337**.
+- The text entered the public Git repository at 14:24 Singapore time, when pull request 6 merged. The page date is only **2026-11-25**, separate from when the live site finished deploying.
+- The price unit is tUSD per tCOL.
+
+</details>
+
+<Callout type="note" title="What you will learn">
+
+- Why a thin-pool spot price that the same trade just pushed up is not a reliable collateral value.
+- With the same parameters, why changing only the valuation source leaves ordinary debt in one case and rejects the request in the other.
+- What 8,000, 5,000 and the recovery gap each mean, and why none of them should all be called a realized loss.
+- That this demo shows a valuation-rule risk, not an Aave bug and not a realized loss.
 
 </Callout>
 
@@ -77,7 +95,7 @@ An internal trace can show a buy and a deposit attempt before the revert. Those 
 
 - The fixed price of 1 shows one thing: if the valuation does not follow this thin-pool trade, the request for 8,000 does not pass.
 - A real system still has stale quotes, a broken peg, disturbed data sources, admin power and thin liquidity.
-- A <Term id="twap">time-weighted average price</Term> is usually harder to push all the way inside one transaction than a spot price. Someone who keeps pushing a thin market across many blocks, or a window that is too short, can still move the average. This lab did not test any real product’s average.
+- A <Term id="twap">time-weighted average price</Term> is usually harder to push all the way inside one transaction than a spot price. Someone who keeps pushing a market with little liquidity across many blocks, or a window that is too short, can still move the average. This lab did not test any real product’s average.
 - Useful guards: read a quote that is independent of the pool the borrower just traded; refuse a borrow, a withdrawal or a liquidation when the quote is too far from a reference, or when it is too old; add size limits, isolated markets and a pause when something looks wrong.
 - Audits and open source have value. A system designed to read a pool spot price still follows that design when the source is public.
 

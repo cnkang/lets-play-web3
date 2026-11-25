@@ -18,9 +18,27 @@ snapshot:
 
 <Callout type="warn" title="Still a local copy, and the numbers differ from Chapter 17">
 
-- **A local copy.** Anvil is Foundry’s local chain simulator. Writes in this chapter used another local Anvil port, `127.0.0.1:8547`, chainId **31337**. The node copied Sepolia block **12165973** and then changed only that copy. The run was **2026-11-25 10:56:13 to 11:00:23** Singapore time. Nothing was broadcast to a public chain.
-- **Page date.** The lab record and the public repository are two events on the same calendar day. The text entered the public Git repository at 14:24 Singapore time, when pull request 6 merged. The page date is only **2026-11-25**, separate from when the live site finished deploying.
-- **Numbers differ from Chapter 17.** The shape matches: post 1 WETH, request a borrow of 2,500 Aave test USDC, then set the quote to 2,800. The position was opened later. Opening debt is **2,499.999999**, one minimal unit under 2,500. After the drop to 2,800, and before liquidation, debt is **2,500.000608** and the health factor is about **0.924** (exactly **0.923999775283254651**). Collateral is still 1. Do not replace these with Chapter 17’s 0.923999549827419324 or 0.9375009135.
+- **A local Anvil fork, not a public Sepolia transaction.** Writes stayed on a local copy. Nothing was broadcast. The copy read Sepolia block **12165973**. Do not open the local hashes on Etherscan.
+- **Numbers differ from Chapter 17.** Conditions are broadly the same (1 WETH, request 2,500, then 2,800), but the position opened later: opening debt **2,499.999999**, health factor about **0.924** after the drop. Do not reuse Chapter 17’s readings.
+- **Lab and publication are both 2026-11-25**, as two events on the same day.
+
+</Callout>
+
+<details>
+<summary>Technical details and verification evidence (expand)</summary>
+
+- The Anvil loopback interface was `127.0.0.1:8547`, chainId **31337**. The run window was **2026-11-25 10:56:13 to 11:00:23** Singapore time.
+- After the drop to 2,800 and before liquidation, debt is **2,500.000608** and the health factor is exactly **0.923999775283254651**. Collateral is still 1. Do not replace these with Chapter 17’s 0.923999549827419324 or 0.9375009135.
+- The text entered the public Git repository at 14:24 Singapore time, when pull request 6 merged. The page date is only **2026-11-25**, separate from when the live site finished deploying.
+
+</details>
+
+<Callout type="note" title="What you will learn">
+
+- Why a flash loan must repay principal and fee inside the same transaction, and what happens to fund state versus gas and the nonce if it cannot.
+- What else one transaction can do with a flash loan (for example liquidation), and what does not fit.
+- Why a real test pool can trade while its price is far from the oracle, and why the local fair-priced pools are only a control.
+- Why this chapter’s figures come from a different local fork and must not be mixed with Chapter 17.
 
 </Callout>
 
@@ -146,7 +164,7 @@ The pool pulls the repayment after the callback returns. A mid-callback balance,
 ## Hashes from this saved run
 
 <details>
-<summary>Local receipts (chainId 31337, do not open Etherscan)</summary>
+<summary>Local receipts and verification links (chainId 31337, do not open Etherscan)</summary>
 
 - Borrow 1,000 and repay: <LocalRef value="0xa0db889ce08a99745b93b3904f6da2c2a48e12140bc805df7b2ee4670ca7e414" env="fork" short />
 - Missing fee, on purpose: <LocalRef value="0x444b6a852d89e7774ea5414a77298fb515ecc1423771c0228abce44b08d0ae9f" env="fork" short />
@@ -169,4 +187,4 @@ The saved receipt excerpt is [p2b-readings.json](https://github.com/cnkang/lets-
 - The real V2 route did trade. The test-pool price is badly distorted. The local mocks are an extra control. They do not cancel that trade.
 - The 1 wei display gap is index rounding. The optional traces on failed branches have an honest HTTP 429 limit.
 
-The next chapter moves the question to the price itself. What happens if another contract treats a thin-pool spot price, just pushed by one large trade, as a reliable value for collateral?
+The next chapter moves the question to the price itself. What happens if another contract treats a spot price from a thin (low-liquidity) pool, just pushed by one large trade, as a reliable value for collateral?

@@ -1,6 +1,6 @@
 ---
 title: "Lab: MBox and ERC-20"
-description: "A token is first of all a balance table inside a contract. Deploying the ERC-20 token MBox (supply 1,000,000); 1,000 MBox sent to a keyless demo address can never be recovered; names and symbols are not unique, so identify a token by its contract address."
+description: "A token is first of all a balance table inside a contract. Deploying the ERC-20 token MBox (supply 1,000,000); 1,000 MBox sent to a demo address with no known usable private key cannot practically be recovered; names and symbols are not unique, so identify a token by its contract address."
 navTitle: "9 · Lab: MBox and ERC-20"
 part: tokens
 order: 90
@@ -49,17 +49,17 @@ For beginners, picture a token as points shared by a group of partner shops. A s
 
 Balances after the transfer (unchanged at the snapshot): A holds **999,000**, the demo address holds **1,000**, and `totalSupply` is still **1,000,000**. Transfers do not change <Term id="total-supply">total supply</Term>.
 
-## Sent to a keyless address: gone for good
+## Sent to an address with no known usable key: practically gone
 
 The 1,000 MBox went to this demo address:
 
 <Addr a="0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E" />
 
-**No <Term id="private-key">private key</Term> for this address was ever stored**, and it holds no <Term id="sepeth">SepETH</Term>. Without a private key nobody can sign a transfer out, and confirmed <Term id="transaction">transactions</Term> cannot be reversed. So these 1,000 MBox are **locked forever and cannot be recovered**.
+**No usable <Term id="private-key">private key</Term> for this address was ever stored**, and it holds no <Term id="sepeth">SepETH</Term>. With no known usable private key, nobody can sign a transfer out, and confirmed <Term id="transaction">transactions</Term> are practically irreversible for learners. So these 1,000 MBox are **effectively locked and cannot be recovered**. That is not a contract `burn` (which lowers balance and total supply together): this is only a transfer to an inaccessible address, so `totalSupply` stays the same.
 
 <Callout type="danger" title="Do not send anything else to this address">
 
-This was a deliberate teaching point, not an accident. Please **do not** send any more tokens or test ETH to `0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E`. Anything sent there is locked the same way. In real life, sending assets to a wrong or uncontrolled address has exactly the same result.
+This was a deliberate teaching point, not an accident. Please **do not** send any more tokens or test ETH to `0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E`. Anything sent there is just as hard to recover. In real life, sending assets to a wrong or uncontrolled address has exactly the same result.
 
 </Callout>
 

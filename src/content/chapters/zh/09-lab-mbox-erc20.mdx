@@ -1,6 +1,6 @@
 ---
 title: "实验：MBox 与 ERC-20"
-description: "代币首先是合约里的一张余额表。部署 ERC-20 代币 MBox（供应 1,000,000），把 1,000 枚转给无私钥演示地址后永久无法找回；名称和符号不唯一，识别代币只能看合约地址。"
+description: "代币首先是合约里的一张余额表。部署 ERC-20 代币 MBox（供应 1,000,000），把 1,000 枚转给没有已知可用私钥的演示地址后实际上找不回来；名称和符号不唯一，识别代币只能看合约地址。"
 navTitle: "9　实验：MBox 与 ERC-20"
 part: tokens
 order: 90
@@ -49,17 +49,17 @@ status: published
 
 转账之后的余额（一直保持到快照）：A 持有 **999,000**，演示地址持有 **1,000**，`totalSupply` 仍是 **1,000,000**。转账不会改变<Term id="total-supply">总供应</Term>。
 
-## 转给无私钥地址：永远拿不回来
+## 转到没有已知可用私钥的地址：实际上拿不回来
 
 那 1,000 枚 MBox 被转到了这个演示地址：
 
 <Addr a="0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E" />
 
-这个地址<strong>从来没有保存过<Term id="private-key">私钥</Term></strong>，也没有任何 <Term id="sepeth">SepETH</Term>。没有私钥，就没有人能为它签名转出；已确认的<Term id="transaction">交易</Term>又不能撤回。所以这 1,000 枚 MBox **永久锁死，无法找回**。
+这个地址<strong>从来没有保存过可用的<Term id="private-key">私钥</Term></strong>，也没有任何 <Term id="sepeth">SepETH</Term>。没有已知可用私钥，就没有人能为它签名转出；已确认的<Term id="transaction">交易</Term>对入门读者又几乎无法撤回。所以这 1,000 枚 MBox **实际上锁死，找不回来**。这和合约里真正的 `burn`（余额和总供应一起减少）不同：这里只是转到难用地址，`totalSupply` 不变。
 
 <Callout type="danger" title="不要再往这个地址转任何东西">
 
-这是有意设计的教学点，不是事故。请**不要**再向 `0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E` 转入任何代币或测试币。转进去的东西都会同样锁死。现实中，把资产转到错误或无人控制的地址，结果完全一样。
+这是有意设计的教学点，不是事故。请**不要**再向 `0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E` 转入任何代币或测试币。转进去的东西都会同样难以取回。现实中，把资产转到错误或无人控制的地址，结果完全一样。
 
 </Callout>
 

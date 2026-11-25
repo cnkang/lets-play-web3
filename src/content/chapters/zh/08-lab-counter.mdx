@@ -98,7 +98,7 @@ Counter 每一步都是一笔已上链的交易，读取 <code>count()</code> �
 - **链在替你记账**：`count` 和 `owner` 都写在链上，事件日志也在链上。要改状态必须自己付 <Term id="gas">gas</Term>。
 - **部署远比调用贵**：部署用了 1,652,641 gas，reset 只用 23,626 gas。主要成本是把合约代码写进链上状态；几行加减逻辑本身并不贵。
 - **同一个函数的 gas 会变**：从 0 变成 1 的 increment 用了 127,229 gas，从 1 变成 2 只用了 29,309 gas。原因是<Term id="storage">存储槽</Term>从零写成非零更贵，已经非零再改就便宜得多。
-- <strong>已确认的<Term id="transaction">交易</Term>不能撤销</strong>：reset 把数字清零，但抹不掉之前 increment 的交易和事件，历史仍在。
+- <strong>已确认的<Term id="transaction">交易</Term>对初学者来说实际上不可逆</strong>：reset 把数字清零，但抹不掉之前 increment 的交易和事件，历史仍在。网络偶发重组极少见，入门阶段按「确认后改不了」理解即可。
 - **这段合约不能再加功能**：想增加批量操作或升级能力，必须在部署时就采用<Term id="upgradeable">可升级</Term>模式。第 13 章的 UBOX 就是这样。
 
 ## 生活对应

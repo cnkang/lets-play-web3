@@ -3,11 +3,11 @@
     "chapter": "02-who-needs-blockchain",
     "zh": {
       "term": "区块链",
-      "def": "多台电脑按同一套规则各自保存、互相核对的账本。新记录按批写进区块，每块带上前一块的指纹，改历史就容易被发现。"
+      "def": "多台电脑按同一套规则各自保存、互相核对的账本。新记录按批写进区块，每块带上前一块的指纹，改历史就容易被发现。副本可能暂时不一致，要靠共识规则决定接受哪条历史。"
     },
     "en": {
       "term": "blockchain",
-      "def": "A ledger that many computers keep and check under the same rules. New records go into blocks, each carrying the previous block's fingerprint, so edits to history are easy to spot."
+      "def": "A ledger that many computers keep and check under the same rules. New records go into blocks, each carrying the previous block's fingerprint, so edits to history are easy to spot. Copies can temporarily differ; consensus rules decide which history to accept."
     }
   },
   "web3": {
@@ -35,22 +35,22 @@
     "chapter": "03-blocks-hashes-consensus",
     "zh": {
       "term": "以太坊（Ethereum）",
-      "def": "一条能运行程序（智能合约）的公共区块链，自带的币叫 ETH。本书的实验都在它的测试网 Sepolia 上完成。"
+      "def": "一条能运行程序（智能合约）的公共区块链，自带的币叫 ETH。本书可公开查询的链上广播发生在它的测试网 Sepolia；浏览器模拟与第 17–19 章的本机 Anvil 不在公共 Sepolia 上。"
     },
     "en": {
       "term": "Ethereum",
-      "def": "A public blockchain that can run programs (smart contracts). Its built-in coin is ETH. Every experiment in this book ran on Ethereum's Sepolia test network."
+      "def": "A public blockchain that can run programs (smart contracts). Its built-in coin is ETH. Public broadcasts in this book used its Sepolia test network; browser simulations and the local Anvil labs in Chapters 17–19 are not on public Sepolia."
     }
   },
   "testnet": {
     "chapter": "06-gas-nonce-explorer",
     "zh": {
       "term": "测试网",
-      "def": "专门用来练习和测试的区块链。测试币可免费领取，没有市场价值；你仍要核对网络和签名内容。"
+      "def": "专门用来练习和测试的区块链。测试币可免费领取，没有市场价值；你仍要核对网络和签名内容。像练习场：能观察操作结果，不必投入主网资产（类比帮助理解，不是严格定义）。"
     },
     "en": {
       "term": "testnet",
-      "def": "A blockchain for practice and testing. Test coins are free and have no market value, but you still need to check the network and what you sign."
+      "def": "A blockchain for practice and testing. Test coins are free and have no market value, but you still need to check the network and what you sign. Like a practice field: you can observe results without committing mainnet assets (an analogy for learning, not a strict definition)."
     }
   },
   "mainnet": {
@@ -78,11 +78,11 @@
     "chapter": "appendix-b-credentials-api-keys",
     "zh": {
       "term": "chainId（链 ID）",
-      "def": "每条以太坊类网络的编号。以太坊主网是 1，Sepolia 是 11155111。钱包和程序用它确认当前连的是哪条链。"
+      "def": "每条以太坊类网络的编号。以太坊主网是 1，Sepolia 是 11155111。钱包和程序用它确认当前连的是哪条链，避免把测试网和主网搞混。"
     },
     "en": {
       "term": "chainId",
-      "def": "An ID number for each Ethereum-style network: mainnet is 1, Sepolia is 11155111. Wallets and scripts use it to confirm which chain they are on."
+      "def": "An ID number for each Ethereum-style network: mainnet is 1, Sepolia is 11155111. Wallets and scripts use it to confirm which chain they are on, so testnet and mainnet never get mixed up."
     }
   },
   "eth": {
@@ -133,77 +133,77 @@
     "chapter": "05-wallets-keys-signatures",
     "zh": {
       "term": "钱包",
-      "def": "保管私钥并用它签名的软件或硬件（例如浏览器插件）。币记在链上；钱包只证明「这是我同意的」。"
+      "def": "保管私钥并用它签名的软件或硬件（例如浏览器插件）。更像印章和钥匙，而不是装钱的抽屉（类比帮助理解，不是严格定义）：余额记在链上；钱包证明操作由该私钥授权，不证明你读懂了内容。"
     },
     "en": {
       "term": "wallet",
-      "def": "Software or hardware that keeps your private key and signs with it, such as a browser extension. Coins are recorded on-chain; the wallet only proves \"I approved this\"."
+      "def": "Software or hardware that keeps your private key and signs with it, such as a browser extension. More like a seal and key than a drawer of money (an analogy for learning, not a strict definition): balances live on-chain; a wallet proves the key authorised the action, not that you understood the content."
     }
   },
   "address": {
     "chapter": "05-wallets-keys-signatures",
     "zh": {
       "term": "地址",
-      "def": "链上账户或合约的公开编号：0x 开头，后跟 40 位十六进制字符。可以分享，但转账前要逐位核对。"
+      "def": "链上账户或合约的公开编号：0x 开头，后跟 40 位十六进制字符。可以分享，像收款账号或门牌号（类比帮助理解，不是严格定义）；转账前要逐位核对。"
     },
     "en": {
       "term": "address",
-      "def": "The public ID of an account or contract: 0x plus 40 hexadecimal characters. Safe to share, but check every character before sending."
+      "def": "The public ID of an account or contract: 0x plus 40 hexadecimal characters. Safe to share, like an account number or street address (an analogy for learning, not a strict definition); check every character before sending."
     }
   },
   "private-key": {
     "chapter": "05-wallets-keys-signatures",
     "zh": {
       "term": "私钥",
-      "def": "控制一个地址的秘密数字。谁拿到它，就能以该地址签名并转走资产。无法重置，也不能告诉任何人。"
+      "def": "控制一个地址的秘密数字。谁拿到它，就能以该地址签名并转走全部资产。无法重置，也没有「找回密码」；绝对不能告诉任何人。"
     },
     "en": {
       "term": "private key",
-      "def": "The secret number that controls an address. Whoever has it can sign as that address and move its assets. It cannot be reset; never share it."
+      "def": "The secret number that controls an address. Whoever has it can sign as that address and move everything it holds. It cannot be reset and there is no “forgot password”; never share it with anyone."
     }
   },
   "seed-phrase": {
     "chapter": "05-wallets-keys-signatures",
     "zh": {
       "term": "助记词",
-      "def": "钱包生成的一组单词（通常 12 或 24 个），可恢复整个钱包（可能含多把私钥）。任何网站或客服都不该向你索要。"
+      "def": "钱包生成的一组单词（通常 12 或 24 个），可恢复整个钱包（可能含多把私钥）。它比单把私钥更要紧：任何网站、客服或聊天都不该向你索要。"
     },
     "en": {
       "term": "seed phrase",
-      "def": "A list of words (usually 12 or 24) that can restore a whole wallet, possibly many private keys. No website or support agent should ask for it."
+      "def": "A list of words (usually 12 or 24) that a wallet generates and that can restore a whole wallet, possibly many private keys. It matters even more than a single private key: no website, support agent, or chat should ask for it."
     }
   },
   "signature": {
     "chapter": "05-wallets-keys-signatures",
     "zh": {
       "term": "签名",
-      "def": "钱包用私钥给消息或交易盖的数字印章。网络可据此确认是该地址主人同意的，无需交出私钥。"
+      "def": "钱包用私钥给消息或交易盖的数字印章。有效签名只证明该私钥授权了这笔内容，不证明签名人读懂了内容；校验时无需交出私钥。"
     },
     "en": {
       "term": "signature",
-      "def": "A digital seal a wallet puts on a message or transaction with the private key. The network can check the address owner approved it, without the key leaving the wallet."
+      "def": "A digital seal a wallet puts on a message or transaction with the private key. A valid signature proves that key authorised the content, not that the signer understood it. The key never needs to leave the wallet for verification."
     }
   },
   "transaction": {
     "chapter": "05-wallets-keys-signatures",
     "zh": {
       "term": "交易",
-      "def": "一条经签名、要求改变链上状态的指令，例如转账或调用合约。被写入区块后才生效，且无法撤回。只读查询不算交易。"
+      "def": "一条经签名、要求改变链上状态的指令，例如转账或调用合约。被写入区块并确认后才生效；对入门读者可视为实际上无法撤回。只读查询不算交易。"
     },
     "en": {
       "term": "transaction",
-      "def": "A signed instruction that asks the chain to change something, such as sending coins or calling a contract. It takes effect only after it is in a block, and cannot be undone. Read-only queries are not transactions."
+      "def": "A signed instruction that asks the chain to change something, such as sending coins or calling a contract. It takes effect only after it is in a block and confirmed; for learners, treat that as practically irreversible. Read-only queries are not transactions."
     }
   },
   "tx-hash": {
     "chapter": "06-gas-nonce-explorer",
     "zh": {
       "term": "交易哈希",
-      "def": "一笔交易的唯一编号（0x 加 64 位十六进制），像快递单号。贴进区块浏览器可查状态；有哈希只说明已发出，不代表已上链。"
+      "def": "一笔交易的唯一编号（0x 加 64 位十六进制），像快递单号（类比帮助理解，不是严格定义）。贴进区块浏览器可查状态；有哈希只说明已发出，不代表已上链。"
     },
     "en": {
       "term": "transaction hash",
-      "def": "A transaction's unique ID (0x plus 64 hex characters), like a tracking number. Paste it into a block explorer to check status. Having a hash only means it was sent, not that it is on-chain."
+      "def": "A transaction's unique ID (0x plus 64 hex characters), like a tracking number (an analogy for learning, not a strict definition). Paste it into a block explorer to check status. Having a hash only means it was sent, not that it is on-chain."
     }
   },
   "block": {
@@ -243,7 +243,7 @@
     "chapter": "03-blocks-hashes-consensus",
     "zh": {
       "term": "共识",
-      "def": "许多互不隶属的电脑，按同一套规则共同决定接受哪一条账本历史。没有它，各人手上的副本可能对不上。"
+      "def": "许多互不隶属的电脑，按同一套规则共同决定接受哪一条账本历史。没有它，各人手上的副本可能不一致。"
     },
     "en": {
       "term": "consensus",
@@ -298,11 +298,11 @@
     "chapter": "04-nodes-trust",
     "zh": {
       "term": "RPC",
-      "def": "程序和节点对话的接口，通常是一个网址。钱包或脚本通过它查数据、发交易。"
+      "def": "程序和节点对话的接口，通常是一个网址。钱包或脚本通过它查数据、发交易。可以想成节点对外开的服务窗口（类比帮助理解，不是严格定义）。"
     },
     "en": {
       "term": "RPC",
-      "def": "The interface programs use to talk to a node, usually a URL. Wallets and scripts use it to read data and send transactions."
+      "def": "The interface programs use to talk to a node, usually a URL. Wallets and scripts use it to read data and send transactions. Think of it as the node's service counter (an analogy for learning, not a strict definition)."
     }
   },
   "oracle": {
@@ -320,11 +320,11 @@
     "chapter": "06-gas-nonce-explorer",
     "zh": {
       "term": "Gas（执行计量单位）",
-      "def": "衡量一次链上操作工作量的单位。手续费 = 用掉的 gas × 单价，用 ETH 支付。像打车：路程乘单价才是车费。"
+      "def": "衡量一次链上操作工作量的单位。手续费 = 用掉的 gas × 单价，用 ETH 支付。像打车：路程乘单价才是车费（类比帮助理解，不是严格定义）。"
     },
     "en": {
       "term": "gas",
-      "def": "A unit for how much work an on-chain action takes. The fee is gas used times the price per unit, paid in ETH. Like a taxi: distance times the rate gives the fare."
+      "def": "A unit for how much work an on-chain action takes. The fee is gas used times the price per unit, paid in ETH. Like a taxi: distance times the rate gives the fare (an analogy for learning, not a strict definition)."
     }
   },
   "base-fee": {
@@ -375,11 +375,11 @@
     "chapter": "06-gas-nonce-explorer",
     "zh": {
       "term": "nonce（交易序号）",
-      "def": "一个账户发出交易的流水号，从 0 起，每成功上链一笔加一。用来保证顺序，并防止同一笔被重复用。"
+      "def": "普通外部账户（EOA）的交易序号，从 0 起。交易一旦被打包进区块就会加一，即使执行回退或失败也一样。还在等待打包的交易不占用链上 nonce。用来保证顺序，并防止同一笔被重复用。"
     },
     "en": {
       "term": "nonce",
-      "def": "An account's transaction counter: starts at 0 and rises by one for each included transaction. It keeps order and stops the same transaction being replayed."
+      "def": "For an ordinary EOA, the transaction counter starts at 0. Once a transaction is included in a block, that nonce is consumed even if execution reverts or fails. A transaction not yet included does not consume the on-chain nonce. It keeps order and stops the same transaction being replayed."
     }
   },
   "eoa": {
@@ -397,11 +397,11 @@
     "chapter": "06-gas-nonce-explorer",
     "zh": {
       "term": "内存池（mempool）",
-      "def": "交易发出后、写入区块前等待的地方。这里的交易仍可能被替换或丢弃，还不算已发生。"
+      "def": "交易发出后、写入区块前等待的地方，像候车室（类比帮助理解，不是严格定义）。这里的交易仍可能被替换或丢弃，还不算已发生。"
     },
     "en": {
       "term": "mempool",
-      "def": "Where sent transactions wait before entering a block. A transaction here can still be replaced or dropped, so it has not happened yet."
+      "def": "Where sent transactions wait before entering a block, like a waiting room (an analogy for learning, not a strict definition). A transaction here can still be replaced or dropped, so it has not happened yet."
     }
   },
   "broadcast": {
@@ -419,22 +419,22 @@
     "chapter": "06-gas-nonce-explorer",
     "zh": {
       "term": "水龙头（faucet）",
-      "def": "免费发放测试网币的网站或服务。领到的币只能在测试网用，没有市场价值。"
+      "def": "免费发放测试网币的网站或服务，像「免费试用装」（类比帮助理解，不是严格定义）。领到的币只能在测试网用，没有市场价值。"
     },
     "en": {
       "term": "faucet",
-      "def": "A website or service that gives out free testnet coins. Those coins only work on the testnet and have no market value."
+      "def": "A website or service that gives out free testnet coins, like free samples (an analogy for learning, not a strict definition). Those coins only work on the testnet and have no market value."
     }
   },
   "block-explorer": {
     "chapter": "06-gas-nonce-explorer",
     "zh": {
       "term": "区块浏览器",
-      "def": "把链上数据做成可搜索网页的网站。输入地址、交易哈希或区块号，可查余额与历史。"
+      "def": "把链上数据做成可搜索网页的网站。输入地址、交易哈希或区块号，可查余额、状态与历史，像链上的快递查询（类比帮助理解，不是严格定义）。"
     },
     "en": {
       "term": "block explorer",
-      "def": "A website that turns chain data into searchable pages. Type an address, transaction hash, or block number to see balances and history."
+      "def": "A website that turns chain data into searchable pages. Type an address, transaction hash, or block number to see balances, status, and history, like a parcel-tracking site for the chain (an analogy for learning, not a strict definition)."
     }
   },
   "etherscan": {
@@ -452,11 +452,11 @@
     "chapter": "07-smart-contracts-evm",
     "zh": {
       "term": "智能合约",
-      "def": "部署在链上的程序：规则公开，各节点按同样方式执行。像自动售货机：条件对了就出货，否则拒绝。它不是法律合同。"
+      "def": "部署在链上的程序：规则公开，各节点按同样方式执行。像自动售货机：条件对了就出货，否则拒绝（类比帮助理解，不是严格定义）。它不是法律合同。"
     },
     "en": {
       "term": "smart contract",
-      "def": "A program on a blockchain whose rules are public and run the same way on every node. Like a vending machine: correct input delivers; otherwise it refuses. It is not a legal contract."
+      "def": "A program on a blockchain whose rules are public and run the same way on every node. Like a vending machine: correct input delivers; otherwise it refuses (an analogy for learning, not a strict definition). It is not a legal contract."
     }
   },
   "evm": {
@@ -551,11 +551,11 @@
     "chapter": "07-smart-contracts-evm",
     "zh": {
       "term": "回滚（revert）",
-      "def": "合约检查失败时，撤销这次执行的全部改动，像没发生过；已消耗的 gas 仍要付。"
+      "def": "合约检查失败时，撤销这次执行的全部状态改动，像没发生过；已消耗的 gas 仍要付。交易一旦被打包进区块，nonce 仍会被占用。"
     },
     "en": {
       "term": "revert",
-      "def": "When a contract check fails, every change from that run is undone, as if it never happened. Gas already used is still paid."
+      "def": "When a contract check fails, every state change from that run is undone, as if it never happened. Gas already used is still paid. Once the transaction is included in a block, the nonce is still consumed."
     }
   },
   "event": {
@@ -650,44 +650,44 @@
     "chapter": "11-lab-mbox-burn",
     "zh": {
       "term": "销毁（burn）",
-      "def": "永久作废代币：持有人余额和总供应同时减少。若只转到无人能用的地址，总供应通常不变。"
+      "def": "永久作废代币：持有人余额和总供应同时减少。若只转到无人能用的地址，总供应通常不变——那不是协议意义上的 burn。"
     },
     "en": {
       "term": "burn",
-      "def": "Permanently destroying tokens: the holder's balance and total supply both fall. Sending to an unusable address usually leaves total supply unchanged."
+      "def": "Permanently destroying tokens: the holder's balance and total supply both fall. Sending to an unusable address usually leaves total supply unchanged — that is not a protocol burn."
     }
   },
   "zero-address": {
     "chapter": "11-lab-mbox-burn",
     "zh": {
       "term": "零地址（0x0）",
-      "def": "全为 0 的特殊地址，无人持有其私钥。浏览器里「转到 0x0」常表示销毁或铸造，要以总供应变化为准。"
+      "def": "全为 0 的特殊地址，没有已知可用私钥。浏览器里「转到 0x0」常表示销毁或铸造，要以总供应是否下降为准；真正的 burn 会减供应，仅转到难用地址通常不减。"
     },
     "en": {
       "term": "zero address (0x0)",
-      "def": "A special all-zero address that nobody holds a key for. \"Sent to 0x0\" in an explorer often signals burn or mint; confirm with total supply."
+      "def": "A special all-zero address with no known usable private key. \"Sent to 0x0\" in an explorer often signals burn or mint; confirm with total supply. A true burn lowers supply; a plain transfer to an inaccessible address usually does not."
     }
   },
   "approve": {
     "chapter": "10-approve-vs-payment",
     "zh": {
       "term": "授权（approve）",
-      "def": "持有人允许另一地址在额度内动用自己的代币。代币此刻不转走，但发交易仍要付手续费；对方之后可代扣。"
+      "def": "持有人设定另一地址可代扣的上限；代币此刻不转走，发交易仍要付手续费。真正动账的是之后的 transferFrom（或 burnFrom）。可想成签一份代扣协议（类比帮助理解，不是严格定义）。"
     },
     "en": {
       "term": "approve",
-      "def": "The holder lets another address use up to a set amount of their tokens. No tokens move yet, though the transaction still costs a fee. The other side may take tokens later."
+      "def": "The holder sets a spending limit for another address. No tokens move yet, though the transaction still costs a fee. transferFrom (or burnFrom) is what later moves tokens. Like signing a direct-debit form (an analogy for learning, not a strict definition)."
     }
   },
   "allowance": {
     "chapter": "10-approve-vs-payment",
     "zh": {
       "term": "额度（allowance）",
-      "def": "被授权者还能代为动用多少代币。有限额度通常随使用减少；有些无限授权不递减。持有人可用 approve 改额度，设为 0 即撤销。"
+      "def": "被授权者还能代为动用多少代币。有限额度通常随使用减少；代币合约对无限额度的处理并不相同。持有人可用 approve 改额度，设为 0 即撤销——须等链上确认后才生效；撤销不会把已转走的代币要回来。"
     },
     "en": {
       "term": "allowance",
-      "def": "How many tokens a spender may still move for the holder. A limited allowance usually falls with use; some infinite allowances stay put. The holder can change it with approve; 0 revokes it once confirmed."
+      "def": "How many tokens a spender may still move for the holder. A limited allowance usually falls with use; token contracts differ on unlimited / infinite allowance. The holder can change it with approve; 0 revokes it once confirmed. Revoke does not return tokens already spent."
     }
   },
   "spender": {
@@ -1089,11 +1089,11 @@
     "chapter": "16-defi-labs",
     "zh": {
       "term": "无限授权",
-      "def": "把授权额度设成最大值，让对方以后可任意数量动用该代币。方便，但合约有漏洞或被骗时，钱包里该币可能被掏空。"
+      "def": "常把额度设成 type(uint256).max（256 位无符号整数的最大值），让对方以后可任意数量动用该代币。方便，但合约有漏洞或被骗时，该币可能被掏空；不同代币合约对「最大值」的处理并不相同。"
     },
     "en": {
       "term": "infinite approval",
-      "def": "Setting an allowance to the maximum so the spender can take any amount later. Convenient, but if the contract is buggy or malicious, that token can be drained."
+      "def": "Often sets the allowance to type(uint256).max (the largest 256-bit unsigned integer) so the spender can take any amount later. Convenient, but if the contract is buggy or malicious, that token can be drained. Token contracts differ on how they treat that maximum."
     }
   },
   "permit2": {

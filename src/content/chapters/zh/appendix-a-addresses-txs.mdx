@@ -32,7 +32,7 @@ status: published
 
 ## 账户与演示地址
 
-这些都是 **Sepolia <Term id="testnet">测试网</Term>地址**。切勿向它们转入<Term id="mainnet">主网</Term>资产，也不要再向无<Term id="private-key">私钥</Term>的演示地址转入任何东西。
+这些都是 **Sepolia <Term id="testnet">测试网</Term>地址**。切勿向它们转入<Term id="mainnet">主网</Term>资产，也不要再向没有已知可用<Term id="private-key">私钥</Term>的演示地址转入任何东西。
 
 <T label="账户与演示地址">
 
@@ -40,7 +40,7 @@ status: published
 | --- | --- | --- |
 | 账户 A | <Addr a="0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC" /> | 主测试账户 / 部署者 / UBOX owner |
 | 账户 B | <Addr a="0x1dB261d3d5BE16E1A81582E8786A6FAB82Fe218c" /> | 被授权者（spender） |
-| MBox 演示收款地址 | <Addr a="0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E" /> | **无私钥，不可找回**；持有 1,000 MBox。请勿再转入 |
+| MBox 演示收款地址 | <Addr a="0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E" /> | **无已知可用私钥，实际上不可找回**；持有 1,000 MBox。请勿再转入 |
 | 演示地址 C | <Addr a="0x6E7F8eF4353DB8012Dea3F70eb523aB1A3051711" /> | 失败批次的演示收款方，不保存密钥，收到 0 |
 | 启动资金来源 | <Addr a="0x52f1984Cd3e46e1214dB222D3Ff63712E7aCEedD" /> | 启动资金 0.05 SepETH 的来源：Google Cloud 的 Sepolia 水龙头（Kang 已确认；链上无官方名称标签） |
 
@@ -64,7 +64,7 @@ status: published
 | A | 3 | increment（1 wei tip） | 成功 | 12111091 | 2,671,809 | <Tx h="0xd61e57686959b7c4c9d774a6aa35b0fb9dac72e8317055146da4676a9e4e4b31" /> |
 | A | 4 | increment（2 wei tip） | 成功 | 12111181 | 762,034 | <Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" /> |
 | A | 5 | 部署 MBox | 成功 | 12115620 | 428,632,485 | <Tx h="0xf9fccb16dd1a0ef99a86d7f4e81cb0e286d4ed4e154963db517c375e3aa92058" /> |
-| A | 6 | 转 1,000 MBox 给无私钥地址 | 成功 | 12115621 | 9,907,800 | <Tx h="0x039ffbb819638f771e760b12e0e01de6ec2c2c6bb5691fa2ed5cd0d6c45eb054" /> |
+| A | 6 | 转 1,000 MBox 给无已知可用私钥地址 | 成功 | 12115621 | 9,907,800 | <Tx h="0x039ffbb819638f771e760b12e0e01de6ec2c2c6bb5691fa2ed5cd0d6c45eb054" /> |
 | A | 7 | 部署 MBox-Burn | 成功 | 12115825 | 555,368,628 | <Tx h="0xd6582fecf142f8879e0d9259c79c3a07885ed0ef9d67ceb6d94d98cdd80d8c20" /> |
 | A | 8 | burn 1,000 MBox-Burn | 成功 | 12115826 | 2,857,684 | <Tx h="0xe11a7f5e583e272633f5b1ef420597b496d594b976a6c698e3289de568f3b03b" /> |
 | A | 9 | 给 B 0.0001 SepETH | 成功 | 12115897 | 13,912,800 | <Tx h="0xdeb796869c494aac1311ea91248f54be4e1fd922d311ec73c9c949440fa4b77d" /> |
@@ -116,7 +116,7 @@ status: published
 | 项目 | 值 |
 | --- | --- |
 | Counter.count / owner | 2 / 账户 A |
-| MBox totalSupply / A / 无私钥演示地址 | 1,000,000 / 999,000 / 1,000（不可找回） |
+| MBox totalSupply / A / 无已知可用私钥演示地址 | 1,000,000 / 999,000 / 1,000（实际上不可找回） |
 | MBox-Burn totalSupply / A / B | 998,900 / 998,800 / 100 |
 | MBox-Burn allowance(A, B) | 0（已撤销） |
 | UBOX 实现 | V3 `0x16E3D2f25e28253b467C66c462973e4ca86fad28`（V4 未上链） |

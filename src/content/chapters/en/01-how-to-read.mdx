@@ -25,8 +25,8 @@ Reading needs no wallet, test coins or account. To see a real action first, try 
 
 1. **Principles and everyday analogies** explain <Term id="blockchain">blockchains</Term> and <Term id="smart-contract">smart contracts</Term>, using shared records and vending machines as examples. An analogy helps you get the idea; it is not a definition or an experimental result.
 2. **On-chain results** come from deployments, <Term id="transaction">transactions</Term> and upgrades on <Term id="ethereum">Ethereum</Term>’s Sepolia testnet on 11–12 November 2026 (Singapore time). Look up addresses, <Term id="tx-hash">transaction hashes</Term> (the IDs used to find transactions) and <Term id="block-number">block numbers</Term> on Sepolia <Term id="etherscan">Etherscan</Term>. Read balances at the recorded block. Today’s values do not replace the historical snapshot.
-3. **Local tests and simulations** supply test counts, assertions and the UBOX V4 simulation. These are local records, not explorer transactions. V4 was never deployed on-chain. Chapter 15 explains the review’s results and limits.
-4. **Plans and later phases** are kept apart from results. Phase-0 (the basic labs) and review are complete. The Phase-1 DeFi labs ran on Sepolia on 2026-11-19. Chapter 16 covers them with its own snapshot (block 12165973). Chapters 17–19 are later local labs. Chapters 17 and 18 fork that same block read-only and then write locally. Chapter 19 builds every contract locally and does not fork. The book keeps plans separate from completed experiments.
+3. **Local tests and simulations** supply test counts, assertions and the UBOX V4 simulation. These are local records, not explorer transactions. V4 was never deployed on-chain. Chapter 15 explains the review’s results and limits. This site also has **browser interactive simulations** (nothing on-chain). Chapters 17–18 write on a local Anvil **fork** of historical Sepolia state; Chapter 19 is a **fully local** teaching chain. Do not look up those local hashes on a public explorer.
+4. **Plans and later phases** are kept apart from results. Phase-0 (the basic labs) and review are complete. The Phase-1 DeFi labs ran on Sepolia on 2026-11-19. Chapter 16 covers them with its own snapshot (block 12165973). The book keeps plans separate from completed experiments.
 
 <Snapshot lang="en" />
 
@@ -42,7 +42,7 @@ Reading needs no wallet, test coins or account. To see a real action first, try 
 | Upgradeable contracts | Proxies, upgrades and redenomination: benefits and costs | 13–14 |
 | Evidence and wrap-up | What tests, source matching and reviews each prove | 15 and appendices |
 | DeFi labs | Swaps, arbitrage, liquidity, a v3 NFT position and mainnet safety warnings | 16 |
-| Lending, flash loans and prices | The health factor, a loan that must be repaid immediately, and why a thin-pool spot price is a poor collateral value | 17–19 |
+| Lending, flash loans and prices | The health factor, a loan that must be repaid immediately, and why a spot price from a thin (low-liquidity) pool is a poor collateral value | 17–19 |
 
 </T>
 
@@ -63,7 +63,7 @@ The whole lab followed a few rules:
 - Why do a group of merchants sometimes need a shared ledger, and sometimes not at all?
 - Looking at one transaction in a <Term id="block-explorer">block explorer</Term>, can you tell "the transaction succeeded" from "a balance changed" from "only an approval was granted"?
 - How do holding <Term id="token">tokens</Term>, approving tokens and upgrading a contract differ as kinds of power?
-- Why can neither a transfer to the wrong address nor any confirmed transaction be undone?
+- Why should learners treat a transfer to the wrong address, or any confirmed transaction, as practically irreversible?
 - Why can a review still have findings when all 49 <Term id="unit-test">unit tests</Term> pass?
 - Why does "passed in a local simulation" not mean "live on-chain"?
 

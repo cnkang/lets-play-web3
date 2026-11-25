@@ -28,6 +28,16 @@ The [constant-product lab](../../labs/constant-product-amm/) lets you change res
 
 </Callout>
 
+<Callout type="note" title="What you will learn">
+
+- How one swap lines up a quote with the amount on the receipt, the minimum received, and the fee.
+- Why two pools for the same pair can show wildly different prices, and why a testnet odd price is not repeatable real income.
+- The difference between an exact approval and an infinite approval, and why this chapter never signed Permit or Permit2.
+- How providing liquidity earns fees and carries impermanent loss, and why overpaid ETH must be refunded in the same transaction.
+- How to check the same steps on a local fork with Foundry before sending anything on a public chain.
+
+</Callout>
+
 ## Start with an everyday picture
 
 Picture an **automatic currency exchange machine** at an airport. It holds two currencies, say dollars and euros. You put in dollars, and a formula decides how many euros come out. There is no clerk, and no other customer has to match your order.
@@ -429,6 +439,11 @@ export POOL=0x3289680dD4d6C10bb19b899729cda5eEF58AEfF1
 
 Before you rely on any address, check it against the official docs and make sure Etherscan shows verified source. Variables last only in this terminal window. In a new window, copy the block again.
 
+The main labs above already tell the story. Expand below when you want the full read-only checks, local fork rehearsals, and Sepolia send commands.
+
+<details>
+<summary>Technical details and verification evidence (expand)</summary>
+
 ### Read-only checks (no signature, no cost)
 
 Check the network <Term id="chainid">chain ID</Term>, your balances and your allowance for SwapRouter02:
@@ -488,7 +503,7 @@ cast rpc anvil_setBalance $ME 0x16345785D8A0000 --rpc-url $FORK
 cast balance $ME --ether --rpc-url $FORK
 ```
 
-The fork also reports chain ID `11155111`, so always check which URL a command uses. If your test wallet has no USDC or EURC yet, you can set `ME` to the book's account A (`0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC`) **on the fork only** and borrow its test balances. If you switch addresses, rerun the block above so Anvil uses and funds the new address. On the real chain nobody can send from another address without its key.
+The fork also reports chain ID `11155111`, so always check which URL a command uses. If your test wallet has no USDC or EURC yet, you can set `ME` to the book's account A (`0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC`) **on the fork only** and borrow its test balances. If you switch addresses, rerun the block above so Anvil uses and funds the new address. On the real chain, without a known usable private key, nobody can send from another address.
 
 To start over, stop `anvil` with Ctrl+C, start it again, and copy the block above again.
 
@@ -662,6 +677,8 @@ cast send $USDC "approve(address,uint256)" $SR02 1000000 --account lab-test --rp
 
 `cast` asks for the keystore password. Before you press Enter, check the URL, the contract, the amount and the minimum. Then look up the transaction hash on Sepolia Etherscan. After the approval alone, the allowance should be `1000000` (1 USDC). After the router spends that amount, check that the allowance is zero. If you stop after approving, revoke it by approving zero for the same router.
 
+</details>
+
 ## Safety checklist
 
 1. Use only the testnet and test tokens. Test tokens have no value.
@@ -703,6 +720,8 @@ Nothing in the table is rounded. Each amount is the on-chain integer converted w
 - Odd testnet pools can be arbitraged. On mainnet, bots take such chances within seconds.
 - Providing liquidity earns fees and carries impermanent loss. v3 magnifies both and earns nothing out of range.
 - Refund overpaid ETH in the same transaction. Anyone can take change left in a router.
+
+For a self-check, try the Appendix C questions on swaps, approvals and liquidity.
 
 ## Where to read more
 

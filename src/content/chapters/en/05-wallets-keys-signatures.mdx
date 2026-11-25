@@ -7,15 +7,15 @@ order: 50
 status: published
 ---
 
-<p class="lead">A <Term id="wallet">wallet</Term> mainly holds the power to sign, not a drawer inside some app where tokens sit.</p>
+<p class="lead">A <Term id="wallet">wallet</Term> mainly holds the power to sign, not a drawer inside some app where tokens sit. Analogies help understanding; they are not strict definitions.</p>
 
 ## Your tokens are not actually "in" the wallet
 
-When you pay by bank card, the bank checks your identity and account permissions. On networks like <Term id="ethereum">Ethereum</Term>, an ordinary account uses a **<Term id="private-key">private key</Term>** to produce a **<Term id="signature">digital signature</Term>**, and the network checks the signature to confirm the <Term id="transaction">transaction</Term> was authorised.
+When you pay by bank card, the bank checks your identity and account permissions. On networks like <Term id="ethereum">Ethereum</Term>, an ordinary account uses a **<Term id="private-key">private key</Term>** to produce a **<Term id="signature">digital signature</Term>**, and the network checks the signature to confirm the <Term id="transaction">transaction</Term> was authorised by that key.
 
 - An **address** is like a public account number. It is safe to share.
 - A **private key** is like a master permission that can never be reset: whoever holds it can sign anything in that address's name.
-- Your token balance is actually recorded **in a contract on-chain** (for example, a balance table inside an <Term id="erc20">ERC-20</Term> contract). The wallet just reads it for you and signs on your behalf when you agree.
+- Your token balance is actually recorded **in a contract on-chain** (for example, a balance table inside an <Term id="erc20">ERC-20</Term> contract). The wallet holds the key and reads balances for you; a valid signature proves that key authorised the action, **not** that you understood the prompt.
 
 <Figure name="wallet-flow" n="2" alt="Five steps: the wallet signs with a local private key; the signed transaction; an RPC node checks it and holds it in the mempool; a validator includes it in a block; the explorer shows network, status, from, to, logs, block and hash.">
 A signed transaction is broadcast, checked by nodes, included in a block by a validator, and then observed in a block explorer. The private key never leaves the wallet.
@@ -24,9 +24,9 @@ A signed transaction is broadcast, checked by nodes, included in a block by a va
 ## Four actions, very different risks
 
 - **Connecting a wallet** tells a website one of your addresses. On its own it does not move any tokens.
-- **Signing a message** may be a harmless log-in statement, or it may grant a risky permission. **Read it before you sign.**
+- **Signing a message** may be a harmless log-in statement, or it may grant a risky permission. **Read it before you sign**—signing proves key approval, not that you understood the content.
 - **Sending a transaction** changes on-chain state and usually costs a <Term id="gas">gas</Term> fee.
-- **Exporting a <Term id="seed-phrase">seed phrase</Term> or private key** means anyone who obtains it may control everything at that address. Legitimate sites almost never need you to do this.
+- **Exporting a <Term id="seed-phrase">seed phrase</Term> or private key** hands over the master key: anyone who obtains it may control that address (and often the whole wallet), and there is usually no way to “reset” it. Legitimate sites almost never need you to do this.
 
 ## Seed phrases, private keys and API keys
 
