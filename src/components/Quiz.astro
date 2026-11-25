@@ -6,13 +6,29 @@ const { lang } = Astro.props
 const items = quiz[lang]
 ---
 <ol class="quiz">
-  {items.map((it, i) => (
-    <li>
-      <p><strong><Nw text={it.q} /></strong></p>
-      <details>
-        <summary>{lang === 'zh' ? `查看第 ${i + 1} 题答案` : `Show the answer to question ${i + 1}`}</summary>
-        <p><Nw text={it.a} /></p>
-      </details>
-    </li>
-  ))}
+  {items.map((it, i) => {
+    const id = `quiz-${String(i + 1).padStart(2, '0')}`
+    return (
+      <li>
+        <p><strong><Nw text={it.q} /></strong></p>
+        <details data-quiz-item={id}>
+          <summary>{lang === 'zh' ? `查看第 ${i + 1} 题答案` : `Show the answer to question ${i + 1}`}</summary>
+          <p><Nw text={it.a} /></p>
+        </details>
+      </li>
+    )
+  })}
 </ol>
+
+<script>
+  document.querySelectorAll('details[data-quiz-item]').forEach((node) => {
+    node.addEventListener('toggle', () => {
+      if (!(node instanceof HTMLDetailsElement) || !node.open) return
+      const id = node.dataset.quizItem
+      if (!id) return
+      document.dispatchEvent(new CustomEvent('lpw3-track', {
+        detail: { name: 'quiz_answer_open', challengeId: id }
+      }))
+    })
+  })
+</script>

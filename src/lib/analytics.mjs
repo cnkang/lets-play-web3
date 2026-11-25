@@ -8,7 +8,8 @@ export const EVENT_NAMES = [
   'prompt_copy',
   'related_chapter_click',
   'guide_to_lab_click',
-  'curriculum_start'
+  'curriculum_start',
+  'quiz_answer_open'
 ]
 
 export const LAB_IDS = ['erc20-allowance', 'constant-product-amm', 'hash-chain']
@@ -41,7 +42,8 @@ export const CHALLENGE_IDS = [
   '11-lab-mbox-burn',
   '13-upgradeable-ubox',
   '16-defi-labs',
-  '17-lending-liquidation'
+  '17-lending-liquidation',
+  ...Array.from({ length: 26 }, (_, i) => `quiz-${String(i + 1).padStart(2, '0')}`)
 ]
 
 const ALLOWED = {
@@ -52,7 +54,8 @@ const ALLOWED = {
   prompt_copy: ['challenge_id'],
   related_chapter_click: ['challenge_id', 'guide_id'],
   guide_to_lab_click: ['guide_id', 'lab_id'],
-  curriculum_start: []
+  curriculum_start: [],
+  quiz_answer_open: ['challenge_id']
 }
 const REQUIRED = {
   learning_path_start: ['learning_path'],
@@ -62,7 +65,8 @@ const REQUIRED = {
   prompt_copy: ['challenge_id'],
   related_chapter_click: ['challenge_id'],
   guide_to_lab_click: ['guide_id', 'lab_id'],
-  curriculum_start: []
+  curriculum_start: [],
+  quiz_answer_open: ['challenge_id']
 }
 
 const ENUMS = {
@@ -100,6 +104,7 @@ function keyFor(event) {
     case 'lab_complete': return `lab_complete:${params.lab_id}:${params.challenge_id}`
     case 'related_chapter_click': return `chapter:${params.guide_id || '-'}:${params.challenge_id}`
     case 'guide_to_lab_click': return `guide-lab:${params.guide_id}:${params.lab_id}`
+    case 'quiz_answer_open': return `quiz:${params.challenge_id}`
     default: return ''
   }
 }

@@ -41,6 +41,19 @@ test('prompt copies debounce and path starts once', () => {
   assert.equal(sanitizeEvent('learning_path_start', { learning_path: 'track-99m' }, 'en'), null)
 })
 
+test('quiz answer opens once per question id and never send free text', () => {
+  let state = emptyGate()
+  const open = sanitizeEvent('quiz_answer_open', { challenge_id: 'quiz-03', answer: 'secret' }, 'zh')
+  assert.deepEqual(open, { name: 'quiz_answer_open', params: { locale: 'zh', challenge_id: 'quiz-03' } })
+  assert.equal(JSON.stringify(open).includes('secret'), false)
+  const first = gateEvent(open, state, 1_000)
+  assert.equal(first.emit, true)
+  state = first.state
+  assert.equal(gateEvent(open, state, 1_100).emit, false)
+  assert.equal(gateEvent(sanitizeEvent('quiz_answer_open', { challenge_id: 'quiz-04' }, 'zh'), state, 1_200).emit, true)
+  assert.equal(sanitizeEvent('quiz_answer_open', { challenge_id: 'quiz-99' }, 'en'), null)
+})
+
 test('decorate adds transport flags without changing the learning params', () => {
   const params = decorate({ locale: 'en', lab_id: 'constant-product-amm' }, { internal: true, debug: true })
   assert.equal(params.locale, 'en')
