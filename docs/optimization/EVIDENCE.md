@@ -4,7 +4,7 @@ Commands were run on the feature branch in this workspace. A skip is not a pass.
 
 ## Unit tests
 
-`node --test scripts/test/*.test.mjs` (also `npm test`): 24 tests, 24 passed, 0 failed.
+`npm test` runs `node --test "scripts/test/*.test.mjs"`: 24 tests, 24 passed, 0 failed. CI uses Node 24, which does not accept the bare directory `scripts/test/` as a test root, so the script names the files.
 
 Pinned results include:
 
