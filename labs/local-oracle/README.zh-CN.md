@@ -4,6 +4,8 @@
 
 这是一场封闭的教学。它在一台新的本地 Anvil 上部署玩具代币。它不调用 Aave、Uniswap、Sepolia 或任何公共链。它不是攻击工具。金额和对手方都写死在 `src/LocalOracleLab.sol` 里。
 
+它也不是网站 `/labs/` 下的浏览器实验（授权、恒定乘积池、哈希链）。那些页面只在浏览器里计算，不启动 Anvil。这个目录需要 Foundry，并且只在 `127.0.0.1:18549` 上写账。
+
 已保存的那一次在 [`docs/evidence/p2/oracle-readings.json`](../../docs/evidence/p2/oracle-readings.json)。你在这里启动的是**新的**一次。要核对的是整数。交易哈希不会和第 19 章相同。
 
 ## 需要先安装
