@@ -16,3 +16,5 @@ SOURCES_DIR=/absolute/path/to/web3-sandbox npm run check:facts
 ```
 
 本仓库节选用于引用，不能用书中内容反过来拼成「原始来源」自证。`check:facts` 只查地址/哈希字面出处和疑似密钥，结论仍要阅读相应证据。本轮文档核对没有重跑链上实验。
+
+第 17–19 章另有一份公开数字摘要：[p2-public-digest.json](p2-public-digest.json)。它只保留教材引用的读数、环境边界和本地哈希。原始回执、脚本、追踪和玩具合约源码不在本仓库。P2A 的 Anvil 启动日志含有节点自带测试密钥，没有纳入摘要。没有外部 Phase-0/1 档案时，`check:facts` 会标明历史出处检查被跳过，这不算那些章节已通过对账。

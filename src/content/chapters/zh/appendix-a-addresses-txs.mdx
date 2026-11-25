@@ -1,13 +1,13 @@
 ---
 title: "附录 A　地址与交易总表"
-description: "本书提到的全部 Sepolia 合约地址、账户地址，以及账户 A（nonce 0–19）和账户 B（nonce 0–2）的全部已广播交易，附完整哈希、区块号、手续费和 Sepolia Etherscan 链接；另附实验环境参数，以及第 16 章 DeFi 实验（账户 A nonce 20–42）的地址与交易。"
+description: "本书提到的 Sepolia 合约、账户，以及已广播交易，附 Etherscan 链接；另附第 16 章的地址与交易。第 17–19 章的本地哈希单独列出，不链接到浏览器。"
 navTitle: "附录 A　地址与交易总表"
 part: appendices
 order: 200
 status: published
 ---
 
-<p class="lead">这一页可以独立核对：每个地址、每笔交易都附完整值和 Sepolia <Term id="etherscan">Etherscan</Term> 链接。表格由脚本直接从实验记录生成，没有手工抄写哈希。</p>
+<p class="lead">Sepolia 上的地址和已广播交易附有完整值和 <Term id="etherscan">Etherscan</Term> 链接。表格由脚本从实验记录生成。第 17–19 章的本地哈希写在本页最后，不链到浏览器。</p>
 
 <Snapshot lang="zh" />
 
@@ -195,3 +195,14 @@ status: published
 
 - 23 笔交易的手续费合计 **6,936,564,251,954 wei**（0.000006936564251954 SepETH），与第 16 章的总账一致。
 - 快照时 A 的 nonce 为 **43**。
+
+## 第 17–19 章：本地证据，不是新的 Sepolia 交易
+
+上面各表保持原样。这里只标出边界，完整数字在各章和 [公开摘要](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2-public-digest.json)。
+
+- 第 17、18 章的写操作在本地 Anvil（chainId 31337），只读分叉源是 Sepolia 区块 **12165973**。资金池是 <Addr a="0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951" short />。那是这个历史区块上的真实 Aave 合约。本地交易哈希不是这个合约的新 Sepolia 交易。
+- 第 17 章全额清算的一次本地回执：<LocalRef value="0x73f963d97d0fe20b67c859a76f0cd4cb766d08c7ce687a38a211bbd242e92cca" env="fork" short />
+- 第 18 章真实 V2 分支的一次本地回执：<LocalRef value="0x2c23365730935cf83b164494eaef65978ad0168b725eb000a28d7b77167e46f2" env="fork" short />
+- 第 19 章没有分叉。脆弱分支的一次本地回执：<LocalRef value="0xc00659ac6179fcb69292949ea0c90b16a7d45890ae8520405c85da8fd8cf4438" env="local" short />
+
+分叉来源区块本身的哈希是 `0x38d7b288efbc2cf0d80ebbc2b897329be18fa5c7aa4f3e1aaf5830eeb783d526`。可以按区块号 12165973 查看历史状态。不要把上面三条本地哈希贴进交易搜索框。重跑会更换临时账户，所以这些哈希只标识已保存的那一次。原始回执包没有放进本仓库。P2A 的节点启动日志含有 Anvil 自带测试密钥，已排除，这里也不出现。

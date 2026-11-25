@@ -1,0 +1,103 @@
+---
+// Same local parameters. Only the valuation source changes.
+// This is a no-fork teaching model, not an Aave bug.
+const zh = !Astro.url.pathname.includes('/en/')
+const cards = zh
+  ? [
+      {
+        id: 'spot',
+        title: '借贷合约直接读薄池现价',
+        rows: [
+          ['估值价格', '3.604869999999999999'],
+          ['允许再借的上限', '8,110.957499999999997750'],
+          ['实际留下的普通债务', '8,000'],
+          ['锁住的抵押品', '3,000，不能再拿去卖'],
+          ['交易结束后的池价', '2.045236389923581453'],
+          ['模拟者余额', '3,678.345270534929823185'],
+          ['按锚价 1 的不足额', '5,000'],
+          ['若能卖掉全部抵押的报价缺口', '3,714.031198495643589346']
+        ],
+        note: '闪贷的 10,000 本金和 5 手续费已经归还。留下的是普通债务，不是闪贷欠款。'
+      },
+      {
+        id: 'fixed',
+        title: '改成独立的固定价 1',
+        rows: [
+          ['估值价格', '1，不跟这笔买入变化'],
+          ['允许再借的上限', '2,250'],
+          ['实际留下的普通债务', '0'],
+          ['锁住的抵押品', '0，临时存入也撤销'],
+          ['交易结束后的池价', '1'],
+          ['模拟者余额', '0'],
+          ['按锚价 1 的不足额', '0'],
+          ['报价缺口', '0']
+        ],
+        note: '同样的请求被 BorrowLimit 拒绝。资金状态撤销。操作者 nonce 加 1，mock ETH 减少 0.000258899。'
+      }
+    ]
+  : [
+      {
+        id: 'spot',
+        title: 'The lender reads the thin-pool spot',
+        rows: [
+          ['Valuation price', '3.604869999999999999'],
+          ['Borrow cap then', '8,110.957499999999997750'],
+          ['Ordinary debt left', '8,000'],
+          ['Locked collateral', '3,000, and it cannot be sold again'],
+          ['Pool price at the end', '2.045236389923581453'],
+          ['Simulator balance', '3,678.345270534929823185'],
+          ['Shortfall at anchor price 1', '5,000'],
+          ['Quote gap if all collateral could be sold', '3,714.031198495643589346']
+        ],
+        note: 'The 10,000 principal and the fee of 5 are repaid. What remains is an ordinary loan, not a flash-loan balance.'
+      },
+      {
+        id: 'fixed',
+        title: 'Switch to an independent fixed price of 1',
+        rows: [
+          ['Valuation price', '1, unchanged by this buy'],
+          ['Borrow cap then', '2,250'],
+          ['Ordinary debt left', '0'],
+          ['Locked collateral', '0. The temporary deposit reverts too'],
+          ['Pool price at the end', '1'],
+          ['Simulator balance', '0'],
+          ['Shortfall at anchor price 1', '0'],
+          ['Quote gap', '0']
+        ],
+        note: 'The same request fails with BorrowLimit. Fund state reverts. The operator nonce increases by 1, and mock ETH falls by 0.000258899.'
+      }
+    ]
+---
+<figure class="scene">
+  <fieldset class="scene-set">
+    <legend>{zh ? '同一套参数，只换估值来源' : 'Same parameters, only the price source changes'}</legend>
+    <p class="scene-help">{zh
+      ? '两张卡片一直都在。代币是教学用的 tUSD 和 tCOL，不是美元，也不是 WETH。这场演示没有分叉公共链。固定价 1 只是不会被这笔交易改写的教学锚，不是真实预言机的安全证明。'
+      : 'Both cards stay visible. The tokens are teaching tokens, tUSD and tCOL. They are not dollars and not WETH. This demo did not fork a public chain. The fixed price of 1 is a teaching anchor this trade cannot move. It does not prove that a real oracle is safe.'}</p>
+    <div class="scene-grid scene-grid-2">
+      {cards.map((card, i) => (
+        <div class="scene-card">
+          <div class="scene-head">
+            <input type="radio" name="oracle-scene" id={`oracle-${card.id}`} checked={i === 0} aria-describedby={`oracle-${card.id}-note`} />
+            <label for={`oracle-${card.id}`}>{card.title}</label>
+          </div>
+          <dl class="scene-dl">
+            {card.rows.map(([k, v]) => (
+              <>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </>
+            ))}
+          </dl>
+          <p id={`oracle-${card.id}-note`}>{card.note}</p>
+        </div>
+      ))}
+    </div>
+  </fieldset>
+  <figcaption>
+    <strong>{zh ? '图 19-1｜' : 'Figure 19-1 · '}</strong>
+    {zh
+      ? '8,000、5,000 和 3,714.031198495643589346 不是同一个“已经亏掉的钱”。8,000 是还留着的普通债务；5,000 是按锚价 1 计算的抵押不足；3,714.031198495643589346 是假设能卖掉锁住抵押品时的报价缺口，这场演示没有执行那次出售。'
+      : '8,000, 5,000 and 3,714.031198495643589346 are not one realized loss. 8,000 is ordinary debt still on the books. 5,000 is the collateral shortfall at anchor price 1. 3,714.031198495643589346 is the quote gap if the locked collateral could be sold. This demo did not execute that sale.'}
+  </figcaption>
+</figure>

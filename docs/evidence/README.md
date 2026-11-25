@@ -16,3 +16,5 @@ SOURCES_DIR=/absolute/path/to/web3-sandbox npm run check:facts
 ```
 
 For the included excerpt alone, create no source corpus from the book itself: it is a citation, not a substitute for all original files. `check:facts` only checks literal address/hash provenance and suspected secrets; the historical conclusions still require reading the corresponding evidence. No experiments were rerun during this documentation review.
+
+Chapters 17–19 also have a public figure digest: [p2-public-digest.json](p2-public-digest.json). It keeps only the readings, environment boundaries and local hashes cited in the book. Raw receipts, scripts, traces and the toy-contract source are not in this repository. The P2A Anvil startup log contained the node’s built-in test keys and is not in the digest. Without the external Phase-0/1 archives, `check:facts` reports that historical provenance was skipped. That is not a pass for those earlier chapters.

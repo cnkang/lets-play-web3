@@ -5,12 +5,12 @@ import Nw from './Nw.astro'
 //   1. 步骤……
 //   结果：<Tx h="0x…" />
 //   </Lab>
-interface Props { title: string; goal?: string; network?: string; status?: 'done' | 'planned' }
-const { title, goal, network = 'Sepolia', status = 'done' } = Astro.props
+interface Props { title: string; goal?: string; network?: string; status?: 'done' | 'planned'; place?: string }
+const { title, goal, network = 'Sepolia', status = 'done', place } = Astro.props
 const zh = !Astro.url.pathname.includes('/en/')
 const tag = zh ? '实验' : 'Lab'
 const statusText = status === 'planned' ? (zh ? '计划中' : 'Planned') : (zh ? '已完成' : 'Done')
-const net = zh ? `${network} 测试网` : `${network} testnet`
+const net = place ?? (zh ? `${network} 测试网` : `${network} testnet`)
 ---
 <div class={`lab lab-${status}`} role="group" aria-label={`${tag}${zh ? '：' : ': '}${title}`}>
   <div class="lab-head">

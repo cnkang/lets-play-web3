@@ -70,9 +70,13 @@ for (const slug of [...slugs].sort()) {
   if (fm.zh && fm.en) {
     const snaps = Object.fromEntries(langs.map((l) => [l, snapshotBlock(join(dir, l, `${slug}.mdx`))]))
     if (snaps.zh !== snaps.en) errors.push(`"${slug}": "snapshot" differs (zh: ${snaps.zh || 'none'}, en: ${snaps.en || 'none'}); keep it identical in both languages`)
-    for (const k of ['part', 'order', 'status']) {
-      if ((fm.zh[k] ?? 'published') !== (fm.en[k] ?? 'published')) errors.push(`"${slug}": "${k}" differs (zh: ${fm.zh[k]}, en: ${fm.en[k]}); keep it identical in both languages`)
+    for (const k of ['part', 'order', 'status', 'lab']) {
+      if ((fm.zh[k] ?? (k === 'status' ? 'published' : '')) !== (fm.en[k] ?? (k === 'status' ? 'published' : ''))) errors.push(`"${slug}": "${k}" differs (zh: ${fm.zh[k]}, en: ${fm.en[k]}); keep it identical in both languages`)
     }
+    const lab = fm.zh.lab || ''
+    if (lab && !['sepolia', 'anvil-fork', 'anvil-local'].includes(lab)) errors.push(`"${slug}": lab must be sepolia, anvil-fork or anvil-local`)
+    if (lab === 'anvil-fork' && !snaps.zh) errors.push(`"${slug}": lab anvil-fork needs a snapshot block (the fork source, not a public broadcast)`)
+    if (lab === 'anvil-local' && snaps.zh) errors.push(`"${slug}": lab anvil-local must not set a chain snapshot`)
     const key = `${fm.zh.part}:${fm.zh.order}`
     if (orders.has(key)) warnings.push(`"${slug}" and "${orders.get(key)}" share part+order ${key}; sorted by slug`)
     orders.set(key, slug)

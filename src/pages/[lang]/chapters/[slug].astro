@@ -15,6 +15,11 @@ import Quiz from '../../../components/Quiz.astro'
 import Lab from '../../../components/Lab.astro'
 import Term from '../../../components/Term.astro'
 import Glossary from '../../../components/Glossary.astro'
+import LocalRef from '../../../components/LocalRef.astro'
+import HfBoard from '../../../components/HfBoard.astro'
+import LiqFlow from '../../../components/LiqFlow.astro'
+import FlashSteps from '../../../components/FlashSteps.astro'
+import OracleSplit from '../../../components/OracleSplit.astro'
 import { ui, langs, type Lang } from '../../../data/book'
 import { getBook, partOf } from '../../../data/chapters'
 import { href, absolute, htmlLang, authorFor, authorLd, PUBLISHED, SNAPSHOT_ISO, SNAPSHOT_BLOCK } from '../../../data/site'
@@ -37,8 +42,9 @@ const next = idx < book.pages.length - 1 ? book.pages[idx + 1] : undefined
 const part = partOf(book, slug)
 const isDraft = entry.data.status === 'draft'
 const modified = entry.data.updated ?? PUBLISHED
-const snap = entry.data.snapshot ?? { at: SNAPSHOT_ISO, block: SNAPSHOT_BLOCK }
-const snapLabel = `${snap.at.slice(0, 10)} ${snap.at.slice(11, 19)} (UTC+8)`
+const lab = entry.data.lab ?? 'sepolia'
+const snap = entry.data.snapshot ?? (lab === 'sepolia' ? { at: SNAPSHOT_ISO, block: SNAPSHOT_BLOCK } : null)
+const snapLabel = snap ? `${snap.at.slice(0, 10)} ${snap.at.slice(11, 19)} (UTC+8)` : ''
 const author = authorLd(lang)
 const byline = authorFor(lang)
 const title = entry.data.title
@@ -70,7 +76,7 @@ const jsonLd: object[] = [
     learningResourceType: lang === 'zh' ? '教材章节' : 'Textbook chapter',
     educationalLevel: lang === 'zh' ? '初学者' : 'Beginner',
     isAccessibleForFree: true,
-    temporalCoverage: snap.at,
+    temporalCoverage: snap?.at ?? modified,
     about: ['Ethereum Sepolia testnet', 'smart contracts', 'ERC-20'],
     isPartOf: { '@type': 'WebSite', name: t.siteTitle, url: absolute(`${lang}/`) }
   },
@@ -92,7 +98,7 @@ if (slug === 'appendix-c-glossary-quiz') {
   })
 }
 // Every MDX component is available in every chapter without an import.
-const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz, Lab, Term, Glossary }
+const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz, Lab, Term, Glossary, LocalRef, HfBoard, LiqFlow, FlashSteps, OracleSplit }
 ---
 <BaseLayout lang={lang} title={title} description={entry.data.description} path={path} jsonLd={jsonLd} ogType="article" currentSlug={slug} noindex={isDraft}
   navKey={slug === 'appendix-a-addresses-txs' ? 'appendix' : slug === 'appendix-c-glossary-quiz' ? 'glossary' : slug === '01-how-to-read' ? 'start' : undefined}>
@@ -108,7 +114,13 @@ const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz,
         <p class="meta-line">
           <span>{lang === 'zh' ? `整理：${byline}` : `By ${byline}`}</span>
           <span>{lang === 'zh' ? '页面发布：' : 'Published: '}<time class="nw" datetime={PUBLISHED}>{PUBLISHED}</time>{modified !== PUBLISHED && <> · <span class="nw">{lang === 'zh' ? '更新：' : 'Updated: '}<time datetime={modified}>{modified}</time></span></>}</span>
-          <span>{lang === 'zh' ? '链上快照：' : 'Chain snapshot: '}<time datetime={snap.at}>{snapLabel}</time>{lang === 'zh' ? <>，<span class="nw">区块 {snap.block}</span></> : <>, <span class="nw">block {snap.block}</span></>}</span>
+          {lab === 'sepolia' && snap && <span>{lang === 'zh' ? '链上快照：' : 'Chain snapshot: '}<time datetime={snap.at}>{snapLabel}</time>{lang === 'zh' ? <>，<span class="nw">区块 {snap.block}</span></> : <>, <span class="nw">block {snap.block}</span></>}</span>}
+          {lab === 'anvil-fork' && snap && <span>{lang === 'zh'
+            ? <>只读分叉来源：<time datetime={snap.at}>{snapLabel}</time>，Sepolia 区块 {snap.block}。写操作在本地 Anvil（chainId 31337）。这些哈希不能到 Etherscan 查询。</>
+            : <>Fork source: <time datetime={snap.at}>{snapLabel}</time>, Sepolia block {snap.block}. Writes ran on local Anvil (chainId 31337). Do not look up these hashes on Etherscan.</>}</span>}
+          {lab === 'anvil-local' && <span>{lang === 'zh'
+            ? <>本书历史快照仍是 <time datetime={SNAPSHOT_ISO}>{`${SNAPSHOT_ISO.slice(0, 10)} ${SNAPSHOT_ISO.slice(11, 19)} (UTC+8)`}</time>，Sepolia 区块 {SNAPSHOT_BLOCK}。本章是完全本地模型，chainId 31337，没有分叉该区块。记录日期 2026-11-25。</>
+            : <>The book’s historical snapshot remains <time datetime={SNAPSHOT_ISO}>{`${SNAPSHOT_ISO.slice(0, 10)} ${SNAPSHOT_ISO.slice(11, 19)} (UTC+8)`}</time>, Sepolia block {SNAPSHOT_BLOCK}. This chapter is a fully local model, chainId 31337, and does not fork that block. Recorded on 2026-11-25.</>}</span>}
         </p>
       </header>
       <div class="prose">

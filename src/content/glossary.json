@@ -138,7 +138,7 @@
     "en": { "term": "RPC", "def": "The interface programs use to talk to a node, usually a URL. Wallets and scripts use it to read data and send transactions. Think of it as the node's service counter." }
   },
   "oracle": {
-    "chapter": "04-nodes-trust",
+    "chapter": "19-oracle-safety",
     "zh": { "term": "预言机", "def": "把链外信息（价格、天气、物流状态等）送上链的服务。区块链自己无法知道现实世界发生了什么，所以送进来的数据可信不可信，是另一个问题。" },
     "en": { "term": "oracle", "def": "A service that brings off-chain facts (prices, weather, delivery status…) onto the chain. A blockchain cannot see the real world by itself, so whether that data is true is a separate question." }
   },
@@ -555,5 +555,40 @@
     "chapter": "16-defi-labs",
     "zh": { "term": "NFT（不可替代代币）", "def": "每一个都独一无二的代币。Uniswap v3 用一个 NFT 代表一个流动性仓位，因为每个仓位的区间都不一样；撤出后可以把它销毁（burn）。" },
     "en": { "term": "NFT (non-fungible token)", "def": "A token where every item is unique. Uniswap v3 uses one NFT to represent one liquidity position, because every position has its own range; after closing it you can burn it." }
+  },
+  "health-factor": {
+    "chapter": "17-lending-liquidation",
+    "zh": { "term": "健康因子（HF）", "def": "借贷仓位的覆盖程度：抵押品价值乘以清算阈值，再除以债务。大于 1 时别人不能来清算；要小于 1 才可以。它不是价格本身，价格下跌只是会让这个比值变差。" },
+    "en": { "term": "health factor (HF)", "def": "How well a loan is covered: collateral value times the liquidation threshold, divided by the debt. Above 1, nobody may liquidate it. It must fall below 1 before they can. The price itself is not the switch. A lower price only makes this ratio worse." }
+  },
+  "ltv": {
+    "chapter": "17-lending-liquidation",
+    "zh": { "term": "贷款价值比（LTV）", "def": "开仓或继续借款时，债务最多能占到抵押品价值的多少。它限制的是还能借多少，不是跌破以后就自动清算的那条线。" },
+    "en": { "term": "loan-to-value (LTV)", "def": "The most debt you may hold, as a share of collateral value, when you open or increase a loan. It limits new borrowing. It is not the line that starts a liquidation." }
+  },
+  "liquidation-threshold": {
+    "chapter": "17-lending-liquidation",
+    "zh": { "term": "清算阈值", "def": "计算健康因子时，抵押品价值要打的那个折。它通常高于贷款价值比，中间留一层缓冲。跌破清算线看的是这个阈值，不是贷款价值比。" },
+    "en": { "term": "liquidation threshold", "def": "The discount applied to collateral value when a protocol computes the health factor. It is usually higher than the loan-to-value ratio, which leaves a buffer. Liquidation uses this threshold, not the borrowing limit." }
+  },
+  "liquidation": {
+    "chapter": "17-lending-liquidation",
+    "zh": { "term": "清算", "def": "仓位已经不健康时，由别人主动发一笔交易，替借款人还掉一部分债务，并按规则取走一部分抵押品。价格下跌本身不会先把抵押品扣走。" },
+    "en": { "term": "liquidation", "def": "When a loan is unhealthy, someone else sends a transaction, repays part of the debt, and receives some of the collateral under the protocol's rules. A price drop does not take the collateral by itself." }
+  },
+  "close-factor": {
+    "chapter": "17-lending-liquidation",
+    "zh": { "term": "清算比例上限", "def": "一次清算最多能还掉多少债务的上限，不是每次都必须还满的定额。不同协议版本的分界不一样，要看当时部署的规则。" },
+    "en": { "term": "close factor", "def": "The maximum share of a debt that one liquidation may repay. It is a cap, not an amount the protocol always takes. The cutoff depends on the deployed version." }
+  },
+  "flash-loan": {
+    "chapter": "18-flash-loans",
+    "zh": { "term": "闪电贷", "def": "只存在于同一笔交易里的借款：先拿到资金，必须在这笔交易返回前还上本金和手续费。还不上，这笔交易里的资金变动会撤销。它不要求传统抵押品，但不是免费，也不是没有风险。" },
+    "en": { "term": "flash loan", "def": "A loan that exists only inside one transaction. You receive the funds and must repay the principal and fee before that transaction ends. If you cannot, the transaction undoes its fund movements. It does not ask for ordinary collateral first. It is not free, and it is not risk-free." }
+  },
+  "twap": {
+    "chapter": "19-oracle-safety",
+    "zh": { "term": "时间加权平均价（TWAP）", "def": "把一段时间里的价格做平均，而不是只看最后一笔成交。它比单笔现价更难在同一笔交易里被一下子推偏，但如果有人在很多区块里持续推一个很薄的市场，平均价仍然可能被带偏。" },
+    "en": { "term": "time-weighted average price (TWAP)", "def": "An average of prices over a period, not the latest trade alone. One transaction has a harder time moving it than a spot price. A thin market can still be pushed over many blocks, so an average is not manipulation-proof." }
   }
 }

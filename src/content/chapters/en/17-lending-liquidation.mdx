@@ -1,0 +1,159 @@
+---
+title: "Lending and liquidation: a price drop does not take collateral"
+description: "A pawn-shop picture of the health factor. At one price, repaying early and repaying nothing do not end the same way. The figures come from a local Anvil fork of Sepolia block 12165973, not from a new public transaction."
+navTitle: "17 · Lending and liquidation"
+part: p2-credit
+order: 170
+status: published
+updated: "2026-11-25"
+lab: anvil-fork
+snapshot:
+  at: "2026-11-19T11:58:12+08:00"
+  block: 12165973
+---
+
+<p class="lead">Post one test token as collateral and borrow another. If the price falls, does the protocol take the collateral by itself? A saved local run says no. Collateral moves only when someone sends a <Term id="liquidation">liquidation</Term> transaction.</p>
+
+<Callout type="warn" title="Which kind of evidence this is">
+
+The writes in this chapter ran on the author’s local Anvil node, at loopback `127.0.0.1:8546`, chainId **31337**. The node copied Sepolia block **12165973** (2026-11-19 11:58:12, Singapore time) and then changed only that copy. The run was **2026-11-20 10:26:53–10:26:58** Singapore time.
+
+These transactions are not new Sepolia transactions. Do not open the local hashes on Etherscan. A new run draws new temporary accounts, so the hashes change. With the same block and the same order, the amounts stay stable. The next chapter forks the same block, but its debt and health factor differ. Do not copy numbers from one chapter into the other.
+
+</Callout>
+
+## Start with an everyday picture
+
+Think of a pawn shop. You leave a watch and borrow cash. The watch’s quoted price falls. The shop’s coverage ratio gets worse. The watch is still in the cupboard.
+
+The price quote does not lift the watch out. Someone has to follow the rule: repay part of the debt and take part of the collateral. Until that step, the watch is still the one you pledged.
+
+On chain, that coverage ratio is the <Term id="health-factor">health factor</Term>. In plain words:
+
+**collateral value × liquidation threshold ÷ debt**
+
+Above 1, nobody may liquidate the position. The ratio must be **below** 1. A value of exactly 1 is still not enough. A lower price only shrinks the top of the fraction. It does not reduce the token balance.
+
+## Which market this was
+
+The contracts were the real Aave V3 Sepolia contracts at that historical block. The writes stayed on the local copy. `POOL_REVISION = 1`. This deployment is **V3.0**, not the later V3.3.
+
+The collateral is Aave’s own test WETH, <Addr a="0xC558DBdd856501FCd9aaF1E62eae57A9F0629a3c" short />. The borrowed token is Aave test USDC, <Addr a="0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8" short />. These are not the Uniswap WETH and Circle USDC from Chapter 16. The names match. The addresses do not. Chapter 16’s USDC cannot repay this market.
+
+At that block, WETH can be collateral and cannot be borrowed. Its <Term id="ltv">loan-to-value ratio</Term> is 80%. Its <Term id="liquidation-threshold">liquidation threshold</Term> is 82.5%. The USDC oracle price is 1. The original WETH price source stores a fixed answer, 4,000.00000000. It has no function that changes the price. It is a test constant, not a live quote anyone can dial.
+
+In the local run, an operator deployed a stand-in price source. A local impersonation of the pool admin pointed WETH at that source. The price was still 4,000, and USDC was still 1. Only then did the run lower the WETH quote. The script did not write Aave’s collateral or debt storage. An ordinary user does not have that admin role on the public network.
+
+## Open the position: 1 WETH, borrow 2,500
+
+The faucet cannot mint this WETH. A simulated mint reverts with `not mintable`. The account wraps 1 ETH with `deposit`, approves the pool for exactly that amount, supplies it, and borrows 2,500 test USDC.
+
+One 12-second local block later, the debt is not a clean 2,500. The reading is **2,500.000610**. The health factor is **1.319999677920078588**. Collateral is still **1** WETH.
+
+This test pool is heavily used. The variable borrow rate, in ray units, is `639970093802817705403628356`, about **64%** a year. Each block adds a visible crumb of interest. A napkin formula that ignores interest misses the protocol by a little. That interest is the main gap. It is not a hidden penalty.
+
+<HfBoard />
+
+## Loan-to-value is not the liquidation switch
+
+The 80% ratio limits new borrowing. One WETH at a value of 4,000 gives a borrowing room of 3,200. The lab borrowed 2,500, so room remained.
+
+The 82.5% ratio enters the health factor. One times 4,000 times 0.825, divided by 2,500.000610, gives the 1.32 reading above. The 2.5 point gap is a buffer. It stops a loan that was just filled from becoming liquidatable after a tiny price move.
+
+If the position already has debt, a withdrawal must still leave the position acceptable. Do not treat the loan-to-value ratio as a general withdrawal line.
+
+## At 2,800 the watch is still in the cupboard
+
+After the local WETH quote becomes 2,800, and before anyone liquidates:
+
+- The aWETH balance is still **1.000000000000000000**.
+- The debt is **2,500.001218**. One more block added only interest.
+- The health factor is **0.923999549827419324**.
+
+The valuation moved from 4,000 to 2,800. The balance did not lose one wei. Collateral moves in the next step, when someone calls liquidation.
+
+## After that call, assets move
+
+<LiqFlow />
+
+At the moment of liquidation, the repaid debt is **2,500.002436** test USDC. Interest grew again after the earlier reading. The health factor is at or below 0.95, so this deployment allows one call to cover **100%**. The request said “maximum”. The protocol cut it to the full debt.
+
+The borrower loses **0.9375009135** WETH. Of that, **0.933036623435714286** goes to the liquidator. **0.004464290064285714** goes to the protocol treasury as a deposit receipt. At the 2,800 oracle mark, the 5% bonus is about 112.50 for the liquidator and about 12.50 for the protocol. That mark is a test-token valuation, not dollar income. The borrower still holds the 2,500 test USDC already borrowed, plus about 0.0624990865 WETH of deposit receipt.
+
+The same transaction also shows a mint to the treasury. That mint records interest the treasury had **already** accrued. It is not an extra bonus. The treasury’s balance rises by exactly the protocol fee.
+
+## Repay 750, and the same price is safe
+
+Restore the same open snapshot. Repay **750** test USDC. The debt becomes **1,750.001826**. At a price of 4,000 the health factor is **1.885712318108175505**. Then set the same price, 2,800.
+
+The debt is now **1,750.002252**. The health factor is **1.319998301350757347**, still above 1. The liquidation call reverts with error **45**. The health factor is not below the threshold. Collateral is still 1 WETH.
+
+Why is this so close to the opening 1.32? Repaying about 30% of the debt offsets the 30% drop from 4,000 to 2,800. The price matches. The debt does not. The ratio changes.
+
+The later full repayment transfers **1,750.004383**. The two repayments exceed the original 2,500 principal by **0.004383** test USDC. That is the interest across these blocks. The account was short by that crumb, so it minted 1 test USDC from the faucet. After closing, it withdraws exactly 1 WETH and the allowances are zero. With no debt, the protocol reports a huge sentinel health factor, not zero.
+
+## Calculate the boundary with the right percentage
+
+Set the health factor to 1:
+
+**boundary price ≈ debt ÷ (collateral amount × 0.825)**
+
+With the opening debt 2,500.000610, that price is about **3,030.30376970**. A read-only probe on the same block finds the edge. A price at or below **3,030.30376969** can be liquidated. At **3,030.30376970** the health factor is exactly 1, so it **cannot** be liquidated. The probe matches the on-copy reading.
+
+Using the 80% loan-to-value ratio instead gives 3,125. That is the price where you can no longer borrow as much. It is not the liquidation price.
+
+Interest slowly lifts the boundary. About every 12 seconds, a 2,500 debt grows by about 0.000608, and the boundary moves up by about 0.00074. A principal-only figure of 3,030.30303030 sits about 0.00074 below the protocol’s opening boundary.
+
+After the 750 repayment, the highest liquidatable price is **2,121.21433453**. The price 2,800 is still far above that line.
+
+## 50% and 100% are caps, and this is V3.0
+
+The <Term id="close-factor">close factor</Term> is a maximum, not an amount the protocol always takes. On this V3.0 deployment:
+
+- At a health factor of 1 or more, liquidation is refused.
+- Above 0.95 and below 1, one call may cover at most 50%.
+- At or below 0.95, one call may cover at most 100%.
+
+This deployment does **not** have the later V3.3 rule that lets a small debt be closed in full. The 100% cap here exists only because the health factor is at or below 0.95. The debt size of 2,500 is not the reason.
+
+A control uses the same snapshot and a price of **2,950**. The health factor is **0.973499525711031074**, between 0.95 and 1. A maximum request repays only **1,250.001218**. The borrower loses **0.444915687762711864** WETH. Afterwards the health factor is **1.080748104576243868**. The remaining debt is 2 minimal units under a perfect half. That is index rounding, not an extra fine.
+
+## Do not mix these numbers with the next chapter
+
+The next chapter also posts 1 WETH, asks to borrow 2,500, and then sets the quote to 2,800. It is a different local position. Deployment and funding happened first, so more blocks passed. Its opening debt is **2,499.999999**, one minimal unit under 2,500. After the drop to 2,800, and before liquidation, its health factor is **0.923999775283254651**. The seized collateral differs too. Use Chapter 18’s readings in Chapter 18.
+
+<Callout type="danger" title="These marks are not income">
+
+The “about 125 extra” at a mark of 2,800 is an oracle valuation of test tokens. Test tokens have no market value. This book did not broadcast to a public chain and did not use a reader’s wallet. Do not treat a local hash as a Sepolia transaction. Do not read the local admin price-source swap as “anyone can change Aave’s price”.
+
+</Callout>
+
+## Hashes from this saved run
+
+A rerun draws new temporary accounts. These hashes identify one saved run. The amounts above are the readings to cite.
+
+<details>
+<summary>Local receipts (chainId 31337, do not open Etherscan)</summary>
+
+- Supply 1 WETH: <LocalRef value="0xf3d1b8e0e5da807ee23f3d4ed851973c5d02fafa99898f66933f006d30750639" env="fork" short />
+- Borrow 2,500: <LocalRef value="0xa404c8ef6a8d12d476e37359312e2d8e6a84804f77da1b77b6fb88e6b2dd1149" env="fork" short />
+- Full liquidation at 2,800: <LocalRef value="0x73f963d97d0fe20b67c859a76f0cd4cb766d08c7ce687a38a211bbd242e92cca" env="fork" short />
+- 50% liquidation at 2,950: <LocalRef value="0xd5ac820103b410a0347058e3951c5badd291dbc89eb3e336a7de57dc25487aeb" env="fork" short />
+- Repay 750 first: <LocalRef value="0x06c7e14f0df2af520e618b656cb58ba3850177862a1453e28dc72b0d51b7c1b5" env="fork" short />
+
+The public hash of the fork-source block is `0x38d7b288efbc2cf0d80ebbc2b897329be18fa5c7aa4f3e1aaf5830eeb783d526`. That hash is Sepolia block 12165973 itself. You can open that block number in an explorer. The five local transactions are not inside it.
+
+The historical P2A launcher did not disable Anvil’s built-in test accounts, so a node log printed Anvil’s own test keys. Those were not a reader’s wallet. The log is not published. If you repeat the idea on your own computer, start Anvil with `--accounts 0 --silent`, and do not commit the node log. This book does not ship that lab’s scripts.
+
+</details>
+
+## In short
+
+- The health factor is collateral value times the liquidation threshold, divided by debt. The loan-to-value ratio only limits new borrowing.
+- A price drop changes the valuation. Collateral moves when someone calls liquidation.
+- At the same price, 2,800, the unpaid position can be closed in one call. After repaying 750, error 45 refuses the call.
+- The boundary uses 82.5% and is about 3,030.30, not the 3,125 you get from 80%. A health factor of exactly 1 is not liquidatable.
+- This deployment is V3.0. The caps on either side of 0.95 are 50% and 100%. There is no V3.3 small-debt rule.
+- The 64% test rate adds debt every block. Cite Chapter 18’s readings only in Chapter 18.
+
+The next chapter asks a different question. Can one transaction borrow, liquidate, and repay before it ends? That is still not free, and it does not promise a profit. The lending questions in Appendix C are the self-check.

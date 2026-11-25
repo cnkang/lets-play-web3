@@ -39,8 +39,16 @@ const chapterSchema = z.object({
   /** Optional date of the last significant edit to this translation. */
   updated: z.iso.date().optional(),
   /**
+   * Where this chapter's recorded actions ran.
+   * sepolia — public Sepolia broadcasts (the default for earlier chapters).
+   * anvil-fork — local Anvil (chainId 31337) writing on a read-only Sepolia fork. `snapshot` is the fork source block, not a new public transaction.
+   * anvil-local — a fully local teaching model with no public-chain fork and no `snapshot`.
+   */
+  lab: z.enum(['sepolia', 'anvil-fork', 'anvil-local']).optional(),
+  /**
    * Optional chapter-specific chain snapshot (e.g. Chapter 16, Phase-1). Defaults to the
    * book snapshot in src/data/site.ts. `at` is ISO 8601 with a +08:00 offset.
+   * For `lab: anvil-fork`, this is the fork source block. Do not set it on `anvil-local`.
    */
   snapshot: z.object({ at: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+08:00$/), block: z.number().int() }).optional()
 })
