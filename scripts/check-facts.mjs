@@ -97,7 +97,7 @@ else {
     }
   }
   console.log(`p2 digest: ${checked} hex values in chapters 17–19 and ${claims} figure strings checked against docs/evidence/p2-public-digest.json`)
-  console.log('p2 digest: this checks the committed fixture. It does not re-read raw receipts, and it is not a Phase-0/1 provenance pass.')
+  console.log('p2 digest: this checks the committed fixture. Bundled receipt excerpts are checked by check:evidence. It is not a Phase-0/1 provenance pass.')
 }
 
 // ---- 2. secrets

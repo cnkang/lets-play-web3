@@ -6,7 +6,7 @@ part: p2-credit
 order: 190
 status: published
 updated: "2026-11-25"
-unreleased: true
+released: "2026-11-25"
 experiment: "2026-11-25"
 lab: anvil-local
 ---
@@ -16,6 +16,8 @@ lab: anvil-local
 <Callout type="warn" title="这场演示没有分叉，也不是 Aave">
 
 2026-11-25 11:31 左右的这场记录，用的是一台全新的本地 Anvil。接口是 `127.0.0.1:18549`，chainId **31337**，从创世块开始。没有公共 RPC，没有加载 Sepolia，没有调用真实的 Aave 或 Uniswap。
+
+实验记录和仓库公开是同一天里的两件事。文字在当天 14:24（新加坡时间）随 pull request 6 进入公开 Git 仓库。页面发布日期只写 **2026-11-25** 这一天，不是网站部署完成的时刻。
 
 代币叫 tUSD 和 tCOL。它们不是美元，也不是 WETH。价格单位是 tUSD/tCOL。下面的「不足」和「缺口」都是教学模型里的读数，不是已经发生的美元亏损，也不是某家真实协议被攻破的证据。
 
@@ -91,7 +93,9 @@ lab: anvil-local
 - 脆弱分支，留下 8,000 普通债务：<LocalRef value="0xc00659ac6179fcb69292949ea0c90b16a7d45890ae8520405c85da8fd8cf4438" env="local" short />
 - 对照分支，`BorrowLimit` 回退：<LocalRef value="0x0983452c237884324c860ac1ee1b5563bed2718cb6136fc16f5225cccbcddcc6" env="local" short />
 
-重跑会更换临时地址和本地哈希。经济读数在同一套规则下应保持这些整数。本书不附带玩具合约的源码。那份源码只在封闭的 chainId 31337 里作为证据存在，不是对真实协议的操作说明。
+重跑会更换临时地址和本地哈希。经济读数在同一套规则下应保持这些整数。
+
+已保存的回执在 [oracle-readings.json](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/oracle-readings.json)。玩具合约和本地启动步骤在 [labs/local-oracle](https://github.com/cnkang/lets-play-web3/blob/main/labs/local-oracle/README.zh-CN.md)。依赖装好以后，这场实验不需要网络，也不需要分叉。它只在 chainId 31337 的回环接口上写账。新跑出来的哈希不是上面这两笔。
 
 </details>
 

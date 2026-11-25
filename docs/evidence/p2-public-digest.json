@@ -1,15 +1,17 @@
 {
   "title": "Phase-2 public figure digest",
-  "purpose": "Minimal figures cited by chapters 17–19. Raw receipts, scripts and toy-contract source are not in this repository.",
+  "purpose": "Figures cited by chapters 17–19. Saved receipt excerpts live in docs/evidence/p2/. The no-fork oracle toy lives in labs/local-oracle. The raw archive, traces, Anvil logs and the fork-lab runners are not in this repository.",
   "verifiedOn": "2026-11-25",
   "verification": {
     "archiveSha256": "d5e801918f6333ecd4c80d192af6939d0601bdcbeea581b406ecc2897ebaf6e3",
     "manifestFilesChecked": 215,
     "manifestMismatches": 0,
-    "method": "Chapter figures were read back from run.json, reconcile.json, reconciliation.json and assertions.json after the manifest hashes matched. This file does not re-run those labs.",
+    "method": "Chapter figures were read back from run.json, reconcile.json, reconciliation.json and assertions.json. The committed excerpts in docs/evidence/p2/ keep the fields needed to trace those figures. This digest does not re-run the labs.",
     "notIncluded": [
-      "The evidence zip and its scripts, traces and verified Solidity trees",
+      "The evidence zip, raw traces, full run.json files and verified Aave source trees",
+      "An Anvil state dump. The sanitized archive did not contain one",
       "P2A anvil.log, which contained Anvil's built-in test mnemonic and keys and was excluded from the archive",
+      "P2A and P2B replay scripts",
       "Any reader wallet, user key or API credential"
     ],
     "limits": [

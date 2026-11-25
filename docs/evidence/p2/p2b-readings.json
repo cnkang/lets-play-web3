@@ -1,0 +1,387 @@
+{
+  "kind": "saved-historical-receipts",
+  "restoresChainState": false,
+  "anvilStateDump": "absent",
+  "chainId": 31337,
+  "loopback": "127.0.0.1:8547",
+  "forkBlock": 12165973,
+  "premiumBps": "5",
+  "premiumProtocolBps": "4",
+  "note": "Subset of one saved local fork run. Signature fields (r, s, v) and raw input are omitted. These hashes are not on Sepolia. A new run creates new hashes. This file is not an Anvil state dump.",
+  "rawTransactionCount": 130,
+  "open": {
+    "debt": "2499999999",
+    "aWETH": "1000000000000000000",
+    "healthFactor": "1320000000528000000"
+  },
+  "beforeRealV2": {
+    "price": "280000000000",
+    "debt": "2500000608",
+    "healthFactor": "923999775283254651",
+    "aWETH": "1000000000000000000"
+  },
+  "e1": {
+    "premium": "500000",
+    "receiverUsdcBefore": "500000"
+  },
+  "rounding": [
+    {
+      "kind": "OBSERVED_SUCCESS",
+      "grossSeizedWei": "937500456375000000",
+      "actualAWETHlossWei": "937500456375000001",
+      "aWETHRoundingWei": "1"
+    },
+    {
+      "kind": "OBSERVED_SUCCESS",
+      "grossSeizedWei": "937500456375000000",
+      "actualAWETHlossWei": "937500456375000001",
+      "aWETHRoundingWei": "1"
+    }
+  ],
+  "transactions": [
+    {
+      "label": "E1 flashLoanSimple 1000 USDC repaid",
+      "evidence": "LOCAL ANVIL chainId 31337; NOT Sepolia transaction",
+      "hash": "0xa0db889ce08a99745b93b3904f6da2c2a48e12140bc805df7b2ee4670ca7e414",
+      "status": "success",
+      "blockNumber": "12165978",
+      "gasUsed": "324175",
+      "effectiveGasPrice": "2000000000",
+      "gasCostWei": "648350000000000",
+      "logs": 8,
+      "chainId": 31337,
+      "nonce": 2,
+      "events": [
+        {
+          "event": "Callback",
+          "args": {
+            "ordinal": "1",
+            "amount": "1000000000",
+            "premium": "500000",
+            "entryBalance": "1000500000"
+          }
+        },
+        {
+          "event": "Settled",
+          "args": {
+            "amount": "1000000000",
+            "premium": "500000",
+            "usdcBeforePull": "1000500000",
+            "wethLeft": "0",
+            "liquidationSpent": "0",
+            "collateralReceived": "0",
+            "swapOut": "0"
+          }
+        },
+        {
+          "event": "FlashLoan",
+          "args": {
+            "target": "0x05a6a797D64b653cdc251F3a8c8381c446f81DfC",
+            "asset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+            "referralCode": 0,
+            "initiator": "0x05a6a797D64b653cdc251F3a8c8381c446f81DfC",
+            "amount": "1000000000",
+            "interestRateMode": 0,
+            "premium": "500000"
+          }
+        }
+      ]
+    },
+    {
+      "label": "E2 no fee funds EXPECTED REVERT",
+      "evidence": "LOCAL ANVIL chainId 31337; NOT Sepolia transaction",
+      "hash": "0x444b6a852d89e7774ea5414a77298fb515ecc1423771c0228abce44b08d0ae9f",
+      "status": "reverted",
+      "blockNumber": "12165977",
+      "gasUsed": "236903",
+      "effectiveGasPrice": "2000000000",
+      "gasCostWei": "473806000000000",
+      "logs": 0,
+      "chainId": 31337,
+      "nonce": 1,
+      "events": []
+    },
+    {
+      "label": "E3-REAL-UNISWAP-V2-2800",
+      "evidence": "LOCAL ANVIL chainId 31337; NOT Sepolia transaction",
+      "hash": "0x2c23365730935cf83b164494eaef65978ad0168b725eb000a28d7b77167e46f2",
+      "status": "success",
+      "blockNumber": "12166089",
+      "gasUsed": "886017",
+      "effectiveGasPrice": "2000000000",
+      "gasCostWei": "1772034000000000",
+      "logs": 30,
+      "chainId": 31337,
+      "nonce": 3,
+      "events": [
+        {
+          "event": "Callback",
+          "args": {
+            "ordinal": "1",
+            "amount": "2501000000",
+            "premium": "1250500",
+            "entryBalance": "2501000000"
+          }
+        },
+        {
+          "event": "LiquidationCall",
+          "args": {
+            "collateralAsset": "0xC558DBdd856501FCd9aaF1E62eae57A9F0629a3c",
+            "debtAsset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+            "user": "0xAf9fFFEd00AF8332A57Caf3178112cB07Ff4b9fe",
+            "debtToCover": "2500001217",
+            "liquidatedCollateralAmount": "933036168487500000",
+            "liquidator": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "receiveAToken": false
+          }
+        },
+        {
+          "event": "Settled",
+          "args": {
+            "amount": "2501000000",
+            "premium": "1250500",
+            "usdcBeforePull": "2502250500",
+            "wethLeft": "932834188037709956",
+            "liquidationSpent": "2500001217",
+            "collateralReceived": "933036168487500000",
+            "swapOut": "2501251717"
+          }
+        },
+        {
+          "event": "FlashLoan",
+          "args": {
+            "target": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "asset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+            "referralCode": 0,
+            "initiator": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "amount": "2501000000",
+            "interestRateMode": 0,
+            "premium": "1250500"
+          }
+        }
+      ]
+    },
+    {
+      "label": "E3-2800-full-profitable",
+      "evidence": "LOCAL ANVIL chainId 31337; NOT Sepolia transaction",
+      "hash": "0x480526575d393ae820396acaa2b958faa0311948ce152614368514d87549ca7f",
+      "status": "success",
+      "blockNumber": "12166089",
+      "gasUsed": "848609",
+      "effectiveGasPrice": "2000000000",
+      "gasCostWei": "1697218000000000",
+      "logs": 28,
+      "chainId": 31337,
+      "nonce": 3,
+      "events": [
+        {
+          "event": "Callback",
+          "args": {
+            "ordinal": "1",
+            "amount": "2501000000",
+            "premium": "1250500",
+            "entryBalance": "2501000000"
+          }
+        },
+        {
+          "event": "LiquidationCall",
+          "args": {
+            "collateralAsset": "0xC558DBdd856501FCd9aaF1E62eae57A9F0629a3c",
+            "debtAsset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+            "user": "0xAf9fFFEd00AF8332A57Caf3178112cB07Ff4b9fe",
+            "debtToCover": "2500001217",
+            "liquidatedCollateralAmount": "933036168487500000",
+            "liquidator": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "receiveAToken": false
+          }
+        },
+        {
+          "event": "Settled",
+          "args": {
+            "amount": "2501000000",
+            "premium": "1250500",
+            "usdcBeforePull": "2581656318",
+            "wethLeft": "0",
+            "liquidationSpent": "2500001217",
+            "collateralReceived": "933036168487500000",
+            "swapOut": "2580657535"
+          }
+        },
+        {
+          "event": "FlashLoan",
+          "args": {
+            "target": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "asset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+            "referralCode": 0,
+            "initiator": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "amount": "2501000000",
+            "interestRateMode": 0,
+            "premium": "1250500"
+          }
+        }
+      ]
+    },
+    {
+      "label": "E4-minOut-protection",
+      "evidence": "LOCAL ANVIL chainId 31337; NOT Sepolia transaction",
+      "hash": "0x0f2b185a3de3fa4bec34815588c820d2ac05e7e07547ca1693e5fcfe592ec5a5",
+      "status": "reverted",
+      "blockNumber": "12166089",
+      "gasUsed": "586250",
+      "effectiveGasPrice": "2000000000",
+      "gasCostWei": "1172500000000000",
+      "logs": 0,
+      "chainId": 31337,
+      "nonce": 3,
+      "events": []
+    },
+    {
+      "label": "E4-2950-50pct",
+      "evidence": "LOCAL ANVIL chainId 31337; NOT Sepolia transaction",
+      "hash": "0xaea94a06089d712f06a1086df59c0200c484994dde2f0c24926afdbfb813acc6",
+      "status": "success",
+      "blockNumber": "12166089",
+      "gasUsed": "838094",
+      "effectiveGasPrice": "2000000000",
+      "gasCostWei": "1676188000000000",
+      "logs": 28,
+      "chainId": 31337,
+      "nonce": 3,
+      "events": [
+        {
+          "event": "Callback",
+          "args": {
+            "ordinal": "1",
+            "amount": "1251000000",
+            "premium": "625500",
+            "entryBalance": "1251000000"
+          }
+        },
+        {
+          "event": "LiquidationCall",
+          "args": {
+            "collateralAsset": "0xC558DBdd856501FCd9aaF1E62eae57A9F0629a3c",
+            "debtAsset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+            "user": "0xAf9fFFEd00AF8332A57Caf3178112cB07Ff4b9fe",
+            "debtToCover": "1250000609",
+            "liquidatedCollateralAmount": "442796825900000000",
+            "liquidator": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "receiveAToken": false
+          }
+        },
+        {
+          "event": "Settled",
+          "args": {
+            "amount": "1251000000",
+            "premium": "625500",
+            "usdcBeforePull": "1297607161",
+            "wethLeft": "0",
+            "liquidationSpent": "1250000609",
+            "collateralReceived": "442796825900000000",
+            "swapOut": "1296607770"
+          }
+        },
+        {
+          "event": "FlashLoan",
+          "args": {
+            "target": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "asset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+            "referralCode": 0,
+            "initiator": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "amount": "1251000000",
+            "interestRateMode": 0,
+            "premium": "625500"
+          }
+        }
+      ]
+    },
+    {
+      "label": "E4-2800-voluntary-partial",
+      "evidence": "LOCAL ANVIL chainId 31337; NOT Sepolia transaction",
+      "hash": "0x0414b0b1d95c5574a49b7feca4ce9f02e98924450ea510103707cd56634ac77d",
+      "status": "success",
+      "blockNumber": "12166089",
+      "gasUsed": "837787",
+      "effectiveGasPrice": "2000000000",
+      "gasCostWei": "1675574000000000",
+      "logs": 28,
+      "chainId": 31337,
+      "nonce": 3,
+      "events": [
+        {
+          "event": "Callback",
+          "args": {
+            "ordinal": "1",
+            "amount": "1250000000",
+            "premium": "625000",
+            "entryBalance": "1250000000"
+          }
+        },
+        {
+          "event": "LiquidationCall",
+          "args": {
+            "collateralAsset": "0xC558DBdd856501FCd9aaF1E62eae57A9F0629a3c",
+            "debtAsset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+            "user": "0xAf9fFFEd00AF8332A57Caf3178112cB07Ff4b9fe",
+            "debtToCover": "1250000000",
+            "liquidatedCollateralAmount": "466517857142857142",
+            "liquidator": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "receiveAToken": false
+          }
+        },
+        {
+          "event": "Settled",
+          "args": {
+            "amount": "1250000000",
+            "premium": "625000",
+            "usdcBeforePull": "1296301912",
+            "wethLeft": "0",
+            "liquidationSpent": "1250000000",
+            "collateralReceived": "466517857142857142",
+            "swapOut": "1296301912"
+          }
+        },
+        {
+          "event": "FlashLoan",
+          "args": {
+            "target": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "asset": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+            "referralCode": 0,
+            "initiator": "0x9D0049ADfBdad15129c996E8811EBc1dc7374677",
+            "amount": "1250000000",
+            "interestRateMode": 0,
+            "premium": "625000"
+          }
+        }
+      ]
+    },
+    {
+      "label": "E4-shallow-unprofitable",
+      "evidence": "LOCAL ANVIL chainId 31337; NOT Sepolia transaction",
+      "hash": "0x822261fee27108b13c4e876eb6bb238d9e294804710d23799248d96ccf8e0f01",
+      "status": "reverted",
+      "blockNumber": "12166089",
+      "gasUsed": "646871",
+      "effectiveGasPrice": "2000000000",
+      "gasCostWei": "1293742000000000",
+      "logs": 0,
+      "chainId": 31337,
+      "nonce": 3,
+      "events": []
+    },
+    {
+      "label": "E4-badDEX-unprofitable",
+      "evidence": "LOCAL ANVIL chainId 31337; NOT Sepolia transaction",
+      "hash": "0x9d4f3b09f9a63ddb5e0d47a53d4e14154189503df42b0f7b33fdf32722d4bae0",
+      "status": "reverted",
+      "blockNumber": "12166089",
+      "gasUsed": "646871",
+      "effectiveGasPrice": "2000000000",
+      "gasCostWei": "1293742000000000",
+      "logs": 0,
+      "chainId": 31337,
+      "nonce": 3,
+      "events": []
+    }
+  ]
+}

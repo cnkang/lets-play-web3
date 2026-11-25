@@ -11,6 +11,7 @@
     "diagrams": "python3 scripts/build_diagrams.py",
     "check:facts": "node scripts/check-facts.mjs",
     "check:evidence": "node scripts/check-p2-evidence.mjs",
+    "check:guards": "node scripts/check-oracle-guard.mjs",
     "appendix": "python3 scripts/gen_appendix.py",
     "check:content": "node scripts/check-content.mjs",
     "check:build": "node scripts/check-build.mjs",

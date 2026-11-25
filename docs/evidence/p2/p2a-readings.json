@@ -1,0 +1,317 @@
+{
+  "kind": "saved-historical-receipts",
+  "restoresChainState": false,
+  "anvilStateDump": "absent",
+  "chainId": 31337,
+  "loopback": "127.0.0.1:8546",
+  "forkBlock": 12165973,
+  "note": "Subset of one saved local fork run. These hashes are not on Sepolia. A new run creates new hashes. This file is not an Anvil state dump and cannot restore blocks, receipts or traces.",
+  "rawTransactionCount": 26,
+  "states": {
+    "OPEN": {
+      "healthFactor": "1319999677920078588",
+      "vUSDC": "2500000610",
+      "aWETH": "1000000000000000000",
+      "ltv": "8000",
+      "currentLiquidationThreshold": "8250",
+      "oracleWETH": "400000000000"
+    },
+    "A_AFTER_DROP_BEFORE_LIQ": {
+      "healthFactor": "923999549827419324",
+      "vUSDC": "2500001218",
+      "aWETH": "1000000000000000000",
+      "ltv": "8000",
+      "currentLiquidationThreshold": "8250",
+      "oracleWETH": "280000000000"
+    },
+    "B_AFTER_REPAY_BEFORE_DROP": {
+      "healthFactor": "1885712318108175505",
+      "vUSDC": "1750001826",
+      "aWETH": "1000000000000000000",
+      "ltv": "8000",
+      "currentLiquidationThreshold": "8250",
+      "oracleWETH": "400000000000"
+    },
+    "B_AFTER_DROP": {
+      "healthFactor": "1319998301350757347",
+      "vUSDC": "1750002252",
+      "aWETH": "1000000000000000000",
+      "ltv": "8000",
+      "currentLiquidationThreshold": "8250",
+      "oracleWETH": "280000000000"
+    },
+    "A2_AFTER_DROP": {
+      "healthFactor": "973499525711031074",
+      "vUSDC": "2500001218",
+      "aWETH": "1000000000000000000",
+      "ltv": "8000",
+      "currentLiquidationThreshold": "8250",
+      "oracleWETH": "295000000000"
+    },
+    "A_POST_LIQ": {
+      "aWETH": "62499086500000000",
+      "healthFactor": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+    }
+  },
+  "probes": {
+    "OPEN": {
+      "highestLiquidatablePrice": "303030376969",
+      "lowestSafePrice": "303030376970",
+      "probeMatchesOnchain": true
+    }
+  },
+  "summary": {
+    "P_DROP": "280000000000",
+    "P_SIDE": "295000000000",
+    "simBReason": "45"
+  },
+  "transactions": [
+    {
+      "label": "A Pool.supply(WETH, 1, A)",
+      "evidence": "LOCAL ANVIL ONLY (chainId 31337 fork) — NOT a Sepolia transaction",
+      "hash": "0xf3d1b8e0e5da807ee23f3d4ed851973c5d02fafa99898f66933f006d30750639",
+      "block": "12165979",
+      "status": "success",
+      "gasUsed": "382776",
+      "fn": "supply",
+      "events": [
+        {
+          "emitter": "aWETH",
+          "event": "Mint",
+          "args": {
+            "caller": "A",
+            "onBehalfOf": "A",
+            "value": "1000000000000000000",
+            "balanceIncrease": "0",
+            "index": "1000604607782853235519439946"
+          }
+        },
+        {
+          "emitter": "POOL",
+          "event": "Supply",
+          "args": {
+            "reserve": "WETH",
+            "onBehalfOf": "A",
+            "referralCode": 0,
+            "user": "A",
+            "amount": "1000000000000000000"
+          }
+        }
+      ]
+    },
+    {
+      "label": "A Pool.borrow(USDC, 2500, variable, A)",
+      "evidence": "LOCAL ANVIL ONLY (chainId 31337 fork) — NOT a Sepolia transaction",
+      "hash": "0xa404c8ef6a8d12d476e37359312e2d8e6a84804f77da1b77b6fb88e6b2dd1149",
+      "block": "12165980",
+      "status": "success",
+      "gasUsed": "494950",
+      "fn": "borrow",
+      "events": [
+        {
+          "emitter": "vUSDC",
+          "event": "Mint",
+          "args": {
+            "caller": "A",
+            "onBehalfOf": "A",
+            "value": "2500000000",
+            "balanceIncrease": "0",
+            "index": "3853636524523126388895633876"
+          }
+        },
+        {
+          "emitter": "POOL",
+          "event": "Borrow",
+          "args": {
+            "reserve": "USDC",
+            "onBehalfOf": "A",
+            "referralCode": 0,
+            "user": "A",
+            "amount": "2500000000",
+            "interestRateMode": 2,
+            "borrowRate": "639970093802817705403628356"
+          }
+        }
+      ]
+    },
+    {
+      "label": "B Pool.liquidationCall(WETH, USDC, A, max, receiveAToken=false) [A]",
+      "evidence": "LOCAL ANVIL ONLY (chainId 31337 fork) — NOT a Sepolia transaction",
+      "hash": "0x73f963d97d0fe20b67c859a76f0cd4cb766d08c7ce687a38a211bbd242e92cca",
+      "block": "12165984",
+      "status": "success",
+      "gasUsed": "499029",
+      "fn": "liquidationCall",
+      "events": [
+        {
+          "emitter": "vUSDC",
+          "event": "Burn",
+          "args": {
+            "from": "A",
+            "target": "0x0000000000000000000000000000000000000000",
+            "value": "2500000001",
+            "balanceIncrease": "2435",
+            "index": "3853640278272447851089344908"
+          }
+        },
+        {
+          "emitter": "aWETH",
+          "event": "Burn",
+          "args": {
+            "from": "A",
+            "target": "B",
+            "value": "933036623435714286",
+            "balanceIncrease": "0",
+            "index": "1000604607782853235519439946"
+          }
+        },
+        {
+          "emitter": "aWETH",
+          "event": "Mint",
+          "args": {
+            "caller": "POOL",
+            "onBehalfOf": "COLLECTOR",
+            "value": "918566113129",
+            "balanceIncrease": "918566113129",
+            "index": "1000604607782853235519439946"
+          }
+        },
+        {
+          "emitter": "POOL",
+          "event": "LiquidationCall",
+          "args": {
+            "collateralAsset": "WETH",
+            "debtAsset": "USDC",
+            "user": "A",
+            "debtToCover": "2500002436",
+            "liquidatedCollateralAmount": "933036623435714286",
+            "liquidator": "B",
+            "receiveAToken": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "B Pool.liquidationCall(WETH, USDC, A, max, receiveAToken=false) [A2]",
+      "evidence": "LOCAL ANVIL ONLY (chainId 31337 fork) — NOT a Sepolia transaction",
+      "hash": "0xd5ac820103b410a0347058e3951c5badd291dbc89eb3e336a7de57dc25487aeb",
+      "block": "12165984",
+      "status": "success",
+      "gasUsed": "488514",
+      "fn": "liquidationCall",
+      "events": [
+        {
+          "emitter": "vUSDC",
+          "event": "Burn",
+          "args": {
+            "from": "A",
+            "target": "0x0000000000000000000000000000000000000000",
+            "value": "1249998783",
+            "balanceIncrease": "2435",
+            "index": "3853640278272447851089344908"
+          }
+        },
+        {
+          "emitter": "aWETH",
+          "event": "Burn",
+          "args": {
+            "from": "A",
+            "target": "B",
+            "value": "442797041630508474",
+            "balanceIncrease": "0",
+            "index": "1000604607782853235519439946"
+          }
+        },
+        {
+          "emitter": "aWETH",
+          "event": "Mint",
+          "args": {
+            "caller": "POOL",
+            "onBehalfOf": "COLLECTOR",
+            "value": "918566113129",
+            "balanceIncrease": "918566113129",
+            "index": "1000604607782853235519439946"
+          }
+        },
+        {
+          "emitter": "POOL",
+          "event": "LiquidationCall",
+          "args": {
+            "collateralAsset": "WETH",
+            "debtAsset": "USDC",
+            "user": "A",
+            "debtToCover": "1250001218",
+            "liquidatedCollateralAmount": "442797041630508474",
+            "liquidator": "B",
+            "receiveAToken": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "A Pool.repay(USDC, 750, variable, A)",
+      "evidence": "LOCAL ANVIL ONLY (chainId 31337 fork) — NOT a Sepolia transaction",
+      "hash": "0x06c7e14f0df2af520e618b656cb58ba3850177862a1453e28dc72b0d51b7c1b5",
+      "block": "12165983",
+      "status": "success",
+      "gasUsed": "240069",
+      "fn": "repay",
+      "events": [
+        {
+          "emitter": "vUSDC",
+          "event": "Burn",
+          "args": {
+            "from": "A",
+            "target": "0x0000000000000000000000000000000000000000",
+            "value": "749998174",
+            "balanceIncrease": "1826",
+            "index": "3853639339834774693378251095"
+          }
+        },
+        {
+          "emitter": "POOL",
+          "event": "Repay",
+          "args": {
+            "reserve": "USDC",
+            "user": "A",
+            "repayer": "A",
+            "amount": "750000000",
+            "useATokens": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "A Pool.withdraw(WETH, max, A)",
+      "evidence": "LOCAL ANVIL ONLY (chainId 31337 fork) — NOT a Sepolia transaction",
+      "hash": "0xc353ac43edc2cfa66f9273eae4d5004d36f738246ec9593ee12d7bbd0d74daa9",
+      "block": "12165990",
+      "status": "success",
+      "gasUsed": "297497",
+      "fn": "withdraw",
+      "events": [
+        {
+          "emitter": "aWETH",
+          "event": "Burn",
+          "args": {
+            "from": "A",
+            "target": "A",
+            "value": "1000000000000000000",
+            "balanceIncrease": "0",
+            "index": "1000604607782853235519439946"
+          }
+        },
+        {
+          "emitter": "POOL",
+          "event": "Withdraw",
+          "args": {
+            "reserve": "WETH",
+            "user": "A",
+            "to": "A",
+            "amount": "1000000000000000000"
+          }
+        }
+      ]
+    }
+  ]
+}

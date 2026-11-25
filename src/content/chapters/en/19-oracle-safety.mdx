@@ -6,7 +6,7 @@ part: p2-credit
 order: 190
 status: published
 updated: "2026-11-25"
-unreleased: true
+released: "2026-11-25"
 experiment: "2026-11-25"
 lab: anvil-local
 ---
@@ -16,6 +16,8 @@ lab: anvil-local
 <Callout type="warn" title="This demo has no fork, and it is not Aave">
 
 The run around 2026-11-25 11:31 used a fresh local Anvil node. The interface was `127.0.0.1:18549`, chainId **31337**, starting at the genesis block. There was no public RPC, no Sepolia state, and no call to real Aave or Uniswap.
+
+The lab record and the public repository are two events on the same calendar day. The text entered the public Git repository at 14:24 Singapore time, when pull request 6 merged. The page date is only **2026-11-25**. It is not the minute the live website finished deploying.
 
 The tokens are tUSD and tCOL. They are not dollars and not WETH. The price unit is tUSD per tCOL. The shortfall and the gap below are readings inside a teaching model. They are not a dollar loss that already happened, and they are not evidence that a real protocol was broken.
 
@@ -91,7 +93,9 @@ Useful guards are separate from the loan itself. Read a quote that is independen
 - Fragile branch, ordinary debt of 8,000 left behind: <LocalRef value="0xc00659ac6179fcb69292949ea0c90b16a7d45890ae8520405c85da8fd8cf4438" env="local" short />
 - Control branch, reverted with `BorrowLimit`: <LocalRef value="0x0983452c237884324c860ac1ee1b5563bed2718cb6136fc16f5225cccbcddcc6" env="local" short />
 
-A rerun changes temporary addresses and local hashes. Under the same rules, the economic integers should stay. This book does not ship the toy contract source. That source exists only as evidence inside a closed chainId 31337. It is not instructions for a real protocol.
+A rerun changes temporary addresses and local hashes. Under the same rules, the economic integers should stay.
+
+The saved receipts are in [oracle-readings.json](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/oracle-readings.json). The toy contract and the local steps are in [labs/local-oracle](https://github.com/cnkang/lets-play-web3/blob/main/labs/local-oracle/README.md). After the tools are installed, this lab needs no network and no fork. It writes only on loopback, chainId 31337. Hashes from a new run are not the two hashes above.
 
 </details>
 

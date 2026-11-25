@@ -39,12 +39,13 @@ const chapterSchema = z.object({
   /** Optional date of the last significant edit to this translation. Becomes schema.org dateModified. */
   updated: z.iso.date().optional(),
   /**
-   * Public release date of this chapter (schema.org datePublished).
-   * Omit it to use the book date in src/data/site.ts. Set `unreleased: true` instead
-   * when the chapter is in the build but has not been published on the public site.
+   * Calendar day this chapter entered the public Git repository (schema.org datePublished).
+   * Day precision only. Omit it to use the book date in src/data/site.ts.
+   * This is not a live-website deploy timestamp. Set `unreleased: true` only while the
+   * chapter is in the build but not yet on the public default branch.
    */
   released: z.iso.date().optional(),
-  /** True when this chapter must not claim the book’s first publication date. */
+  /** True when this chapter must not claim a public repository date. */
   unreleased: z.boolean().optional(),
   /** Date the recorded lab ran. This is not a publication date. */
   experiment: z.iso.date().optional(),

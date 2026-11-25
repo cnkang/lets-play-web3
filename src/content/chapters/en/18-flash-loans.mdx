@@ -6,7 +6,7 @@ part: p2-credit
 order: 180
 status: published
 updated: "2026-11-25"
-unreleased: true
+released: "2026-11-25"
 experiment: "2026-11-25"
 lab: anvil-fork
 snapshot:
@@ -19,6 +19,8 @@ snapshot:
 <Callout type="warn" title="Still a local copy, and the numbers differ from Chapter 17">
 
 Writes in this chapter used another local Anvil port, `127.0.0.1:8547`, chainId **31337**. The read-only fork source is still Sepolia block **12165973**. The run was **2026-11-25 10:56:13–11:00:23** Singapore time. Nothing was broadcast to a public chain.
+
+The lab record and the public repository are two events on the same calendar day. The text entered the public Git repository at 14:24 Singapore time, when pull request 6 merged. The page date is only **2026-11-25**. It is not the minute the live website finished deploying.
 
 The shape matches Chapter 17: post 1 WETH, request a borrow of 2,500 Aave test USDC, then set the quote to 2,800. The position was opened later. Opening debt is **2,499.999999**, one minimal unit under 2,500. After the drop to 2,800, and before liquidation, debt is **2,500.000608** and the health factor is about **0.924** (exactly **0.923999775283254651**). Collateral is still 1. Do not replace these with Chapter 17’s 0.923999549827419324 or 0.9375009135.
 
@@ -146,7 +148,9 @@ The pool pulls the repayment after the callback returns. A mid-callback balance,
 - Fairly priced deep pool: <LocalRef value="0x480526575d393ae820396acaa2b958faa0311948ce152614368514d87549ca7f" env="fork" short />
 - Minimum-out revert: <LocalRef value="0x0f2b185a3de3fa4bec34815588c820d2ac05e7e07547ca1693e5fcfe592ec5a5" env="fork" short />
 
-This run started Anvil with `--accounts 0 --silent`, so the log did not print Anvil’s built-in test accounts. The older launcher behind Chapter 17 did not use those flags. Do not rewrite either history. This book does not ship the lab scripts, and it does not suggest copying them onto a real protocol.
+This run started Anvil with `--accounts 0 --silent`, so the log did not print Anvil’s built-in test accounts. The older launcher behind Chapter 17 did not use those flags. Do not rewrite either history.
+
+The saved receipt excerpt is [p2b-readings.json](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/p2b-readings.json). This repository does not ship the script that calls the real Aave pool, so it does not become a tool aimed at a chosen target. A new run needs an archival Sepolia node that can still read block 12165973, and it gets new hashes. It cannot be done offline. See the [evidence folder](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/README.md).
 
 </details>
 
