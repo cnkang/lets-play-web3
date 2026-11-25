@@ -112,7 +112,7 @@ export const guides = [
       ],
       why: [
         'Two ideas get mixed together. A ledger that is hard to edit can still host a contract designed to switch its logic.',
-        'The hash chain shows the first idea. Change an old page and later hashes fail. Recalculating them on your own computer creates a new head. It does not create agreement.',
+        'The hash chain shows the first idea. Change an old page and later hashes fail. Recalculating them on your own computer creates a new head. It does not create network consensus.',
         'The proxy shows the second idea. New code can be selected for a stable address, if the contract was built to allow that.'
       ],
       example: [
