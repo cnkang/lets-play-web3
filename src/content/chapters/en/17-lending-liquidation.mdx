@@ -18,10 +18,27 @@ snapshot:
 
 <Callout type="warn" title="Which kind of evidence this is">
 
-- **A local copy.** Anvil is Foundry’s local chain simulator. The writes in this chapter ran on the author’s local Anvil node, at loopback `127.0.0.1:8546`, chainId **31337**. The node copied Sepolia block **12165973** (2026-11-19 11:58:12, Singapore time) and then changed only that copy. The run was **2026-11-20 10:26:53 to 10:26:58** Singapore time.
-- **Not new public transactions.** Do not open the local hashes on Etherscan. A new run draws new temporary accounts, so the hashes change. With the same block and the same order, the amounts stay stable.
+- **A local Anvil fork, not a public Sepolia transaction.** The writes stayed on a copy on the author’s computer. That copy read Sepolia block **12165973** (2026-11-19 11:58:12, Singapore time) and then changed only the copy. Do not open the local hashes on Etherscan.
 - **Do not mix numbers with Chapter 18.** The next chapter forks the same block, but its debt and health factor differ.
-- **Page date.** This chapter’s text entered the public Git repository on **2026-11-25** (pull request 6 merged at 2026-11-25 14:24 Singapore time). The page date is that calendar day, separate from when the live site finished deploying. The lab record remains 2026-11-20.
+- **The lab record is 2026-11-20.** The page date is **2026-11-25**.
+
+</Callout>
+
+<details>
+<summary>Technical details and verification evidence (expand)</summary>
+
+- Anvil is Foundry’s local chain simulator. The loopback interface was `127.0.0.1:8546`, chainId **31337**. The run window was **2026-11-20 10:26:53 to 10:26:58** Singapore time.
+- Each run creates new temporary accounts, so local hashes change. With the same block and the same order, the amounts stay stable.
+- This chapter’s text entered the public Git repository on **2026-11-25** (pull request 6 merged at 2026-11-25 14:24 Singapore time). The page date is that calendar day, separate from when the live site finished deploying.
+
+</details>
+
+<Callout type="note" title="What you will learn">
+
+- What the health factor roughly means, and why a price drop alone does not reduce the collateral balance.
+- At the same price, 2,800, why repaying nothing and repaying part of the debt end differently.
+- What the loan-to-value ratio and the liquidation threshold each control, and which percentage belongs in the boundary price.
+- Why these figures come from a local fork record and must not be looked up as new public-chain transactions.
 
 </Callout>
 
@@ -53,7 +70,7 @@ The faucet cannot mint this WETH. A simulated mint reverts with `not mintable`. 
 
 One 12-second local block later, the debt is not a clean 2,500. The reading is **2,500.000610**. The health factor is about **1.32**. Collateral is still **1** WETH.
 
-This test pool is heavily used. The variable borrow rate, in ray units, is `639970093802817705403628356`, about **64%** a year. Each block adds a visible crumb of interest. A napkin formula that ignores interest misses the protocol by a little; the gap is mostly that interest.
+This test pool is heavily used. The variable borrow rate is about **64%** a year. Each block adds a visible crumb of interest. A napkin formula that ignores interest misses the protocol by a little; the gap is mostly that interest. The raw ray integer is in the expandable verification evidence at the end.
 
 <HfBoard />
 
@@ -81,7 +98,7 @@ The valuation moved from 4,000 to 2,800. The balance did not lose one wei. Colla
 
 At the moment of liquidation, the repaid debt is **2,500.002436** test USDC. Interest grew again after the earlier reading. The health factor is at or below 0.95, so this deployment allows one call to cover **100%**. The request said “maximum”. The protocol cut it to the full debt.
 
-The borrower loses **0.9375009135** WETH. Of that, **0.933036623435714286** goes to the liquidator. **0.004464290064285714** goes to the protocol treasury as a deposit receipt. At the 2,800 oracle mark, the 5% liquidation bonus is about 112.50 for the liquidator and about 12.50 for the protocol. The protocol’s share is 10% of the bonus (the bonus itself is about 5% of the seized collateral). The flash-loan fee split in the next chapter is a different rule. The mark is a test-token valuation, with no dollar income. The borrower still holds the 2,500 test USDC already borrowed, plus about 0.0624990865 WETH of deposit receipt.
+The borrower loses **0.9375009135** WETH. Of that, **0.933036623435714286** goes to the liquidator. **0.004464290064285714** goes to the protocol treasury as a deposit receipt. At the 2,800 oracle mark, that collateral is worth about 2,625 (covering the repaid debt of about 2,500.002436 plus an ~5% bonus). The ~5% liquidation bonus is relative to the **debt repaid**, not to the seized collateral as a whole: about 112.50 for the liquidator and about 12.50 for the protocol (the protocol’s share is 10% of the bonus). The flash-loan fee split in the next chapter is a different rule. The mark is a test-token valuation, with no dollar income. The borrower still holds the 2,500 test USDC already borrowed, plus about 0.0624990865 WETH of deposit receipt.
 
 The same transaction also shows a mint to the treasury. That mint records interest the treasury had **already** accrued, separate from this liquidation bonus. The treasury’s balance rises by exactly the protocol fee.
 
@@ -133,10 +150,14 @@ The “about 125 extra” at a mark of 2,800 is an oracle valuation of test toke
 
 ## Hashes from this saved run
 
-A rerun draws new temporary accounts. These hashes identify one saved run. The 0.924 and 1.32 figures above are rounded. The protocol readings are: opening health factor **1.319999677920078588**; at 2,800 before liquidation, **0.923999549827419324**; after repaying 750 and then 2,800, **1.319998301350757347**; at 2,950, **0.973499525711031074**. The next chapter’s health factor at the same displayed price is **0.923999775283254651**, and its opening debt is **2,499.999999**.
+Each run creates new temporary accounts. These hashes identify one saved run. The 0.924 and 1.32 figures above are rounded. Exact protocol readings, the raw rate ray, and the local receipts are in the expandable block below.
 
 <details>
-<summary>Local receipts (chainId 31337, do not open Etherscan)</summary>
+<summary>Local receipts and exact readings (chainId 31337, do not open Etherscan)</summary>
+
+Protocol readings: opening health factor **1.319999677920078588**; at 2,800 before liquidation, **0.923999549827419324**; after repaying 750 and then 2,800, **1.319998301350757347**; at 2,950, **0.973499525711031074**. The next chapter’s health factor at the same displayed price is **0.923999775283254651**, and its opening debt is **2,499.999999**.
+
+The variable borrow rate, in ray units, is `639970093802817705403628356`.
 
 - Supply 1 WETH: <LocalRef value="0xf3d1b8e0e5da807ee23f3d4ed851973c5d02fafa99898f66933f006d30750639" env="fork" short />
 - Borrow 2,500: <LocalRef value="0xa404c8ef6a8d12d476e37359312e2d8e6a84804f77da1b77b6fb88e6b2dd1149" env="fork" short />

@@ -1,6 +1,6 @@
 ---
 title: "Two calls are not one transaction: atomicity"
-description: "Two separate transferFrom calls are not atomic; UBOX V2's batchTransfer is atomic: an intentionally failing batch (100 to B plus 2,000,000 to C) reverted entirely, and a successful batch sent 100 to B and 200 to A itself. Confirmed transactions cannot be undone."
+description: "Two separate transferFrom calls are not atomic; UBOX V2's batchTransfer is atomic: an intentionally failing batch (100 to B plus 2,000,000 to C) reverted entirely, and a successful batch sent 100 to B and 200 to A itself. Confirmed transactions are practically irreversible for learners."
 navTitle: "12 · Two calls are not one transaction: atomicity"
 part: tokens
 order: 120
@@ -73,9 +73,9 @@ The same function, this time with two items that can both succeed: **100** to B 
 
 The 200 self-transfer is subtracted and added inside the same atomic transaction, netting to zero, but its event is still emitted.
 
-## Confirmed transactions cannot be undone
+## Confirmed transactions are practically irreversible for learners
 
-Success or failure, once a transaction is mined and confirmed it **cannot be reversed**. The 100 sent to B in the successful batch cannot be "cancelled"; getting it back would need B to send a brand-new transfer. The original stays in history forever.
+Success or failure, once a transaction is mined and confirmed, treat it as **practically irreversible** for learners (inclusion is not absolute mathematical finality). The 100 sent to B in the successful batch cannot be "cancelled"; getting it back would need B to send a brand-new transfer. The original stays in history forever. A failed transaction undoes its state changes, but gas is still paid, and once included the nonce is still consumed.
 
 <T label="Non-atomic vs atomic">
 

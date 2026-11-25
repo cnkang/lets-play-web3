@@ -98,7 +98,7 @@ All five succeeded. Use the links or the Copy buttons for full hashes. Appendix 
 - **The chain keeps the books for you**: `count`, `owner` and the event logs all live on-chain. Changing state means paying <Term id="gas">gas</Term> yourself.
 - **Deploying costs far more than calling**: deployment used 1,652,641 gas, reset only 23,626. Most of the cost is writing the contract's code into chain state. The few lines of arithmetic are cheap by comparison.
 - **The same function can cost different gas**: the increment from 0 to 1 used 127,229 gas, from 1 to 2 only 29,309. Writing a <Term id="storage">storage slot</Term> from zero to non-zero is expensive. Changing an already non-zero value is much cheaper.
-- **Confirmed <Term id="transaction">transactions</Term> cannot be undone**: reset sets the number back to zero but cannot erase the earlier increment transactions or events. The history is still there.
+- **Confirmed <Term id="transaction">transactions</Term> are practically irreversible for beginners**: reset sets the number back to zero but cannot erase the earlier increment transactions or events. The history is still there. Rare network reorgs exist; for learning, treat a confirmed record as fixed.
 - **This contract cannot gain features**: to add batch operations or upgradeability you must choose an <Term id="upgradeable">upgradeable</Term> pattern at deployment time. That is what UBOX does in Chapter 13.
 
 ## Everyday equivalent

@@ -47,4 +47,11 @@ status: published
 
 ## 本书实验和这一章的关系
 
-后面的实验都在 <Term id="sepolia">Sepolia</Term> <strong><Term id="testnet">测试网</Term></strong>上做。测试网是专门用来练习的区块链，它的「钱」可以免费领取、没有市场价值，目的只是让你亲眼看到「多方可核对的共同记账」长什么样：每一笔<Term id="transaction">交易</Term>都能在<Term id="block-explorer">区块浏览器</Term>（查询链上记录的网站）上被任何人查到。任何人都能查，这就是「公开可核查」。代价是每次改动都要付手续费（<Term id="gas">gas</Term>），第 6 章会细讲。
+本书用到四种环境，不要混为一谈：
+
+1. **浏览器里的互动模拟**（本站实验页）：不上链，也没有可查的公共哈希。
+2. **历史上公开的 Sepolia 交易**：可在 <Term id="sepolia">Sepolia</Term> <Term id="block-explorer">区块浏览器</Term>核对。
+3. **本机 Anvil 分叉**（第 17–18 章）：只读复制历史 Sepolia 状态，再在本机写入；本地哈希不能到公共浏览器查。
+4. **完全本机的 Anvil 教学链**（第 19 章）：不从 Sepolia 分叉，哈希同样不能到公共浏览器查。
+
+<Term id="testnet">测试网</Term>的「钱」可免费领取、没有市场价值。公开可核查的那部分，目的是让你亲眼看到「多方可核对的共同记账」：每一笔公共<Term id="transaction">交易</Term>都能被任何人查到。代价是每次真正改链上状态都要付手续费（<Term id="gas">gas</Term>），第 6 章会细讲。

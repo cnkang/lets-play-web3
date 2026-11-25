@@ -32,7 +32,7 @@ This page is a historical snapshot. Compare §5 (transactions) and §10 (wrap-up
 
 ## Accounts and demo addresses
 
-These are all **Sepolia <Term id="testnet">testnet</Term> addresses**. Never send <Term id="mainnet">mainnet</Term> assets to them, and never send anything more to the demo address that has no <Term id="private-key">private key</Term>.
+These are all **Sepolia <Term id="testnet">testnet</Term> addresses**. Never send <Term id="mainnet">mainnet</Term> assets to them, and never send anything more to the demo address that has no known usable <Term id="private-key">private key</Term>.
 
 <T label="Accounts and demo addresses">
 
@@ -40,7 +40,7 @@ These are all **Sepolia <Term id="testnet">testnet</Term> addresses**. Never sen
 | --- | --- | --- |
 | Account A | <Addr a="0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC" /> | Main test account / deployer / UBOX owner |
 | Account B | <Addr a="0x1dB261d3d5BE16E1A81582E8786A6FAB82Fe218c" /> | Approved spender |
-| MBox demo recipient | <Addr a="0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E" /> | **No key, unrecoverable**; holds 1,000 MBox. Do not send anything here |
+| MBox demo recipient | <Addr a="0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E" /> | **No known usable key; practically unrecoverable**; holds 1,000 MBox. Do not send anything here |
 | Demo address C | <Addr a="0x6E7F8eF4353DB8012Dea3F70eb523aB1A3051711" /> | Recipient in the failing batch; key never stored; received 0 |
 | Starting-funds source | <Addr a="0x52f1984Cd3e46e1214dB222D3Ff63712E7aCEedD" /> | Source of the 0.05 SepETH starting funds: Google Cloud's Sepolia faucet (confirmed by Kang; no official name tag on-chain) |
 
@@ -64,7 +64,7 @@ The table lists every transaction from account A (nonces 0-19) and from account 
 | A | 3 | increment (1 wei tip) | success | 12111091 | 2,671,809 | <Tx h="0xd61e57686959b7c4c9d774a6aa35b0fb9dac72e8317055146da4676a9e4e4b31" /> |
 | A | 4 | increment (2 wei tip) | success | 12111181 | 762,034 | <Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" /> |
 | A | 5 | Deploy MBox | success | 12115620 | 428,632,485 | <Tx h="0xf9fccb16dd1a0ef99a86d7f4e81cb0e286d4ed4e154963db517c375e3aa92058" /> |
-| A | 6 | Send 1,000 MBox to the keyless address | success | 12115621 | 9,907,800 | <Tx h="0x039ffbb819638f771e760b12e0e01de6ec2c2c6bb5691fa2ed5cd0d6c45eb054" /> |
+| A | 6 | Send 1,000 MBox to address with no known usable key | success | 12115621 | 9,907,800 | <Tx h="0x039ffbb819638f771e760b12e0e01de6ec2c2c6bb5691fa2ed5cd0d6c45eb054" /> |
 | A | 7 | Deploy MBox-Burn | success | 12115825 | 555,368,628 | <Tx h="0xd6582fecf142f8879e0d9259c79c3a07885ed0ef9d67ceb6d94d98cdd80d8c20" /> |
 | A | 8 | burn 1,000 MBox-Burn | success | 12115826 | 2,857,684 | <Tx h="0xe11a7f5e583e272633f5b1ef420597b496d594b976a6c698e3289de568f3b03b" /> |
 | A | 9 | Send B 0.0001 SepETH | success | 12115897 | 13,912,800 | <Tx h="0xdeb796869c494aac1311ea91248f54be4e1fd922d311ec73c9c949440fa4b77d" /> |
@@ -116,7 +116,7 @@ The table lists every transaction from account A (nonces 0-19) and from account 
 | Item | Value |
 | --- | --- |
 | Counter.count / owner | 2 / account A |
-| MBox totalSupply / A / keyless demo address | 1,000,000 / 999,000 / 1,000 (unrecoverable) |
+| MBox totalSupply / A / demo address (no known usable key) | 1,000,000 / 999,000 / 1,000 (practically unrecoverable) |
 | MBox-Burn totalSupply / A / B | 998,900 / 998,800 / 100 |
 | MBox-Burn allowance(A, B) | 0 (revoked) |
 | UBOX implementation | V3 `0x16E3D2f25e28253b467C66c462973e4ca86fad28` (V4 not on-chain) |

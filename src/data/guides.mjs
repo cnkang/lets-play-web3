@@ -17,21 +17,21 @@ export const guides = [
       ],
       example: [
         'In the book’s MBox-Burn lab, account A approved account B for 500 test tokens. Balances did not change.',
-        'Later spending used part of that allowance. A later approve of 0 revoked what remained. Tokens that had already moved stayed with the recipient.',
+        'Later spending used part of that allowance. A later approve of 0 revoked what remained once confirmed. Tokens that had already moved stayed with the recipient.',
         'Chapter 10 explains the rule. Chapter 11 records the Sepolia transactions. The browser lab lets you try the same steps with fictional PLAY tokens. It does not sign anything.'
       ],
       limits: [
-        'Token contracts differ. In this site’s simplified model, a finite allowance decreases when it is used. The uint256 maximum (the largest number this token type allows) does not.',
-        'A new approve overwrites the old number. It does not add to it.',
+        'Token contracts differ. In this site’s simplified model, a finite allowance decreases when it is used. type(uint256).max (the largest 256-bit unsigned integer) often stays unlimited and is not decremented.',
+        'A new approve overwrites the old number. It does not add to it. Changing or revoking an allowance takes effect only once the transaction is confirmed on-chain.',
         'This page is not a request to approve a live contract. Read the address and the amount before you sign anything outside this simulation.'
       ]
     },
     zh: {
       title: '钱包为什么让你授权代币，而不是直接付款？',
-      description: '授权写下的是额度（可花上限），余额不动。之后的 transferFrom 才会动余额。签名之前先分清这两步。',
+      description: '授权写下的是额度（可支配额度），余额不动。之后的 transferFrom 才会动余额。签名之前先分清这两步。',
       answer: [
         '钱包是在请你允许另一个地址，在限额内花掉你的一种代币。这个限额叫做授权额度。',
-        '授权被记下时，你的代币余额不变。授权是可花上限，不是付款。'
+        '授权被记下时，你的代币余额不变。授权是可支配额度，不是付款。'
       ],
       why: [
         '很多应用分两步动用代币。你先授权某个合约。之后那个合约再调用 transferFrom。',
@@ -39,12 +39,12 @@ export const guides = [
       ],
       example: [
         '在本书的 MBox-Burn 实验里，账户 A 给账户 B 授权了 500 枚测试代币。两边的余额都没有因此改变。',
-        '后来的代扣用掉了一部分额度。再发一笔 approve 0，撤销的是剩下的额度。已经转走的代币仍在收款人那里。',
+        '后来的代扣用掉了一部分额度。再发一笔 approve 0，链上确认后撤销的是剩下的额度。已经转走的代币仍在收款人那里。',
         '第 10 章讲规则。第 11 章留下了 Sepolia 上的交易记录。浏览器实验用虚构的 PLAY 代币让你走同样的步骤。它不会签名。'
       ],
       limits: [
-        '代币合约的写法并不相同。本站的简化模型里，有限额度在使用后会减少；uint256 的最大值（这种代币类型允许的最大数字）不会。',
-        '新的 approve 会覆盖旧数字，不是在旧数字上相加。',
+        '代币合约的写法并不相同。本站的简化模型里，有限额度在使用后会减少；type(uint256).max（256 位无符号整数的最大值）常作为无限额度，使用后通常不递减。',
+        '新的 approve 会覆盖旧数字，不是在旧数字上相加。改额度或撤销须等交易链上确认后才生效。',
         '本页不是让你去授权某个真实合约。离开这个模拟之后，签名前要核对地址和数量。'
       ]
     }
@@ -135,7 +135,7 @@ export const guides = [
       ],
       why: [
         '两件事容易混在一起。账本很难被篡改，同时一份合约仍可以被设计成可以更换逻辑。',
-        '哈希链对应第一件事。改掉旧的一页，后面的哈希就对不上。只在自己的电脑上重算，会得到一个新的链头，不会因此得到别人的同意。',
+        '哈希链对应第一件事。改掉旧的一页，后面的哈希就不再匹配。只在自己的电脑上重算，会得到一个新的链头，不会因此形成网络共识。',
         '代理对应第二件事。如果合约一开始就留了升级路径，同一个地址可以改去运行新代码。'
       ],
       example: [

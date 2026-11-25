@@ -47,4 +47,11 @@ Learn what a blockchain can do, and when it is not worth using. If everyone alre
 
 ## How this connects to the labs
 
-All the later experiments run on the <Term id="sepolia">Sepolia</Term> **<Term id="testnet">testnet</Term>**, a blockchain meant for practice. Its "money" is free and has no market value; the point is to see with your own eyes what jointly verifiable bookkeeping looks like: anyone can look up every <Term id="transaction">transaction</Term> in a <Term id="block-explorer">block explorer</Term> (a website for searching on-chain records). Anyone can look it up: that is what "publicly verifiable" means here. The cost is that every change costs a fee (<Term id="gas">gas</Term>), which Chapter 6 explains.
+This book uses four environments. Keep them apart:
+
+1. **Browser interactive simulations** (the lab pages on this site): nothing goes on-chain, and there is no public hash to look up.
+2. **Historical public Sepolia transactions**: look them up on a <Term id="sepolia">Sepolia</Term> <Term id="block-explorer">block explorer</Term>.
+3. **Local Anvil forks** (Chapters 17–18): a read-only copy of historical Sepolia state, then writes on that local copy. Local hashes are not look-up-able on a public explorer.
+4. **A fully local Anvil teaching chain** (Chapter 19): no Sepolia fork; those hashes are not look-up-able on a public explorer either.
+
+A <Term id="testnet">testnet</Term>'s "money" is free and has no market value. The publicly verifiable parts exist so you can see jointly checkable bookkeeping: anyone can look up those public <Term id="transaction">transactions</Term>. Real on-chain changes still cost a fee (<Term id="gas">gas</Term>), which Chapter 6 explains.
