@@ -43,10 +43,16 @@ const routes = JSON.stringify({ zh, en })
   <body>
     <main id="main" class="shell">
       <h1>一起玩 Web3 · <span lang="en">Let’s Play Web3</span></h1>
-      <p>
-        <a href={zh} hreflang="zh-CN" data-lang-choice="zh">进入中文版</a> ·
-        <a href={en} lang="en" hreflang="en" data-lang-choice="en">Read in English</a>
-      </p>
+      <p>免费的中英双语入门站。阅读教材，或在浏览器里练习授权、兑换和哈希链。不需要钱包，也不花真钱。</p>
+      <p lang="en">A free bilingual introduction. Read the book, or practice allowances, swaps, and hash chains in the browser. No wallet and no real money.</p>
+      <ul>
+        <li><a href={zh} hreflang="zh-CN" data-lang-choice="zh">进入中文版</a></li>
+        <li><a href={en} lang="en" hreflang="en" data-lang-choice="en">Read in English</a></li>
+        <li><a href={href('zh/labs/')} hreflang="zh-CN">中文互动实验</a> · <a href={href('en/labs/')} lang="en" hreflang="en">English labs</a></li>
+        <li><a href={href('zh/guides/')} hreflang="zh-CN">中文问题指南</a> · <a href={href('en/guides/')} lang="en" hreflang="en">English guides</a></li>
+        <li><a href={href('zh/learn-with-ai/')} hreflang="zh-CN">请 AI 带练</a> · <a href={href('en/learn-with-ai/')} lang="en" hreflang="en">Learn with an AI agent</a></li>
+      </ul>
+      <p>有 JavaScript 时，本页会按已保存的语言或浏览器语言进入中文版或英文版。没有 JavaScript 时，请使用上面的链接。中文版和英文版本身不会自动跳转。</p>
     </main>
     <script is:inline>
       document.addEventListener('click', function (e) {

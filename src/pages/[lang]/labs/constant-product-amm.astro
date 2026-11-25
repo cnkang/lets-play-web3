@@ -1,0 +1,319 @@
+---
+import '../../../styles/labs.css'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import Crumb from '../../../components/Crumb.astro'
+import { labs } from '../../../data/labs-copy.mjs'
+import { ui, langs, type Lang } from '../../../data/book'
+import { absolute, authorLd, href, htmlLang } from '../../../data/site'
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }))
+}
+const { lang } = Astro.params as { lang: Lang }
+const t = labs['constant-product-amm'][lang]
+const path = 'labs/constant-product-amm/'
+const site = ui[lang].siteTitle
+const pageUrl = absolute(`${lang}/${path}`)
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: t.title,
+    description: t.description,
+    url: pageUrl,
+    inLanguage: htmlLang[lang],
+    learningResourceType: lang === 'zh' ? '互动模拟' : 'Interactive simulation',
+    isAccessibleForFree: true,
+    author: authorLd(lang)
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: site, item: absolute(`${lang}/`) },
+      { '@type': 'ListItem', position: 2, name: t.labsName, item: absolute(`${lang}/labs/`) },
+      { '@type': 'ListItem', position: 3, name: t.title, item: pageUrl }
+    ]
+  }
+]
+---
+<BaseLayout lang={lang} title={t.title} description={t.description} path={path} jsonLd={jsonLd} navKey="labs">
+  <article class="shell lab-page" data-lab="constant-product-amm" data-pagefind-body>
+    <Crumb lang={lang} items={[{ href: `${lang}/`, name: site }, { href: `${lang}/labs/`, name: t.labsName }, { name: t.title }]} />
+    <p class="kicker">{t.kicker}</p>
+    <h1>{t.title}</h1>
+    <p>{t.lede}</p>
+    <p class="callout warn">{t.simulation}</p>
+    <p>{t.outcome}</p>
+    <h2>{t.challengeTitle}</h2>
+    <ol class="lab-steps">
+      <li data-step="small">{t.stepSmall} <span class="step-state"></span></li>
+      <li data-step="execute">{t.stepExecute} <span class="step-state"></span></li>
+      <li data-step="reject">{t.stepReject} <span class="step-state"></span></li>
+    </ol>
+    <div class="lab-split">
+      <form class="lab-panel" id="amm-form">
+        <fieldset class="lab-fields">
+          <legend class="visually-hidden">{t.title}</legend>
+          <label>{t.reserveIn}<input id="reserve-in" inputmode="numeric" autocomplete="off" value="1000000" /></label>
+          <label>{t.reserveOut}<input id="reserve-out" inputmode="numeric" autocomplete="off" value="1000000" /></label>
+          <label>{t.fee}<input id="fee" inputmode="numeric" autocomplete="off" value="30" /></label>
+          <label>{t.amount}<input id="amount" inputmode="numeric" autocomplete="off" value="1000" /></label>
+          <label>{t.slippage}<input id="slippage" inputmode="numeric" autocomplete="off" value="10" /></label>
+          <label class="lab-check"><span>{t.prior}</span><input id="prior" type="checkbox" /></label>
+        </fieldset>
+        <div class="lab-actions">
+          <button type="button" class="btn primary" data-action="quote">{t.quote}</button>
+          <button type="button" class="btn ghost" data-action="execute">{t.execute}</button>
+          <button type="button" class="btn ghost" data-action="small">{t.small}</button>
+          <button type="button" class="btn ghost" data-action="large">{t.large}</button>
+          <button type="button" class="btn ghost" data-action="deep">{t.deep}</button>
+          <button type="button" class="btn ghost" data-action="shallow">{t.shallow}</button>
+          <button type="button" class="btn ghost" data-action="reset">{t.reset}</button>
+          <button type="button" class="btn ghost copy-btn" data-copy={pageUrl} data-done={t.copied}>{t.share}</button>
+        </div>
+      </form>
+      <div class="lab-panel">
+        <h2 id="curve-title">{t.curveTitle}</h2>
+        <p id="curve-desc">{t.curveDesc}</p>
+        <svg id="curve" class="lab-curve" viewBox="0 0 640 320" role="img" aria-labelledby="curve-title curve-desc"></svg>
+        <h2>{t.stateTitle}</h2>
+        <table>
+          <caption class="visually-hidden">{t.stateTitle}</caption>
+          <tbody>
+            <tr><th scope="row">{t.spot}</th><td id="spot">—</td></tr>
+            <tr><th scope="row">{t.execution}</th><td id="execution">—</td></tr>
+            <tr><th scope="row">{t.impact}</th><td id="impact">—</td></tr>
+            <tr><th scope="row">{t.estimated}</th><td id="estimated">—</td></tr>
+            <tr><th scope="row">{t.minimum}</th><td id="minimum">—</td></tr>
+            <tr><th scope="row">{t.feeNote}</th><td id="fee-note">0.30%</td></tr>
+            <tr><th scope="row">{t.kNote}</th><td id="k-note">—</td></tr>
+          </tbody>
+        </table>
+        <p id="feedback" class="lab-feedback" role="status"></p>
+        <p id="error" class="lab-error" tabindex="-1" hidden></p>
+      </div>
+    </div>
+    <h2>{t.related}</h2>
+    <ul>
+      <li><a data-track="related_chapter_click" data-challenge-id="16-defi-labs" href={href(`${lang}/chapters/16-defi-labs/`)}>{t.chapter16}</a></li>
+      <li><a href={href(`${lang}/guides/how-pools-set-a-price/`)}>{t.guide}</a></li>
+    </ul>
+    <h2>{t.privacyTitle}</h2>
+    <p>{t.privacyBody}</p>
+    <div data-event-panel hidden>
+      <h3>{t.eventLogTitle}</h3>
+      <pre data-event-log></pre>
+    </div>
+    <noscript><p class="callout">{t.noscript}</p></noscript>
+    <script type="application/json" id="lab-copy" set:html={JSON.stringify(t)} />
+  </article>
+  <script>
+    import { curvePoints, emptyProgress, executeQuoted, LARGE_TRADE, minimumReceived, observe, PRIOR_TRADE, quote, SMALL_TRADE } from '../../../lib/labs/amm.mjs'
+    import { formatBps, formatInt, formatRatio } from '../../../lib/labs/format.mjs'
+    import { emit } from '../../../scripts/track.mjs'
+
+    const root = document.querySelector('[data-lab="constant-product-amm"]')
+    const text = JSON.parse(document.getElementById('lab-copy').textContent)
+    const fields = {
+      reserveIn: root.querySelector('#reserve-in'),
+      reserveOut: root.querySelector('#reserve-out'),
+      fee: root.querySelector('#fee'),
+      amount: root.querySelector('#amount'),
+      slippage: root.querySelector('#slippage'),
+      prior: root.querySelector('#prior')
+    }
+    const error = root.querySelector('#error')
+    const feedback = root.querySelector('#feedback')
+    let pool = { reserveIn: 1000000n, reserveOut: 1000000n }
+    let saved = null
+    let progress = emptyProgress()
+    let started = false
+
+    function showError(message) {
+      error.hidden = !message
+      error.textContent = message || ''
+      if (message) error.focus()
+    }
+    function parseDigits(value, { max, label }) {
+      const raw = String(value).trim()
+      if (!/^[0-9]+$/.test(raw)) return { ok: false, error: label }
+      const number = BigInt(raw)
+      if (number > max) return { ok: false, error: label }
+      return { ok: true, value: number }
+    }
+    function readInputs() {
+      const reserveIn = parseDigits(fields.reserveIn.value, { max: 1000000000000n, label: 'notInteger' })
+      const reserveOut = parseDigits(fields.reserveOut.value, { max: 1000000000000n, label: 'notInteger' })
+      const amount = parseDigits(fields.amount.value, { max: 1000000000000n, label: 'notInteger' })
+      const fee = parseDigits(fields.fee.value, { max: 999n, label: 'badFee' })
+      const slippage = parseDigits(fields.slippage.value, { max: 10000n, label: 'badSlippage' })
+      for (const parsed of [reserveIn, reserveOut, amount, fee, slippage]) {
+        if (!parsed.ok) return { ok: false, error: parsed.error }
+      }
+      if (reserveIn.value <= 0n || reserveOut.value <= 0n) return { ok: false, error: 'emptyPool' }
+      if (amount.value <= 0n) return { ok: false, error: 'notInteger' }
+      return { ok: true, reserveIn: reserveIn.value, reserveOut: reserveOut.value, amount: amount.value, fee: fee.value, slippage: slippage.value }
+    }
+    function touch() {
+      if (started) return
+      started = true
+      emit('lab_start', { lab_id: 'constant-product-amm' })
+    }
+    function mark() {
+      const flags = { small: progress.sawSmall && progress.sawLarge, execute: progress.sawExecute, reject: progress.sawReject }
+      for (const step of ['small', 'execute', 'reject']) {
+        const item = root.querySelector(`[data-step="${step}"]`)
+        item.dataset.done = String(flags[step])
+        item.querySelector('.step-state').textContent = flags[step] ? text.done : ''
+      }
+      if (progress.complete) emit('lab_complete', { lab_id: 'constant-product-amm', challenge_id: 'main' })
+    }
+    function draw(after) {
+      const points = curvePoints(pool.reserveIn, pool.reserveOut)
+      const svg = root.querySelector('#curve')
+      if (points.length < 2) { svg.replaceChildren(); return }
+      const width = 640
+      const height = 320
+      const pad = 36
+      const minX = points[0].x
+      const maxX = points[points.length - 1].x
+      const minY = points[points.length - 1].y
+      const maxY = points[0].y
+      const mapX = (x) => pad + Number(x - minX) * (width - pad * 2) / Number(maxX - minX)
+      const mapY = (y) => pad + Number(maxY - y) * (height - pad * 2) / Number(maxY - minY || 1n)
+      const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
+      poly.setAttribute('fill', 'none')
+      poly.setAttribute('stroke', 'currentColor')
+      poly.setAttribute('stroke-width', '2')
+      poly.setAttribute('points', points.map((point) => `${mapX(point.x).toFixed(1)},${mapY(point.y).toFixed(1)}`).join(' '))
+      svg.replaceChildren(poly)
+      for (const dot of [{ point: { x: pool.reserveIn, y: pool.reserveOut }, label: text.nowPoint }, after ? { point: after, label: text.afterPoint } : null].filter(Boolean)) {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+        circle.setAttribute('cx', mapX(dot.point.x).toFixed(1))
+        circle.setAttribute('cy', mapY(dot.point.y).toFixed(1))
+        circle.setAttribute('r', '5')
+        circle.setAttribute('fill', 'currentColor')
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+        label.setAttribute('x', (mapX(dot.point.x) + 8).toFixed(1))
+        label.setAttribute('y', (mapY(dot.point.y) - 8).toFixed(1))
+        label.textContent = dot.label
+        svg.append(circle, label)
+      }
+    }
+    function showQuote(result, slippage) {
+      const minimum = minimumReceived(result.amountOut, slippage)
+      root.querySelector('#spot').textContent = formatRatio(result.spotNumerator, result.spotDenominator)
+      root.querySelector('#execution').textContent = formatRatio(result.executionNumerator, result.executionDenominator)
+      root.querySelector('#impact').textContent = formatBps(result.impactBps)
+      root.querySelector('#estimated').textContent = formatInt(result.amountOut)
+      root.querySelector('#minimum').textContent = formatInt(minimum.amount)
+      root.querySelector('#fee-note').textContent = formatBps(result.feeBps)
+      root.querySelector('#k-note').textContent = `${formatInt(result.kBefore)} → ${formatInt(result.kAfter)}`
+      draw({ x: result.next.reserveIn, y: result.next.reserveOut })
+    }
+    function sameQuoteInputs(inputs) {
+      return saved && saved.reserveIn === inputs.reserveIn && saved.reserveOut === inputs.reserveOut && saved.amount === inputs.amount && saved.fee === inputs.fee && pool.reserveIn === saved.reserveIn && pool.reserveOut === saved.reserveOut
+    }
+    function makeQuote(size) {
+      touch()
+      const inputs = readInputs()
+      if (!inputs.ok) { showError(text[inputs.error] || text.generic); return }
+      pool = { reserveIn: inputs.reserveIn, reserveOut: inputs.reserveOut }
+      const result = quote({ reserveIn: inputs.reserveIn, reserveOut: inputs.reserveOut, amountIn: inputs.amount, feeBps: inputs.fee })
+      if (!result.ok) { showError(text[result.error === 'too-small' ? 'tooSmall' : result.error === 'empty-pool' ? 'emptyPool' : 'generic']); return }
+      saved = { ...inputs, amountOut: result.amountOut, result }
+      showError('')
+      showQuote(result, inputs.slippage)
+      feedback.textContent = text.didQuote
+      if (size) progress = observe(progress, { type: 'quote', size })
+      mark()
+    }
+    root.querySelector('[data-action="quote"]').addEventListener('click', () => makeQuote(''))
+    root.querySelector('[data-action="small"]').addEventListener('click', () => { fields.amount.value = SMALL_TRADE.toString(); makeQuote('small') })
+    root.querySelector('[data-action="large"]').addEventListener('click', () => { fields.amount.value = LARGE_TRADE.toString(); makeQuote('large') })
+    root.querySelector('[data-action="deep"]').addEventListener('click', () => {
+      fields.reserveIn.value = '1000000'
+      fields.reserveOut.value = '1000000'
+      pool = { reserveIn: 1000000n, reserveOut: 1000000n }
+      saved = null
+      feedback.textContent = text.noQuote
+      draw(null)
+    })
+    root.querySelector('[data-action="shallow"]').addEventListener('click', () => {
+      fields.reserveIn.value = '10000'
+      fields.reserveOut.value = '10000'
+      pool = { reserveIn: 10000n, reserveOut: 10000n }
+      saved = null
+      feedback.textContent = text.noQuote
+      draw(null)
+    })
+    fields.slippage.addEventListener('input', () => {
+      if (!saved) return
+      const slippage = parseDigits(fields.slippage.value, { max: 10000n, label: 'badSlippage' })
+      if (!slippage.ok) return
+      saved.slippage = slippage.value
+      root.querySelector('#minimum').textContent = formatInt(minimumReceived(saved.amountOut, slippage.value).amount)
+      feedback.textContent = text.didQuote
+    })
+    root.querySelector('[data-action="execute"]').addEventListener('click', () => {
+      touch()
+      const inputs = readInputs()
+      if (!inputs.ok) { showError(text[inputs.error] || text.generic); return }
+      if (!saved || !sameQuoteInputs(inputs)) { feedback.textContent = text.stale; return }
+      const prior = fields.prior.checked ? PRIOR_TRADE : 0n
+      const outcome = executeQuoted({
+        reserveIn: saved.reserveIn,
+        reserveOut: saved.reserveOut,
+        amountIn: saved.amount,
+        feeBps: saved.fee,
+        minimumOut: minimumReceived(saved.amountOut, inputs.slippage).amount,
+        priorAmountIn: prior
+      })
+      if (!outcome.ok && outcome.error === 'below-minimum') {
+        pool = outcome.poolAfterPrior
+        fields.reserveIn.value = pool.reserveIn.toString()
+        fields.reserveOut.value = pool.reserveOut.toString()
+        feedback.textContent = text.didReject
+        showError('')
+        progress = observe(progress, { type: 'execute', ok: false, error: 'below-minimum' })
+        draw(null)
+        mark()
+        return
+      }
+      if (!outcome.ok) { showError(text.generic); return }
+      const slipped = outcome.amountOut < saved.amountOut
+      pool = outcome.reserves
+      fields.reserveIn.value = pool.reserveIn.toString()
+      fields.reserveOut.value = pool.reserveOut.toString()
+      feedback.textContent = slipped ? text.didSlip : text.didExecute
+      showError('')
+      saved = null
+      progress = observe(progress, { type: 'execute', ok: true })
+      draw(null)
+      mark()
+    })
+    root.querySelector('[data-action="reset"]').addEventListener('click', () => {
+      pool = { reserveIn: 1000000n, reserveOut: 1000000n }
+      saved = null
+      progress = emptyProgress()
+      fields.reserveIn.value = '1000000'
+      fields.reserveOut.value = '1000000'
+      fields.fee.value = '30'
+      fields.amount.value = '1000'
+      fields.slippage.value = '10'
+      fields.prior.checked = false
+      showError('')
+      feedback.textContent = text.noQuote
+      for (const id of ['spot', 'execution', 'impact', 'estimated', 'minimum', 'k-note']) root.querySelector(`#${id}`).textContent = '—'
+      root.querySelector('#fee-note').textContent = '0.30%'
+      draw(null)
+      mark()
+      emit('lab_reset', { lab_id: 'constant-product-amm' })
+    })
+    root.querySelector('#amm-form').addEventListener('submit', (event) => event.preventDefault())
+    feedback.textContent = text.noQuote
+    draw(null)
+    mark()
+  </script>
+</BaseLayout>

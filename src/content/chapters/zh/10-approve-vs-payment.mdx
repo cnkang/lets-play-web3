@@ -5,12 +5,18 @@ navTitle: "10　授权不是付款"
 part: tokens
 order: 100
 status: published
-updated: "2026-11-18"
+updated: "2026-11-25"
 ---
 
 <p class="lead">ERC-20 的 <code>approve</code> 设置<Term id="spender">被授权者</Term>今后能动用多少代币，这个上限叫<Term id="allowance">授权额度</Term>（allowance）。授权时，代币余额维持原值，发起交易仍要付网络手续费。</p>
 
 对照 [MBox-Burn 的代扣与撤销记录](../11-lab-mbox-burn/)，可以在 Sepolia 上逐笔核对。
+
+<Callout type="note" title="签名之前，先在浏览器里走一遍">
+
+[授权实验](../../labs/erc20-allowance/)使用浏览器里的虚构代币。你可以授权、代扣、再撤销。授权不会改变余额。撤销也不会把已经转走的代币要回来。这是模拟，不是本书里的 MBox-Burn 记录。
+
+</Callout>
 
 ## 为什么钱包常弹「授权」而不是「付款」？
 

@@ -1,0 +1,226 @@
+---
+import '../../../styles/labs.css'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import Crumb from '../../../components/Crumb.astro'
+import { labs } from '../../../data/labs-copy.mjs'
+import { ui, langs, type Lang } from '../../../data/book'
+import { absolute, authorLd, href, htmlLang } from '../../../data/site'
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }))
+}
+const { lang } = Astro.params as { lang: Lang }
+const t = labs['hash-chain'][lang]
+const path = 'labs/hash-chain/'
+const site = ui[lang].siteTitle
+const pageUrl = absolute(`${lang}/${path}`)
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: t.title,
+    description: t.description,
+    url: pageUrl,
+    inLanguage: htmlLang[lang],
+    learningResourceType: lang === 'zh' ? '互动模拟' : 'Interactive simulation',
+    isAccessibleForFree: true,
+    author: authorLd(lang)
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: site, item: absolute(`${lang}/`) },
+      { '@type': 'ListItem', position: 2, name: t.labsName, item: absolute(`${lang}/labs/`) },
+      { '@type': 'ListItem', position: 3, name: t.title, item: pageUrl }
+    ]
+  }
+]
+---
+<BaseLayout lang={lang} title={t.title} description={t.description} path={path} jsonLd={jsonLd} navKey="labs">
+  <article class="shell lab-page" data-lab="hash-chain" data-lang={lang} data-pagefind-body>
+    <Crumb lang={lang} items={[{ href: `${lang}/`, name: site }, { href: `${lang}/labs/`, name: t.labsName }, { name: t.title }]} />
+    <p class="kicker">{t.kicker}</p>
+    <h1>{t.title}</h1>
+    <p>{t.lede}</p>
+    <p class="callout warn">{t.simulation}</p>
+    <p>{t.outcome}</p>
+    <h2 id="not-consensus">{lang === 'zh' ? '哈希能发现改动，不能代替共识' : 'A hash can show an edit. It cannot settle which history a network accepts.'}</h2>
+    <p>{lang === 'zh'
+      ? '如果你从被改的那一块开始，把后面的哈希都重算一遍，你自己的副本可以重新对上。链头会变成另一个值。其他保存旧链头的人不会因此接受你的版本。没有人投票，也没有广播。'
+      : 'If you recalculate every hash after the edit, your own copy can match itself again. The head becomes a different value. People who saved the old head have not accepted your version. Nobody voted, and nothing was broadcast.'}</p>
+    <h2>{t.challengeTitle}</h2>
+    <ol class="lab-steps">
+      <li data-step="tamper">{t.stepTamper} <span class="step-state"></span></li>
+      <li data-step="rewrite">{t.stepRewrite} <span class="step-state"></span></li>
+    </ol>
+    <div id="blocks"></div>
+    <div class="lab-actions">
+      <button type="button" class="btn primary" data-action="tamper">{t.tryEdit}</button>
+      <button type="button" class="btn ghost" data-action="reset">{t.reset}</button>
+      <button type="button" class="btn ghost copy-btn" data-copy={pageUrl} data-done={t.copied}>{t.share}</button>
+    </div>
+    <dl class="lab-state">
+      <dt>{t.head}</dt><dd id="head" class="lab-hash">…</dd>
+      <dt>{t.originalHead}</dt><dd id="original-head" class="lab-hash">…</dd>
+    </dl>
+    <p id="feedback" class="lab-feedback" role="status"></p>
+    <p id="error" class="lab-error" tabindex="-1" hidden></p>
+    <h2>{t.related}</h2>
+    <ul>
+      <li><a data-track="related_chapter_click" data-challenge-id="03-blocks-hashes-consensus" href={href(`${lang}/chapters/03-blocks-hashes-consensus/`)}>{t.chapter3}</a></li>
+    </ul>
+    <h2>{t.privacyTitle}</h2>
+    <p>{t.privacyBody}</p>
+    <div data-event-panel hidden>
+      <h3>{t.eventLogTitle}</h3>
+      <pre data-event-log></pre>
+    </div>
+    <noscript><p class="callout">{t.noscript}</p></noscript>
+    <script type="application/json" id="lab-copy" set:html={JSON.stringify(t)} />
+  </article>
+  <script>
+    import { assess, buildChain, createGeneration, emptyProgress, expectedHashes, headOf, MAX_DATA_LENGTH, observe, recalculateFrom, replaceData, SAMPLE, sha256Hex, TAMPER } from '../../../lib/labs/hashchain.mjs'
+    import { emit } from '../../../scripts/track.mjs'
+
+    const root = document.querySelector('[data-lab="hash-chain"]')
+    const text = JSON.parse(document.getElementById('lab-copy').textContent)
+    const lang = root.dataset.lang === 'zh' ? 'zh' : 'en'
+    const list = root.querySelector('#blocks')
+    const feedback = root.querySelector('#feedback')
+    const error = root.querySelector('#error')
+    const session = createGeneration()
+    let blocks = []
+    let originalHead = ''
+    let progress = emptyProgress()
+    let started = false
+
+    function showError(message) {
+      error.hidden = !message
+      error.textContent = message || ''
+    }
+    function touch() {
+      if (started) return
+      started = true
+      emit('lab_start', { lab_id: 'hash-chain' })
+    }
+    function paintSteps() {
+      const flags = { tamper: progress.sawBreak, rewrite: progress.sawRewrite }
+      for (const step of ['tamper', 'rewrite']) {
+        const item = root.querySelector(`[data-step="${step}"]`)
+        item.dataset.done = String(flags[step])
+        item.querySelector('.step-state').textContent = flags[step] ? text.done : ''
+      }
+      if (progress.complete) emit('lab_complete', { lab_id: 'hash-chain', challenge_id: 'main' })
+    }
+    function buildEditors() {
+      list.replaceChildren()
+      blocks.forEach((block, index) => {
+        const wrap = document.createElement('section')
+        wrap.className = 'hash-block lab-panel'
+        wrap.dataset.index = String(index)
+        const title = document.createElement('h3')
+        title.textContent = lang === 'zh' ? `第 ${block.id} 块` : `Block ${block.id}`
+        const label = document.createElement('label')
+        label.append(document.createTextNode(text.dataLabel))
+        const area = document.createElement('textarea')
+        area.value = block.data
+        area.rows = 2
+        area.setAttribute('aria-label', `${text.dataLabel} ${block.id}`)
+        label.append(area)
+        const meta = document.createElement('p')
+        meta.className = 'hash-meta'
+        meta.append(Object.assign(document.createElement('strong'), {}), document.createElement('span'), document.createElement('span'))
+        const prev = document.createElement('p')
+        prev.className = 'lab-hash'
+        prev.dataset.role = 'prev'
+        const hash = document.createElement('p')
+        hash.className = 'lab-hash'
+        hash.dataset.role = 'hash'
+        const actions = document.createElement('div')
+        actions.className = 'lab-actions'
+        for (const [forward, labelText] of [[false, text.recalcOne], [true, text.recalcForward]]) {
+          const button = document.createElement('button')
+          button.type = 'button'
+          button.className = 'btn ghost'
+          button.textContent = labelText
+          button.addEventListener('click', () => recalculate(index, forward))
+          actions.append(button)
+        }
+        area.addEventListener('input', () => {
+          touch()
+          if ([...area.value].length > MAX_DATA_LENGTH) { showError(text.tooLong); return }
+          showError(area.value.length === 0 ? text.emptyOk : '')
+          blocks = replaceData(blocks, index, area.value)
+          void refresh()
+        })
+        wrap.append(title, label, meta, prev, hash, actions)
+        list.append(wrap)
+      })
+    }
+    function paint(rows) {
+      if (list.children.length !== blocks.length) buildEditors()
+      blocks.forEach((block, index) => {
+        const wrap = list.children[index]
+        const row = rows[index]
+        const area = wrap.querySelector('textarea')
+        if (document.activeElement !== area && area.value !== block.data) area.value = block.data
+        const [state, link, content] = wrap.querySelectorAll('.hash-meta > *')
+        state.textContent = row?.valid ? text.valid : text.broken
+        link.textContent = row ? (row.linkOk ? text.linkOk : text.linkBad) : text.waiting
+        content.textContent = row ? (row.contentOk ? text.contentOk : text.contentBad) : ''
+        wrap.querySelector('[data-role="prev"]').textContent = `${lang === 'zh' ? '前一块哈希' : 'Previous hash'}: ${block.storedPrev}`
+        wrap.querySelector('[data-role="hash"]').textContent = `${lang === 'zh' ? '本块哈希' : 'This hash'}: ${block.storedHash}`
+      })
+      root.querySelector('#head').textContent = headOf(blocks)
+      root.querySelector('#original-head').textContent = originalHead
+    }
+    async function refresh() {
+      const ticket = session.bump()
+      feedback.textContent = text.waiting
+      const result = await expectedHashes(blocks, sha256Hex, () => session.isCurrent(ticket))
+      if (result.stale || !session.isCurrent(ticket)) return
+      if (!session.isCurrent(ticket)) return
+      const rows = assess(blocks, result.hashes)
+      const edited = rows[1] && !rows[1].contentOk && rows[2]?.linkOk && rows[0]?.valid
+      if (edited) progress = observe(progress, { type: 'break' })
+      const aligned = rows.every((row) => row.valid)
+      if (aligned && headOf(blocks) !== originalHead) progress = observe(progress, { type: 'rewrite' })
+      paint(rows)
+      feedback.textContent = !aligned && edited ? text.brokenSummary : aligned && headOf(blocks) !== originalHead ? text.newHead : aligned ? text.sameHead : text.brokenSummary
+      paintSteps()
+    }
+    async function recalculate(index, forward) {
+      touch()
+      const ticket = session.bump()
+      if (!forward) {
+        const result = await expectedHashes(blocks, sha256Hex, () => session.isCurrent(ticket))
+        if (result.stale || !session.isCurrent(ticket)) return
+        blocks = blocks.map((block, cursor) => cursor === index ? { ...block, storedHash: result.hashes[index] } : { ...block })
+      } else {
+        const next = await recalculateFrom(blocks, index)
+        if (!session.isCurrent(ticket)) return
+        blocks = next
+      }
+      await refresh()
+    }
+    async function boot() {
+      blocks = await buildChain(SAMPLE[lang])
+      originalHead = headOf(blocks)
+      progress = emptyProgress()
+      showError('')
+      buildEditors()
+      await refresh()
+    }
+    root.querySelector('[data-action="tamper"]').addEventListener('click', () => {
+      touch()
+      blocks = replaceData(blocks, 1, TAMPER[lang])
+      void refresh()
+    })
+    root.querySelector('[data-action="reset"]').addEventListener('click', async () => {
+      await boot()
+      emit('lab_reset', { lab_id: 'hash-chain' })
+    })
+    void boot()
+  </script>
+</BaseLayout>

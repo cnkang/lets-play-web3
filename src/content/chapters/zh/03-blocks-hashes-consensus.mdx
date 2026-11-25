@@ -5,6 +5,7 @@ navTitle: "3　区块、哈希与共识"
 part: everyday
 order: 30
 status: published
+updated: "2026-11-25"
 ---
 
 <p class="lead">账本里有一笔旧记录被改了，怎么发现？先看每一页怎样引用前一页，再看大家怎样决定接受哪份账。</p>
@@ -18,6 +19,12 @@ status: published
 <Figure name="blocks" n="1" alt="三个区块从左到右排列，每个区块保存前一块的指纹、交易列表和本块指纹，箭头把每块的指纹连到下一块。">
 <Term id="block">区块</Term>里存着交易数据，并通过「前一块的哈希」与前一块连在一起。图中的 H(…) 只是符号，不是真实数值。
 </Figure>
+
+<Callout type="note" title="用真实哈希试一次">
+
+图里的 H(…) 只是符号。[SHA-256 实验](../../labs/hash-chain/)会在你的浏览器里计算哈希。改一块，后面的检查就会失败。只在自己的电脑上重算，并不能让网络接受这次修改。这个实验不会发送任何数据。
+
+</Callout>
 
 ## 但为什么还需要共识？
 

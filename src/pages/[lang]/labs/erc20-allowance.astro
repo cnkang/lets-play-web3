@@ -1,0 +1,220 @@
+---
+import '../../../styles/labs.css'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import Crumb from '../../../components/Crumb.astro'
+import { labs } from '../../../data/labs-copy.mjs'
+import { ui, langs, type Lang } from '../../../data/book'
+import { absolute, authorLd, href, htmlLang } from '../../../data/site'
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }))
+}
+const { lang } = Astro.params as { lang: Lang }
+const t = labs['erc20-allowance'][lang]
+const path = 'labs/erc20-allowance/'
+const site = ui[lang].siteTitle
+const pageUrl = absolute(`${lang}/${path}`)
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: t.title,
+    description: t.description,
+    url: pageUrl,
+    inLanguage: htmlLang[lang],
+    learningResourceType: lang === 'zh' ? '互动模拟' : 'Interactive simulation',
+    isAccessibleForFree: true,
+    author: authorLd(lang)
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: site, item: absolute(`${lang}/`) },
+      { '@type': 'ListItem', position: 2, name: t.labsName, item: absolute(`${lang}/labs/`) },
+      { '@type': 'ListItem', position: 3, name: t.title, item: pageUrl }
+    ]
+  }
+]
+---
+<BaseLayout lang={lang} title={t.title} description={t.description} path={path} jsonLd={jsonLd} navKey="labs">
+  <article class="shell lab-page" data-lab="erc20-allowance" data-pagefind-body>
+    <Crumb lang={lang} items={[{ href: `${lang}/`, name: site }, { href: `${lang}/labs/`, name: t.labsName }, { name: t.title }]} />
+    <p class="kicker">{t.kicker}</p>
+    <h1>{t.title}</h1>
+    <p>{t.lede}</p>
+    <p class="callout warn">{t.simulation}</p>
+    <p>{t.outcome}</p>
+    <h2>{t.challengeTitle}</h2>
+    <ol class="lab-steps">
+      <li data-step="approve">{t.stepApprove} <span class="step-state"></span></li>
+      <li data-step="spend">{t.stepSpend} <span class="step-state"></span></li>
+      <li data-step="revoke">{t.stepRevoke} <span class="step-state"></span></li>
+      <li data-step="unlimited">{t.stepUnlimited} <span class="step-state"></span></li>
+    </ol>
+    <div class="lab-split">
+      <form class="lab-panel" id="erc20-form">
+        <fieldset class="lab-fields">
+          <legend class="visually-hidden">{t.title}</legend>
+          <label>{t.amount}
+            <input id="amount" name="amount" inputmode="numeric" autocomplete="off" value="400" />
+          </label>
+          <label>{t.recipient}
+            <select id="recipient" name="recipient">
+              <option value="spender">{t.spender}</option>
+              <option value="other">{t.other}</option>
+              <option value="holder">{t.you}</option>
+            </select>
+          </label>
+        </fieldset>
+        <div class="lab-actions">
+          <button type="button" class="btn primary" data-action="approve">{t.approve}</button>
+          <button type="button" class="btn ghost" data-action="spend">{t.spend}</button>
+          <button type="button" class="btn ghost" data-action="revoke">{t.revoke}</button>
+          <button type="button" class="btn ghost" data-action="unlimited">{t.unlimited}</button>
+          <button type="button" class="btn ghost" data-action="reset">{t.reset}</button>
+          <button type="button" class="btn ghost copy-btn" data-copy={pageUrl} data-done={t.copied}>{t.share}</button>
+        </div>
+      </form>
+      <div class="lab-panel">
+        <h2>{t.stateTitle}</h2>
+        <dl class="lab-state">
+          <dt>{t.you}</dt><dd data-balance="holder">1,000</dd>
+          <dt>{t.spender}</dt><dd data-balance="spender">0</dd>
+          <dt>{t.other}</dt><dd data-balance="other">0</dd>
+          <dt>{t.allowanceLabel}</dt><dd id="allowance">0</dd>
+          <dt>{t.supply}</dt><dd id="supply">1,000</dd>
+        </dl>
+        <p id="feedback" class="lab-feedback" role="status"></p>
+        <p id="error" class="lab-error" tabindex="-1" hidden></p>
+      </div>
+    </div>
+    <h2>{t.related}</h2>
+    <ul>
+      <li><a data-track="related_chapter_click" data-challenge-id="10-approve-vs-payment" href={href(`${lang}/chapters/10-approve-vs-payment/`)}>{t.chapter10}</a></li>
+      <li><a data-track="related_chapter_click" data-challenge-id="11-lab-mbox-burn" href={href(`${lang}/chapters/11-lab-mbox-burn/`)}>{t.chapter11}</a></li>
+      <li><a href={href(`${lang}/guides/why-wallets-ask-approval/`)}>{lang === 'zh' ? '指南：钱包为什么要求授权' : 'Guide: why a wallet asks for approval'}</a></li>
+    </ul>
+    <h2>{t.privacyTitle}</h2>
+    <p>{t.privacyBody}</p>
+    <div data-event-panel hidden>
+      <h3>{t.eventLogTitle}</h3>
+      <pre data-event-log></pre>
+    </div>
+    <noscript><p class="callout">{t.noscript}</p></noscript>
+    <script type="application/json" id="lab-copy" set:html={JSON.stringify(t)} />
+  </article>
+  <script>
+    import { approve, emptyProgress, initialState, isUnlimited, observe, parseWhole, totalSupply, transferFrom, UNLIMITED } from '../../../lib/labs/erc20.mjs'
+    import { formatInt } from '../../../lib/labs/format.mjs'
+    import { emit } from '../../../scripts/track.mjs'
+
+    const root = document.querySelector('[data-lab="erc20-allowance"]')
+    const text = JSON.parse(document.getElementById('lab-copy').textContent)
+    const amount = root.querySelector('#amount')
+    const recipient = root.querySelector('#recipient')
+    const error = root.querySelector('#error')
+    const feedback = root.querySelector('#feedback')
+    let state = initialState()
+    let progress = emptyProgress()
+    let started = false
+
+    const say = {
+      'not-integer': text.notInteger,
+      zero: text.zero,
+      'too-large': text.tooLarge,
+      'insufficient-allowance': text.insufficientAllowance,
+      'insufficient-balance': text.insufficientBalance,
+      'bad-recipient': text.badRecipient,
+      'invalid-amount': text.notInteger
+    }
+
+    function showError(message) {
+      error.hidden = !message
+      error.textContent = message || ''
+      if (message) error.focus()
+    }
+
+    function paint() {
+      for (const id of ['holder', 'spender', 'other']) {
+        root.querySelector(`[data-balance="${id}"]`).textContent = formatInt(state.balances[id])
+      }
+      root.querySelector('#allowance').textContent = isUnlimited(state.allowance) ? text.unlimitedValue : formatInt(state.allowance)
+      root.querySelector('#supply').textContent = formatInt(totalSupply(state))
+      for (const step of ['approve', 'spend', 'revoke', 'unlimited']) {
+        const done = (step === 'approve' && progress.sawApproveWithoutBalanceChange)
+          || (step === 'spend' && progress.sawFiniteSpend)
+          || (step === 'revoke' && progress.sawRevokeAfterSpend)
+          || (step === 'unlimited' && progress.sawUnlimitedPersists)
+        const item = root.querySelector(`[data-step="${step}"]`)
+        item.dataset.done = String(done)
+        item.querySelector('.step-state').textContent = done ? text.done : ''
+      }
+      if (progress.complete) emit('lab_complete', { lab_id: 'erc20-allowance', challenge_id: 'main' })
+    }
+
+    function touch() {
+      if (started) return
+      started = true
+      emit('lab_start', { lab_id: 'erc20-allowance' })
+    }
+
+    function apply(action, result, message) {
+      if (!result.ok) {
+        showError(say[result.error] || text.notInteger)
+        feedback.textContent = ''
+        return
+      }
+      state = result.state
+      progress = observe(progress, { type: action, ...result })
+      showError('')
+      feedback.textContent = message
+      paint()
+    }
+
+    root.querySelector('[data-action="approve"]').addEventListener('click', () => {
+      touch()
+      const parsed = parseWhole(amount.value)
+      if (!parsed.ok) { showError(say[parsed.error]); return }
+      apply('approve', approve(state, parsed.value), text.didApprove)
+    })
+    root.querySelector('[data-action="spend"]').addEventListener('click', () => {
+      touch()
+      const parsed = parseWhole(amount.value)
+      if (!parsed.ok) { showError(say[parsed.error]); return }
+      const result = transferFrom(state, recipient.value, parsed.value)
+      apply('transferFrom', result, result.unlimited ? text.didUnlimited : text.didSpend)
+    })
+    root.querySelector('[data-action="revoke"]').addEventListener('click', () => {
+      touch()
+      showError('')
+      apply('approve', approve(state, 0n), text.didRevoke)
+    })
+    root.querySelector('[data-action="unlimited"]').addEventListener('click', () => {
+      touch()
+      showError('')
+      const approved = approve(state, UNLIMITED)
+      state = approved.state
+      progress = observe(progress, { type: 'approve', ...approved })
+      const spent = transferFrom(state, 'spender', 1n)
+      if (spent.ok) {
+        state = spent.state
+        progress = observe(progress, { type: 'transferFrom', ...spent })
+      }
+      feedback.textContent = text.didUnlimited
+      paint()
+    })
+    root.querySelector('[data-action="reset"]').addEventListener('click', () => {
+      state = initialState()
+      progress = emptyProgress()
+      amount.value = '400'
+      recipient.value = 'spender'
+      showError('')
+      feedback.textContent = ''
+      paint()
+      emit('lab_reset', { lab_id: 'erc20-allowance' })
+    })
+    root.querySelector('#erc20-form').addEventListener('submit', (event) => event.preventDefault())
+    paint()
+  </script>
+</BaseLayout>

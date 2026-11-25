@@ -5,12 +5,18 @@ navTitle: "10 · Approval is not payment"
 part: tokens
 order: 100
 status: published
-updated: "2026-11-18"
+updated: "2026-11-25"
 ---
 
 <p class="lead">ERC-20 <code>approve</code> sets how many tokens a <Term id="spender">spender</Term> may use later. That limit is the allowance. The approval leaves token balances unchanged, and submitting it still costs a network fee.</p>
 
 Follow the [MBox-Burn spending and revocation records](../11-lab-mbox-burn/) to see each action on Sepolia.
+
+<Callout type="note" title="Try the steps before you sign anything">
+
+The [allowance lab](../../labs/erc20-allowance/) uses fictional tokens in your browser. Approve, spend, and revoke. Approval does not change balances. Revoking does not return tokens already spent. It is a simulation, not the MBox-Burn records in this book.
+
+</Callout>
 
 ## Why do wallets keep asking you to "approve" rather than "pay"?
 

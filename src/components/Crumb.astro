@@ -1,0 +1,18 @@
+---
+import { href } from '../data/site'
+interface Item { href?: string; name: string }
+interface Props { lang: 'zh' | 'en'; items: Item[] }
+const { lang, items } = Astro.props
+---
+<nav class="crumb" aria-label={lang === 'zh' ? '面包屑' : 'Breadcrumb'}>
+  <ol>
+    {items.map((item, index) => (
+      <li>
+        {index > 0 && <span aria-hidden="true">/</span>}
+        {item.href && index < items.length - 1
+          ? <a href={item.href.startsWith('http') ? item.href : href(item.href)}>{item.name}</a>
+          : <span aria-current={index === items.length - 1 ? 'page' : undefined}>{item.name}</span>}
+      </li>
+    ))}
+  </ol>
+</nav>

@@ -20,6 +20,7 @@ import HfBoard from '../../../components/HfBoard.astro'
 import LiqFlow from '../../../components/LiqFlow.astro'
 import FlashSteps from '../../../components/FlashSteps.astro'
 import OracleSplit from '../../../components/OracleSplit.astro'
+import Crumb from '../../../components/Crumb.astro'
 import { ui, langs, type Lang } from '../../../data/book'
 import { getBook, partOf } from '../../../data/chapters'
 import { href, absolute, htmlLang, authorFor, authorLd, PUBLISHED, SNAPSHOT_ISO, SNAPSHOT_BLOCK } from '../../../data/site'
@@ -111,6 +112,7 @@ const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz,
     </aside>
     <article class="article" aria-labelledby="chapter-title" data-pagefind-body>
       <header class="article-head">
+        <Crumb lang={lang} items={[{ href: `${lang}/`, name: t.siteTitle }, { name: title }]} />
         <p class="eyebrow">{part?.[lang]}</p>
         {isDraft && <p class="callout warn">{lang === 'zh' ? '草稿：只在本地开发模式可见，正式构建不会包含本章。' : 'Draft: visible in local dev only; production builds leave this chapter out.'}</p>}
         <h1 id="chapter-title"><Nw text={title} /></h1>

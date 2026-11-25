@@ -8,6 +8,8 @@
 
 **[阅读中文版](https://letsplayweb3.liukang.com/zh/)** · **[从第 1 章开始](https://letsplayweb3.liukang.com/zh/chapters/01-how-to-read/)** · [English site](https://letsplayweb3.liukang.com/en/)
 
+不只是阅读 Web3，而是亲手玩懂 Web3。三个浏览器实验不需要钱包，也不花真钱：[授权额度](https://letsplayweb3.liukang.com/zh/labs/erc20-allowance/)、[恒定乘积资金池](https://letsplayweb3.liukang.com/zh/labs/constant-product-amm/)、[SHA-256 哈希链](https://letsplayweb3.liukang.com/zh/labs/hash-chain/)。它们是模拟。章节里的实验记录仍然是证据。[问题指南](https://letsplayweb3.liukang.com/zh/guides/)和[给 AI 代理的提示词](https://letsplayweb3.liukang.com/zh/learn-with-ai/)也守着同一条边界。
+
 想先看一眼？[到第 8 章看一笔测试网交易](https://letsplayweb3.liukang.com/zh/chapters/08-lab-counter/#inspect-a-transaction)：先看是否成功、有没有代币转账、留下了什么事件。阅读和查询都不需要连接钱包、领币或注册账号。
 
 ## 目前能读到什么
@@ -44,6 +46,7 @@ npm run preview   # 预览构建结果
 
 | 命令 | 用途 |
 | --- | --- |
+| `npm test` | 运行浏览器实验和学习事件的单元测试，不需要额外依赖 |
 | `npm run check:content` | 检查中英章节配对、frontmatter 和术语；构建前也会自动运行 |
 | `npm run check:facts` | 在可用实验记录里查找地址与哈希；始终扫描疑似密钥 |
 | `npm run check:build` | 用与构建相同的 `SITE_URL`、`BASE` 检查站内链接、资源和语言/SEO 网址 |
