@@ -36,6 +36,9 @@ test('prompt copies debounce and path starts once', () => {
   const started = gateEvent(path, state, 0)
   assert.equal(gateEvent(path, started.state, 50).emit, false)
   assert.equal(gateEvent(sanitizeEvent('learning_path_start', { learning_path: 'ai' }, 'zh'), started.state, 50).emit, true)
+  assert.equal(sanitizeEvent('learning_path_start', { learning_path: 'track-5m' }, 'en').params.learning_path, 'track-5m')
+  assert.equal(sanitizeEvent('learning_path_start', { learning_path: 'track-defi' }, 'zh').params.learning_path, 'track-defi')
+  assert.equal(sanitizeEvent('learning_path_start', { learning_path: 'track-99m' }, 'en'), null)
 })
 
 test('decorate adds transport flags without changing the learning params', () => {

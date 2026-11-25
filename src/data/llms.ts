@@ -8,7 +8,7 @@ import { learningPaths } from './public-paths.mjs'
 const license = `License / 授权: Kang’s original English and Chinese teaching text, term explanations, self-check questions and original teaching diagrams are shared under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/); this does not cover the whole repository. Full scope and contact / 完整范围与联系: [LICENSING.md](${REPO_URL}/blob/main/LICENSING.md).`
 const HEADER = `# Let’s Play Web3 / 一起玩 Web3
 
-> A free bilingual (Simplified Chinese + English) blockchain guide for beginners who can use a computer and the web. Hands-on labs run on the **Ethereum Sepolia testnet** (chainId 11155111). Start with everyday examples, then look at real transaction records. Reading needs no wallet, faucet, or account. Unofficial personal study notes, not affiliated with Ethereum, Etherscan, or any company. **Testnet only. Not financial advice. Test ETH and test tokens have no market value.**
+> A free bilingual (Simplified Chinese + English) blockchain guide for beginners who can use a computer and the web. Start with browser interactive labs (no wallet), then read everyday explanations and historical **Ethereum Sepolia** (chainId 11155111) records. Chapters 17–18 use local Anvil forks of Sepolia state; Chapter 19 is a fully local Anvil teaching chain. Reading and browser labs need no wallet, faucet, or account. Unofficial personal study notes, not affiliated with Ethereum, Etherscan, or any company. **Testnet / local labs only. Not financial advice. Test ETH and test tokens have no market value.**
 
 ${license}
 
