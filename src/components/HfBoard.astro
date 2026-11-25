@@ -1,0 +1,57 @@
+---
+// P2A health-factor comparison. All five states stay visible.
+// Selecting a card only highlights it. Numbers are the P2A local-fork readings,
+// not the later P2B readings.
+const zh = !Astro.url.pathname.includes('/en/')
+const cards = zh
+  ? [
+      { id: 'open', title: '开仓，预言机价 4,000', hf: '1.319999677920078588', pos: '86.7%', meter: true, note: '抵押仍是 1 WETH。债务 2,500.000610。健康因子大于 1，不能清算。', body: '1 WETH 抵押，借出 2,500 枚 Aave 测试 USDC。贷款价值比 80% 只说明当时还能再借，不是清算开关。' },
+      { id: 'drop', title: '跌到 2,800，还没人清算', hf: '0.923999549827419324', pos: '20.7%', meter: true, note: '抵押品余额仍然是 1 WETH。健康因子已经小于 0.95，但价格本身没有扣走抵押品。', body: '估值从 4,000 变成 2,800。aWETH 一个 wei 都没少。债务因又过了一个区块，变成 2,500.001218。' },
+      { id: 'liq', title: '有人调用清算之后', hf: '债务归零', pos: '0%', meter: false, note: '这次清算转走了 0.9375009135 WETH。价格下跌没有先扣，是这笔清算交易扣的。', body: '清算人代还了当时的全部债务。借款人还剩约 0.0624990865 WETH 的存款凭证，以及手里原本借出的测试 USDC。' },
+      { id: 'repay', title: '先还 750，再跌到同一个 2,800', hf: '1.319998301350757347', pos: '86.7%', meter: true, note: '价格和分支 A 相同，健康因子仍大于 1。清算调用被拒绝，错误码 45。', body: '债务降到 1,750.002252。同样的 2,800 不再穿过清算线。抵押品仍是整整 1 WETH。' },
+      { id: 'half', title: '只跌到 2,950', hf: '0.973499525711031074', pos: '28.9%', meter: true, note: '健康因子小于 1、但大于 0.95。这一部署一次最多清算 50%，不是 100%。', body: '请求即使写成最大值，协议也按 50% 截断。这是上限，不是每次都必须清掉一半。' }
+    ]
+  : [
+      { id: 'open', title: 'Open, oracle price 4,000', hf: '1.319999677920078588', pos: '86.7%', meter: true, note: 'Collateral is still 1 WETH. Debt is 2,500.000610. The health factor is above 1, so liquidation is refused.', body: 'The position posts 1 WETH and borrows 2,500 Aave test USDC. The 80% loan-to-value ratio limits further borrowing. It is not the liquidation switch.' },
+      { id: 'drop', title: 'Price 2,800, before anyone liquidates', hf: '0.923999549827419324', pos: '20.7%', meter: true, note: 'The collateral balance is still 1 WETH. The health factor is below 0.95, but the price drop has not taken collateral.', body: 'The valuation moves from 4,000 to 2,800. The aWETH balance does not lose one wei. One more block of interest makes the debt 2,500.001218.' },
+      { id: 'liq', title: 'After someone calls liquidation', hf: 'Debt is zero', pos: '0%', meter: false, note: 'This liquidation moves 0.9375009135 WETH. The price drop did not take it. The liquidation transaction did.', body: 'The liquidator repays the whole debt at that moment. The borrower keeps about 0.0624990865 WETH of deposit receipt, plus the test USDC already borrowed.' },
+      { id: 'repay', title: 'Repay 750, then the same price 2,800', hf: '1.319998301350757347', pos: '86.7%', meter: true, note: 'The price matches branch A. The health factor stays above 1. The liquidation call is rejected with error 45.', body: 'Debt falls to 1,750.002252. The same price 2,800 no longer crosses the liquidation line. Collateral is still the full 1 WETH.' },
+      { id: 'half', title: 'Price only falls to 2,950', hf: '0.973499525711031074', pos: '28.9%', meter: true, note: 'The health factor is below 1 and above 0.95. This deployment caps one liquidation at 50%, not 100%.', body: 'A max request is still cut to 50%. The cap is a maximum. The protocol does not force every liquidation to take half.' }
+    ]
+---
+<figure class="scene">
+  <fieldset class="scene-set">
+    <legend>{zh ? '同一次开仓快照上的五种读法' : 'Five readings from the same open-position snapshot'}</legend>
+    <p class="scene-help">{zh
+      ? '五张卡片一直都在。点选一张，只是用边框标出你正在看的情况。横条把健康因子 0.80 到 1.40 画成全长，两条竖线是 0.95 和 1.00。精确数字以文字为准。这些是借贷实验的读数，不要和下一章闪电贷实验里多出来的利息混用。'
+      : 'All five cards stay visible. Choosing one only draws a border around it. Each bar maps health factor 0.80 to 1.40. The two marks are 0.95 and 1.00. Read the digits in the text. These are the lending-lab readings. Do not mix them with the extra interest in the next chapter.'}</p>
+    <div class="scene-grid">
+      {cards.map((card, i) => (
+        <div class="scene-card">
+          <div class="scene-head">
+            <input type="radio" name="hf-scene" id={`hf-${card.id}`} checked={i === 0} aria-describedby={`hf-${card.id}-note`} />
+            <label for={`hf-${card.id}`}>{card.title}</label>
+          </div>
+          <p class="scene-hf"><span>{zh ? '健康因子' : 'Health factor'}</span> <strong>{card.hf}</strong></p>
+          {card.meter ? (
+            <div class="hf-track" aria-hidden="true">
+              <span class="hf-fill" style={`--pos: ${card.pos}`}></span>
+              <span class="hf-tick tick-95"></span>
+              <span class="hf-tick tick-1"></span>
+            </div>
+          ) : (
+            <p class="scene-empty">{zh ? '没有债务时，协议用一个极大约定值表示健康因子。这里不再画条。' : 'With no debt, the protocol reports a huge sentinel health factor. This card has no bar.'}</p>
+          )}
+          <p id={`hf-${card.id}-note`}>{card.note}</p>
+          <p>{card.body}</p>
+        </div>
+      ))}
+    </div>
+  </fieldset>
+  <figcaption>
+    <strong>{zh ? '图 17-1｜' : 'Figure 17-1 · '}</strong>
+    {zh
+      ? '价格从 4,000 跌到 2,800 时，不还款的仓位健康因子是 0.923999549827419324，抵押余额仍是 1。先还 750 后再到同一价格，健康因子是 1.319998301350757347，清算被拒绝。'
+      : 'At oracle price 2,800, the unpaid position has health factor 0.923999549827419324 and still holds 1 WETH. After repaying 750, the same price leaves health factor 1.319998301350757347, and liquidation is rejected.'}
+  </figcaption>
+</figure>

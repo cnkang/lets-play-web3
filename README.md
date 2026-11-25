@@ -12,8 +12,9 @@ Prefer to look first? [Inspect a testnet transaction in Chapter 8](https://letsp
 
 ## What is ready
 
-- 16 numbered chapters in English and Simplified Chinese, followed by 3 unnumbered appendices covering addresses, transactions, credentials guidance, the glossary and a self-check.
+- 19 numbered chapters in English and Simplified Chinese, followed by 3 unnumbered appendices covering addresses, transactions, credentials guidance, the glossary and a self-check.
 - **Phase-0 basics, experiments and review are complete. The Phase-1 DeFi labs ran on Sepolia on 2026-11-19.** Chapter 16 records them (swaps, arbitrage, v2 and v3 liquidity) with its own snapshot, block 12165973. Test tokens have no real value.
+- **Chapters 17–19 are later local labs, not new Sepolia broadcasts.** Chapters 17 and 18 write on a local Anvil fork of block 12165973 (lending, liquidation, flash loans). Chapter 19 is a fully local price-source comparison with no fork. Local hashes are not Sepolia transactions. Test-token marks are not income.
 - On-chain figures preserve the historical snapshot **2026-11-12 15:39:55 UTC+8 / Sepolia block 12117419**, except Chapter 16, which states its own (2026-11-19 / block 12165973). MBox-Burn’s leftover allowance was revoked during the Phase-0 wrap-up. Sourcify matched 8/8 addresses (5 `exact_match`, 3 `match`); Etherscan was still queued at the snapshot. UBOX V4 was tested and simulated locally, never deployed on-chain. [Chapter 15](https://letsplayweb3.liukang.com/en/chapters/15-evidence-p0/) explains the evidence and limits.
 - The Phase-0 review concluded **PASS WITH FINDINGS**, not “no vulnerabilities”. This is personal learning material compiled by Kang, not a professional audit or an official Ethereum/Etherscan publication.
 

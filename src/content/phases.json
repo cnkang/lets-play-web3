@@ -1,4 +1,6 @@
 [
   { "id": "p0", "order": 0, "zh": "Phase-0 · 基础实验与复核", "en": "Phase-0 · Basics, labs and review" },
-  { "id": "p1", "order": 1, "zh": "Phase-1 · DeFi", "en": "Phase-1 · DeFi" }
+  { "id": "p1", "order": 1, "zh": "Phase-1 · DeFi", "en": "Phase-1 · DeFi" },
+  { "id": "p2", "order": 2, "zh": "Phase-2 · 借贷、闪电贷与定价", "en": "Phase-2 · Lending, flash loans and prices" },
+  { "id": "ref", "order": 9, "zh": "参考", "en": "Reference" }
 ]

@@ -1,0 +1,62 @@
+---
+// Same-transaction flash-loan order, and what a failed repayment does.
+// Success and failure cards both stay on the page.
+const zh = !Astro.url.pathname.includes('/en/')
+const cards = zh
+  ? [
+      {
+        id: 'ok',
+        title: '同一笔交易里还清',
+        lead: '借出 1,000，手续费 0.500000 事先放在接收合约里。结束后借款没有留下。',
+        steps: ['资金池转出 1,000 测试 USDC', '回调里余额是 1,000.500000', '精确授权 1,000.500000', '返回前收回本金和手续费', '接收合约从 0.500000 变成 0；底层托管增加 0.500000']
+      },
+      {
+        id: 'bad',
+        title: '手续费没带够',
+        lead: '只拿到 1,000，还不出 1,000.5。资金状态撤销。gas 和 nonce 不撤销。',
+        steps: ['回调里只有 1,000', '归还转账失败', '持久日志是空的', '借款、授权和回调计数都回到交易前', '发送者 nonce 加 1，并付出 0.000473806 ETH 的 gas']
+      }
+    ]
+  : [
+      {
+        id: 'ok',
+        title: 'Repaid inside one transaction',
+        lead: 'The loan is 1,000. The 0.500000 fee was already in the receiver. No debt remains.',
+        steps: ['The pool transfers 1,000 test USDC', 'The callback balance is 1,000.500000', 'The receiver approves exactly 1,000.500000', 'The pool pulls principal and fee before the call returns', 'The receiver goes from 0.500000 to 0. Custody of the underlying token rises by 0.500000']
+      },
+      {
+        id: 'bad',
+        title: 'The fee was not there',
+        lead: 'The callback holds only 1,000 and cannot repay 1,000.5. Fund state reverts. Gas and nonce do not.',
+        steps: ['The callback holds only 1,000', 'The repayment transfer fails', 'The persistent logs are empty', 'The loan, approval and callback count return to the pre-transaction state', 'The sender’s nonce increases by 1 and the gas paid is 0.000473806 ETH']
+      }
+    ]
+---
+<figure class="scene">
+  <fieldset class="scene-set">
+    <legend>{zh ? '一笔闪电贷里，什么会留下' : 'What one flash-loan transaction keeps'}</legend>
+    <p class="scene-help">{zh
+      ? '两张卡片一直都在。左边是还清的顺序，右边是还不清时哪些东西撤销。手续费 0.500000 是交易前从本地水龙头领的测试币，不是获利。'
+      : 'Both cards stay visible. The first is the repay order. The second is what reverts when repayment fails. The 0.500000 fee was test money taken from the local faucet before the transaction. It is not profit.'}</p>
+    <div class="scene-grid scene-grid-2">
+      {cards.map((card, i) => (
+        <div class="scene-card">
+          <div class="scene-head">
+            <input type="radio" name="flash-scene" id={`flash-${card.id}`} checked={i === 0} aria-describedby={`flash-${card.id}-note`} />
+            <label for={`flash-${card.id}`}>{card.title}</label>
+          </div>
+          <p id={`flash-${card.id}-note`}>{card.lead}</p>
+          <ol class="step-list">
+            {card.steps.map((step) => <li>{step}</li>)}
+          </ol>
+        </div>
+      ))}
+    </div>
+  </fieldset>
+  <figcaption>
+    <strong>{zh ? '图 18-1｜' : 'Figure 18-1 · '}</strong>
+    {zh
+      ? '成功的那笔本地交易把借出、授权和归还放在同一个回执里。失败的那笔状态是回退，日志为空，但 gas 已经支付。两笔都不是 Sepolia 上的新交易。'
+      : 'The successful local transaction puts the borrow, the approval and the repayment in one receipt. The failed receipt is reverted and has no logs, but the gas was paid. Neither hash is a new Sepolia transaction.'}
+  </figcaption>
+</figure>

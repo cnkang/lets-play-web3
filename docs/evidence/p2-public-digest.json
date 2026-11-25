@@ -1,0 +1,133 @@
+{
+  "title": "Phase-2 public figure digest",
+  "purpose": "Minimal figures cited by chapters 17–19. Raw receipts, scripts and toy-contract source are not in this repository.",
+  "verifiedOn": "2026-11-25",
+  "verification": {
+    "archiveSha256": "d5e801918f6333ecd4c80d192af6939d0601bdcbeea581b406ecc2897ebaf6e3",
+    "manifestFilesChecked": 215,
+    "manifestMismatches": 0,
+    "method": "Chapter figures were read back from run.json, reconcile.json, reconciliation.json and assertions.json after the manifest hashes matched. This file does not re-run those labs.",
+    "notIncluded": [
+      "The evidence zip and its scripts, traces and verified Solidity trees",
+      "P2A anvil.log, which contained Anvil's built-in test mnemonic and keys and was excluded from the archive",
+      "Any reader wallet, user key or API credential"
+    ],
+    "limits": [
+      "Historical Phase-0 and Phase-1 provenance still needs the external lab archives. A secret scan without those archives is not a pass for those claims.",
+      "Local transaction hashes identify one saved run. A rerun draws new temporary accounts, so hashes change. Amounts were stable under the fixed block and fixed order.",
+      "The block hash below was copied from the P2A report. The packaging note says it was not re-queried from a public RPC."
+    ]
+  },
+  "environments": {
+    "p2a": {
+      "kind": "local-anvil-fork",
+      "chainId": 31337,
+      "loopback": "127.0.0.1:8546",
+      "forkBlock": 12165973,
+      "forkTimeSgt": "2026-11-19T11:58:12+08:00",
+      "runSgt": "2026-11-20 10:26:53–10:26:58",
+      "poolRevision": 1,
+      "note": "The historical launcher did not pass --accounts 0 --silent. Do not publish its node log. A later rerun should use those flags."
+    },
+    "p2b": {
+      "kind": "local-anvil-fork",
+      "chainId": 31337,
+      "loopback": "127.0.0.1:8547",
+      "forkBlock": 12165973,
+      "runSgt": "2026-11-25 10:56:13–11:00:23",
+      "poolRevision": 1,
+      "flashPremiumBps": 5,
+      "note": "This run did use --accounts 0 --silent. Real V2 trading and local mock pools are different evidence."
+    },
+    "oracleLab": {
+      "kind": "fully-local-no-fork",
+      "chainId": 31337,
+      "loopback": "127.0.0.1:18549",
+      "recordedSgt": "2026-11-25 11:31:21",
+      "note": "Teaching tokens tUSD and tCOL. Not Aave, not Uniswap, not a public-chain loss."
+    }
+  },
+  "figures": {
+    "p2aOpenHealthFactor": "1.319999677920078588",
+    "p2aHealthFactorAt2800BeforeLiquidation": "0.923999549827419324",
+    "p2aHealthFactorAfterRepay750At2800": "1.319998301350757347",
+    "p2aHealthFactorAt2950": "0.973499525711031074",
+    "p2aHighestLiquidatablePrice": "303030376969",
+    "p2aFullLiquidationDebtToCover": "2500002436",
+    "p2aCollateralSeizedWei": "937500913500000000",
+    "p2bOpenDebt": "2499999999",
+    "p2bHealthFactorAt2800BeforeLiquidation": "923999775283254651",
+    "p2bDisplayedCollateralLossWei": "937500456375000001",
+    "p2bProtocolSeizedWei": "937500456375000000",
+    "p2bRoundingWei": 1,
+    "p2bRealV2RemainderWethWei": "932834188037709956",
+    "oracleProfitAfterFeesBeforeGas": "3678345270534929823185",
+    "oracleExitQuoteShortfall": "3714031198495643589346",
+    "oracleAnchorShortfall": "5000000000000000000000",
+    "oracleDebt": "8000000000000000000000"
+  },
+  "jsonPointers": {
+    "p2aOpenHealthFactor": "web3-p2a-lending/evidence/run.json states.OPEN.A.uad.healthFactor",
+    "p2aAt2800": "states.A_AFTER_DROP_BEFORE_LIQ.A.uad.healthFactor",
+    "p2aAfterRepay": "states.B_AFTER_DROP.A.uad.healthFactor",
+    "p2aAt2950": "states.A2_AFTER_DROP.A.uad.healthFactor",
+    "p2aProbe": "probes.OPEN.highestLiquidatablePrice",
+    "p2bOpen": "web3-p2b-flashloan/evidence/run.json states.OPEN.debt",
+    "p2bAt2800": "states.E3-REAL-UNISWAP-V2-2800-before.uad[5]",
+    "p2bRounding": "evidence/reconcile.json aWETHRoundingWei",
+    "oracle": "web3-local-oracle-lab/evidence/reconciliation.json",
+    "oracleAssertions": "evidence/assertions.json sourceOnlyDifference, controlFailureExact, gasAndNonceChargedOnFailure"
+  },
+  "hex": [
+    "0xC558DBdd856501FCd9aaF1E62eae57A9F0629a3c",
+    "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+    "0x776BBf6AaE81A63A06470D3aed0208FA2305420b",
+    "0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3",
+    "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951",
+    "0x38d7b288efbc2cf0d80ebbc2b897329be18fa5c7aa4f3e1aaf5830eeb783d526",
+    "0xf3d1b8e0e5da807ee23f3d4ed851973c5d02fafa99898f66933f006d30750639",
+    "0xa404c8ef6a8d12d476e37359312e2d8e6a84804f77da1b77b6fb88e6b2dd1149",
+    "0x73f963d97d0fe20b67c859a76f0cd4cb766d08c7ce687a38a211bbd242e92cca",
+    "0xd5ac820103b410a0347058e3951c5badd291dbc89eb3e336a7de57dc25487aeb",
+    "0x06c7e14f0df2af520e618b656cb58ba3850177862a1453e28dc72b0d51b7c1b5",
+    "0xa0db889ce08a99745b93b3904f6da2c2a48e12140bc805df7b2ee4670ca7e414",
+    "0x444b6a852d89e7774ea5414a77298fb515ecc1423771c0228abce44b08d0ae9f",
+    "0x2c23365730935cf83b164494eaef65978ad0168b725eb000a28d7b77167e46f2",
+    "0x480526575d393ae820396acaa2b958faa0311948ce152614368514d87549ca7f",
+    "0x0f2b185a3de3fa4bec34815588c820d2ac05e7e07547ca1693e5fcfe592ec5a5",
+    "0xc00659ac6179fcb69292949ea0c90b16a7d45890ae8520405c85da8fd8cf4438",
+    "0x0983452c237884324c860ac1ee1b5563bed2718cb6136fc16f5225cccbcddcc6"
+  ],
+  "claims": [
+    {"id": "p2a-open-hf", "value": "1.319999677920078588", "files": ["src/content/chapters/zh/17-lending-liquidation.mdx", "src/content/chapters/en/17-lending-liquidation.mdx"]},
+    {"id": "p2a-hf-2800", "value": "0.923999549827419324", "files": ["src/content/chapters/zh/17-lending-liquidation.mdx", "src/content/chapters/en/17-lending-liquidation.mdx"]},
+    {"id": "p2a-hf-repay", "value": "1.319998301350757347", "files": ["src/content/chapters/zh/17-lending-liquidation.mdx", "src/content/chapters/en/17-lending-liquidation.mdx"]},
+    {"id": "p2a-hf-2950", "value": "0.973499525711031074", "files": ["src/content/chapters/zh/17-lending-liquidation.mdx", "src/content/chapters/en/17-lending-liquidation.mdx"]},
+    {"id": "p2a-boundary", "value": "3,030.30376969", "files": ["src/content/chapters/zh/17-lending-liquidation.mdx", "src/content/chapters/en/17-lending-liquidation.mdx"]},
+    {"id": "p2a-seized", "value": "0.9375009135", "files": ["src/content/chapters/zh/17-lending-liquidation.mdx", "src/content/chapters/en/17-lending-liquidation.mdx"]},
+    {"id": "p2a-cover", "value": "2,500.002436", "files": ["src/content/chapters/zh/17-lending-liquidation.mdx", "src/content/chapters/en/17-lending-liquidation.mdx"]},
+    {"id": "p2a-interest", "value": "0.004383", "files": ["src/content/chapters/zh/17-lending-liquidation.mdx", "src/content/chapters/en/17-lending-liquidation.mdx"]},
+    {"id": "p2a-not-mintable", "value": "not mintable", "files": ["src/content/chapters/zh/17-lending-liquidation.mdx", "src/content/chapters/en/17-lending-liquidation.mdx"]},
+    {"id": "p2b-open-debt", "value": "2,499.999999", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-hf", "value": "0.923999775283254651", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-debt-before", "value": "2,500.000608", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-display-loss", "value": "0.937500456375000001", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-gross-wei", "value": "937500456375000000", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-gas", "value": "0.000473806", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-mock-remainder", "value": "79.405818", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-v2-remainder", "value": "0.932834188037709956", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-spot", "value": "12,542,705.937", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-429", "value": "HTTP 429", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-prefund", "value": "0.500000", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "p2b-mark", "value": "2,611.935726505587876800", "files": ["src/content/chapters/zh/18-flash-loans.mdx", "src/content/chapters/en/18-flash-loans.mdx"]},
+    {"id": "oracle-profit", "value": "3,678.345270534929823185", "files": ["src/content/chapters/zh/19-oracle-safety.mdx", "src/content/chapters/en/19-oracle-safety.mdx"]},
+    {"id": "oracle-gap", "value": "3,714.031198495643589346", "files": ["src/content/chapters/zh/19-oracle-safety.mdx", "src/content/chapters/en/19-oracle-safety.mdx"]},
+    {"id": "oracle-recovery", "value": "4,285.968801504356410654", "files": ["src/content/chapters/zh/19-oracle-safety.mdx", "src/content/chapters/en/19-oracle-safety.mdx"]},
+    {"id": "oracle-cap", "value": "8,110.957499999999997750", "files": ["src/content/chapters/zh/19-oracle-safety.mdx", "src/content/chapters/en/19-oracle-safety.mdx"]},
+    {"id": "oracle-end-price", "value": "2.045236389923581453", "files": ["src/content/chapters/zh/19-oracle-safety.mdx", "src/content/chapters/en/19-oracle-safety.mdx"]},
+    {"id": "oracle-peak", "value": "3.604869999999999999", "files": ["src/content/chapters/zh/19-oracle-safety.mdx", "src/content/chapters/en/19-oracle-safety.mdx"]},
+    {"id": "oracle-fail-gas", "value": "0.000258899", "files": ["src/content/chapters/zh/19-oracle-safety.mdx", "src/content/chapters/en/19-oracle-safety.mdx"]},
+    {"id": "oracle-ok-gas", "value": "0.000312342", "files": ["src/content/chapters/zh/19-oracle-safety.mdx", "src/content/chapters/en/19-oracle-safety.mdx"]},
+    {"id": "oracle-borrow-limit", "value": "BorrowLimit", "files": ["src/content/chapters/zh/19-oracle-safety.mdx", "src/content/chapters/en/19-oracle-safety.mdx"]}
+  ]
+}

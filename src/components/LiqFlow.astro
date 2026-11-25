@@ -1,0 +1,53 @@
+---
+// Asset flow for the P2A full liquidation at oracle price 2,800.
+// The SVG repeats the list, so assistive tech uses the list.
+const zh = !Astro.url.pathname.includes('/en/')
+const steps = zh
+  ? [
+      ['清算人付出', '2,500.002436 枚测试 USDC，替借款人还清当时的债务。'],
+      ['借款人失去', '0.9375009135 WETH。跌价那一步并没有先扣这笔。'],
+      ['清算人收到', '0.933036623435714286 WETH。'],
+      ['协议金库另得', '0.004464290064285714 aWETH。这是奖励里分给协议的部分，不是把清算人的币再扣一次。']
+    ]
+  : [
+      ['The liquidator pays', '2,500.002436 test USDC and clears the debt at that moment.'],
+      ['The borrower loses', '0.9375009135 WETH. The earlier price drop did not take this.'],
+      ['The liquidator receives', '0.933036623435714286 WETH.'],
+      ['The protocol treasury also receives', '0.004464290064285714 aWETH. That is the protocol’s share of the bonus, not a second cut from the liquidator.']
+    ]
+---
+<figure class="scene">
+  <div class="flow" aria-hidden="true">
+    <div class="flow-box flow-pay">
+      <strong>{zh ? '清算人' : 'Liquidator'}</strong>
+      <span>{zh ? '付出测试 USDC' : 'Pays test USDC'}</span>
+    </div>
+    <div class="flow-arrow" aria-hidden="true">→</div>
+    <div class="flow-box">
+      <strong>{zh ? '资金池' : 'Pool'}</strong>
+      <span>{zh ? '债务被还清' : 'Debt is repaid'}</span>
+    </div>
+    <div class="flow-arrow" aria-hidden="true">→</div>
+    <div class="flow-stack">
+      <div class="flow-box flow-get">
+        <strong>{zh ? '清算人收回' : 'Liquidator receives'}</strong>
+        <span>0.933036623435714286 WETH</span>
+      </div>
+      <div class="flow-box flow-fee">
+        <strong>{zh ? '协议金库' : 'Protocol treasury'}</strong>
+        <span>0.004464290064285714 aWETH</span>
+      </div>
+    </div>
+  </div>
+  <ol class="flow-list">
+    {steps.map(([title, text]) => (
+      <li><strong>{title}</strong> {text}</li>
+    ))}
+  </ol>
+  <figcaption>
+    <strong>{zh ? '图 17-2｜' : 'Figure 17-2 · '}</strong>
+    {zh
+      ? '这是借贷实验里、预言机价 2,800 且有人真正调用清算之后的资产去向。按 2,800 的测试计价，多出来的大约 5% 是清算奖励：约 112.50 给清算人，约 12.50 给协议。这是预言机计价，不是美元收入。'
+      : 'This is where assets moved in the lending lab after a real liquidation call at oracle price 2,800. At that test valuation, the extra 5% is the liquidation bonus: about 112.50 to the liquidator and about 12.50 to the protocol. The valuation is not dollar income.'}
+  </figcaption>
+</figure>

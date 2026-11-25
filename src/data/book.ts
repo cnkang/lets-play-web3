@@ -27,7 +27,7 @@ export const ui = {
     switchLabel: '切换到英文版',
     skip: '跳到正文',
     footer:
-      '非官方的个人学习资料，与 Ethereum、Etherscan 或任何公司无关 · 仅 Ethereum Sepolia 测试网 · 不构成投资建议',
+      '非官方的个人学习资料，与 Ethereum、Etherscan 或任何公司无关 · 公共广播仅 Ethereum Sepolia · 第 17–19 章为本地实验 · 不构成投资建议',
     snapshot: '链上数字截至 2026-11-12 15:39:55（新加坡时间，UTC+8）· Sepolia 区块 12117419',
     menu: '菜单'
   },
@@ -49,7 +49,7 @@ export const ui = {
     switchLabel: 'Switch to Chinese',
     skip: 'Skip to content',
     footer:
-      'Unofficial personal study notes, not affiliated with Ethereum, Etherscan or any company · Ethereum Sepolia testnet only · Not financial advice',
+      'Unofficial personal study notes, not affiliated with Ethereum, Etherscan or any company · Public broadcasts on Ethereum Sepolia only · Chapters 17–19 are local labs · Not financial advice',
     snapshot: 'On-chain figures as of 2026-11-12 15:39:55 Singapore time (UTC+8) · Sepolia block 12117419',
     menu: 'Menu'
   }

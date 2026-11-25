@@ -2,7 +2,7 @@ import puppeteer from 'puppeteer-core'
 import { readFileSync } from 'node:fs'
 const axeSrc = readFileSync('node_modules/axe-core/axe.min.js', 'utf8')
 const B = 'http://localhost:4399'
-const pages = ['', 'chapters/01-how-to-read/', 'chapters/08-lab-counter/', 'chapters/10-approve-vs-payment/', 'chapters/12-atomicity-batch/', 'chapters/appendix-a-addresses-txs/', 'chapters/appendix-b-credentials-api-keys/', 'chapters/appendix-c-glossary-quiz/', 'chapters/16-defi-labs/', 'search/', 'accessibility/']
+const pages = ['', 'chapters/01-how-to-read/', 'chapters/08-lab-counter/', 'chapters/10-approve-vs-payment/', 'chapters/12-atomicity-batch/', 'chapters/appendix-a-addresses-txs/', 'chapters/appendix-b-credentials-api-keys/', 'chapters/appendix-c-glossary-quiz/', 'chapters/16-defi-labs/', 'chapters/17-lending-liquidation/', 'chapters/18-flash-loans/', 'chapters/19-oracle-safety/', 'search/', 'accessibility/']
 const urls = []
 for (const l of ['zh', 'en']) for (const p of pages) urls.push(`${B}/${l}/${p}`)
 urls.push(`${B}/404.html`, `${B}/`)

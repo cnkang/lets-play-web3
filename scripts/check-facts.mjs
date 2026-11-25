@@ -47,8 +47,13 @@ const fail = (msg) => { failures++; console.error('✗ ' + msg) }
 
 // ---- 1. facts
 const hexRe = /0x[0-9a-fA-F]{64}|0x[0-9a-fA-F]{40}/g
+const digestPath = join(root, 'docs/evidence/p2-public-digest.json')
+const hasDigest = existsSync(digestPath)
+const digestText = hasDigest ? readFileSync(digestPath, 'utf8') : ''
+const digestLower = digestText.toLowerCase()
+
 if (sourceFiles.length) {
-  const corpus = sourceFiles.map((f) => readFileSync(f, 'utf8')).join('\n').toLowerCase()
+  const corpus = (sourceFiles.map((f) => readFileSync(f, 'utf8')).join('\n') + '\n' + digestText).toLowerCase()
   let checked = 0
   for (const f of files) {
     if (!/src\/|public\/diagrams|scripts\//.test(f)) continue
@@ -61,9 +66,38 @@ if (sourceFiles.length) {
       if (!corpus.includes(m[0].toLowerCase())) fail(`${relative(root, f)}: ${m[0]} not found in sources`)
     }
   }
-  console.log(`facts: ${checked} hex values checked against ${sourceFiles.length} source files`)
+  console.log(`facts: ${checked} hex values checked against ${sourceFiles.length} source files plus the P2 public digest`)
 } else {
-  console.log('facts: sources not found, skipping (set SOURCES_DIR to enable)')
+  console.log('facts: historical provenance SKIPPED (set SOURCES_DIR and P1_SOURCES_DIR). This is not a pass for Phase-0 or Phase-1 claims.')
+}
+
+// Chapters 17–19 cite a committed public digest. Raw receipts are not in this repo.
+// A missing external lab archive must not be reported as if those chapters were unchecked.
+if (!hasDigest) fail('docs/evidence/p2-public-digest.json is missing')
+else {
+  const p2Chapter = /chapters\/(zh|en)\/(17-lending-liquidation|18-flash-loans|19-oracle-safety)\.mdx$/
+  let checked = 0
+  for (const f of files) {
+    if (!p2Chapter.test(f)) continue
+    const text = readFileSync(f, 'utf8')
+    for (const m of text.matchAll(hexRe)) {
+      const after = text[m.index + m[0].length]
+      if (after && /[0-9a-fA-F]/.test(after)) continue
+      checked++
+      if (!digestLower.includes(m[0].toLowerCase())) fail(`${relative(root, f)}: ${m[0]} is not in the P2 public digest`)
+    }
+  }
+  const digest = JSON.parse(digestText)
+  let claims = 0
+  for (const claim of digest.claims || []) {
+    claims++
+    for (const relPath of claim.files || []) {
+      const text = readFileSync(join(root, relPath), 'utf8')
+      if (!text.includes(claim.value)) fail(`${relPath}: missing checked figure ${claim.id} (${claim.value})`)
+    }
+  }
+  console.log(`p2 digest: ${checked} hex values in chapters 17–19 and ${claims} figure strings checked against docs/evidence/p2-public-digest.json`)
+  console.log('p2 digest: this checks the committed fixture. It does not re-read raw receipts, and it is not a Phase-0/1 provenance pass.')
 }
 
 // ---- 2. secrets

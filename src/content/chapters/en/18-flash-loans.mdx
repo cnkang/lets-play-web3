@@ -1,0 +1,160 @@
+---
+title: "Flash loans: repay before the transaction ends"
+description: "A flash loan lets one transaction use pooled funds if it repays principal and fee before it returns. If it cannot, fund state reverts. Gas and the nonce do not. A real test pool can trade at a badly distorted price."
+navTitle: "18 · Flash loans and atomic liquidation"
+part: p2-credit
+order: 180
+status: published
+updated: "2026-11-25"
+lab: anvil-fork
+snapshot:
+  at: "2026-11-19T11:58:12+08:00"
+  block: 12165973
+---
+
+<p class="lead">An ordinary loan can last for days. A flash loan cannot. The funds exist only inside one transaction. Take them, use them, and repay the principal and the fee before the transaction ends. If you cannot, the transfers in that transaction revert. You do not keep the borrowed tokens.</p>
+
+<Callout type="warn" title="Still a local copy, and the numbers differ from Chapter 17">
+
+Writes in this chapter used another local Anvil port, `127.0.0.1:8547`, chainId **31337**. The read-only fork source is still Sepolia block **12165973**. The run was **2026-11-25 10:56:13–11:00:23** Singapore time. Nothing was broadcast to a public chain.
+
+The shape matches Chapter 17: post 1 WETH, request a borrow of 2,500 Aave test USDC, then set the quote to 2,800. The position was opened later. Opening debt is **2,499.999999**, one minimal unit under 2,500. After the drop to 2,800, and before liquidation, debt is **2,500.000608** and the health factor is **0.923999775283254651**. Collateral is still 1. Do not replace these with Chapter 17’s 0.923999549827419324 or 0.9375009135.
+
+</Callout>
+
+## Start with an everyday picture
+
+Before a shop closes, the clerk may let you take the till, finish one errand next door, and put the money back before you leave. You must also add a small fee.
+
+If you cannot, the clerk restores the till. You do not leave with the money. The taxi fare is still paid. The number you took in the queue is not given back. On chain, those leftovers are gas and the nonce.
+
+A <Term id="flash-loan">flash loan</Term> enforces “settle now”. It is not “no cost”. It is not “no risk”. It does not promise a profit.
+
+## Why the pool can lend
+
+The protocol does not ask for ordinary collateral to cover this flash loan. It uses a different rule. The transaction must not end while the flash loan is still unpaid. After the callback returns, the pool pulls the principal and the fee. If the pull fails, the fund operations in that transaction fail.
+
+This market has USDC flash loans enabled. At the fixed block, about **29,072.222094** test USDC was available. That is more than the later requests of 1,000 and 2,501. The total fee is **5** basis points, or **0.05%**. The protocol’s share is 4 of those basis points. It is a split of the 5, not a second fee on the principal. `flashLoanSimple` does not turn the flash loan into ordinary debt. The borrower still pays the fee.
+
+<FlashSteps />
+
+In experiment 1, the 0.500000 fee was minted from the local faucet into the receiver before the flash loan. That is outside test money, not profit. The borrow, the approval and the repayment share one receipt. Deployment and the prefund are earlier transactions. Do not describe the whole setup as “only one transaction”.
+
+Experiment 2 skips the prefund on purpose. The callback holds 1,000 and cannot repay 1,000.5. The receipt is reverted. Its persistent logs are empty. Scaled debt and scaled collateral match the earlier state. The sender’s nonce moves from 1 to 2. ETH falls by **0.000473806**, equal to gas used times the gas price. The transfer fails because the balance cannot cover principal plus fee.
+
+After a failure, the unscaled debt balance can look larger because a new block added interest. That is not a partial liquidation. Check the rollback with scaled balances and underlying tokens.
+
+## What else can fit in one transaction
+
+If the protocol allows the steps, and every step can finish inside the same transaction, a flash loan can also:
+
+1. **Liquidate.** You do not have to hold the full repayment first. That is the lab below.
+2. **Change collateral.** Repay the old debt, withdraw the old collateral, post new collateral, and borrow an ordinary loan that repays the flash loan.
+3. **Exit a position that already has debt.** Borrow to repay, withdraw collateral, sell part of it, and repay the flash loan. Keep the rest.
+4. **Reduce leverage partly.** Repay only some debt. The position remains. The health factor often improves. Ordinary debt does not vanish.
+5. **Add leverage in one transaction.** Buy more collateral, supply it, and borrow an ordinary loan to repay the flash loan. The flash loan is gone. The ordinary loan remains. It still accrues interest, and it can still be liquidated.
+6. **Move a debt to another market.** Withdrawing, supplying and borrowing again must all fit in the same transaction.
+7. **Redeem or settle immediately.** The underlying asset must be available now. A queue, a cooldown, or delivery in a later block does not fit an ordinary flash loan.
+
+These paths are usually a custom contract, not one button. A cross-chain transfer, or a chance that appears only in the next transaction, is not an ordinary flash loan.
+
+## A wide price gap is not a reason to borrow more
+
+A usual arbitrage borrows, buys where the price is low, sells where it is high, repays, and keeps what remains. The path can cross three pools.
+
+The limits are the same family as swaps:
+
+- Buying lifts the price. Selling pushes it down. A larger amount can erase the gap you saw.
+- A quote is not a fill. The ratio on screen is often the price of a tiny trade.
+- Subtract the flash-loan fee, the swap fee, price impact and gas.
+- On a public network, someone else may trade ahead of you or around you. Chapter 16 calls that extractable ordering value <Term id="mev">MEV</Term>.
+- A contract can require a minimum amount out and revert otherwise. The revert can avoid a losing fund operation. The gas is still spent.
+
+This chapter does not give steps for trading against a live pool. The list is a boundary, not a checklist.
+
+## The real V2 pool did trade, at a price nothing like 2,800
+
+The run did not switch to a fake exchange first. It looked, on the same fork, for pools of the **same Aave test tokens**. The Uniswap V2 router and pair did complete the liquidation.
+
+The pair is <Addr a="0x776BBf6AaE81A63A06470D3aed0208FA2305420b" short />. The router is <Addr a="0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3" short />. The pool’s spot ratio is about **12,542,705.937** test USDC per test WETH. The Aave oracle said 2,800. Those are not the same claim.
+
+The order inside the transaction was:
+
+1. Flash-borrow **2,501.000000** test USDC, a little more than the debt, so interest does not leave the repayment short. The fee is **1.250500**.
+2. Liquidation actually repays **2,500.001217**. The borrower’s debt becomes 0.
+3. The receiver gets **0.933036168487500000** WETH. The protocol separately gets **0.004464287887500000** aWETH. The borrower’s displayed collateral falls by **0.937500456375000001** WETH.
+4. The router sells only **0.000201980449790044** WETH and receives enough test USDC to repay. Unused flash-loan funds stay in the same callback and help the repayment.
+5. The receiver ends with **0** test USDC and **0.932834188037709956** WETH.
+
+Mark the leftover WETH at the oracle price 2,800. Before gas, that mark is about **2,611.935726505587876800** test USDC. The liquidation bonus itself is only about **112.500054765**. Most of the gap comes from the distorted test pool: a tiny amount of WETH buys a large amount of test USDC. Do not call that repeatable dollar income. Do not call the whole remainder a 5% bonus.
+
+The protocol’s total collateral transfer is **937500456375000000** wei. The displayed balance falls by **937500456375000001** wei. The extra **1** wei comes from two divisions by the liquidity index, then a multiplication. The index is `1000604607782853235519439946`. It is not a fine and not a fee. The integer check did not wave the 1 wei through as “close enough”. Chapter 17’s seized amount is a different run. Do not describe 0.9375009135 as this same rounding.
+
+Some V3 fee tiers had zero active liquidity. That does not prove every size is untradable. A swap can cross an empty range. A large token balance also does not prove depth at the current price. This run does not claim it searched every exchange for the best route.
+
+## The fairly priced local pools are a control
+
+The real V2 path already traded. The next four pools were deployed later on the same fork. They are constant-product pools. Each one holds real test-token balances first. They do not mint swap output from a made-up price. WETH comes from a local wrap. USDC comes from the faucet, at most 10,000 per mint.
+
+- Deep 2,800: 100 WETH and 280,000 USDC
+- Deep 2,950: 100 WETH and 295,000 USDC
+- Shallow 2,800: 10 WETH and 28,000 USDC
+- A worse 2,400 pool: 100 WETH and 240,000 USDC
+
+The swap fee is 0.3%. Those reserves are outside experiment capital. Gas for opening, deployment, funding and the oracle change is setup cost too. The core table subtracts only the strategy transaction’s own gas. Do not ignore the setup and then say the whole run created money from nothing.
+
+On success, the mock branches sell all WETH received from liquidation and record the remainder as USDC. The real V2 branch sells only enough WETH to repay and keeps the rest as WETH. Do not compare the two remainders by the USDC figure alone.
+
+<T label="Three successful liquidations against fairly priced pools">
+
+| Case | Actually repaid | Gross remainder (test USDC) | Gas for that transaction (ETH) | Teaching net if ETH is marked at 2,800 |
+| --- | ---: | ---: | ---: | ---: |
+| 2,800 deep pool, full close | 2,500.001217 | 79.405818 | 0.001697218 | 74.653607600 |
+| 2,950, protocol cuts to 50% | 1,250.000609 | 45.981661 | 0.001676188 | 41.288334600 |
+| 2,800, repay only 1,250 by choice | 1,250.000000 | 45.676912 | 0.001675574 | 40.985304800 |
+
+</T>
+
+“If ETH is marked at 2,800” is an assumption. Keep it separate from the ETH actually spent. At 2,950 the request said maximum, but the health factor **0.973499763244857579** is still above 0.95, so the protocol allows about half. At 2,800, choosing to repay only 1,250 does not make the protocol demand the rest. Both 50% and 100% are caps.
+
+Keep the three failures in two columns, “if it had traded” and “what the chain kept”:
+
+- The same 2,800 on a shallow pool: the pure calculation is **−118.262443** test USDC. Collateral, debt and pool reserves return to the scaled state that can be checked. The receiver remainder is 0. Gas is **0.001293742** ETH.
+- The oracle stays at 2,800, but the pool trades at 2,400: the pure calculation is **−289.259545**. The transaction reverts as well. Gas is **0.001293742** ETH.
+- The deep pool could have left 79.405818, but the order required at least 2,700 out. The quote was too low, so the guard reverted. Do not say the flash-loan fee was paid. Do not say collateral was seized. Gas is **0.001172500** ETH.
+
+The shallow pool shows this: the screen can still say 2,800 while a large sale knocks the price down. The bad pool shows this: the oracle price is not the price you can sell at. The minimum-out guard shows this: the contract can abandon the whole fund operation, and the gas is still gone.
+
+Two older failed branches later asked for an internal trace. The upstream debug call returned **HTTP 429** (too many requests). The record keeps that limit. It did not switch endpoints, and it did not invent a trace. The final minimum-out call trace was saved. Where no trace exists, do not write that an internal transfer was seen.
+
+<Callout type="danger" title="A balance inside the callback is not success">
+
+The pool pulls the repayment after the callback returns. A mid-callback balance, or a temporary log, is not the final ledger. Read the receipt status, the persistent logs, and the scaled balances before and after.
+
+</Callout>
+
+## Hashes from this saved run
+
+<details>
+<summary>Local receipts (chainId 31337, do not open Etherscan)</summary>
+
+- Borrow 1,000 and repay: <LocalRef value="0xa0db889ce08a99745b93b3904f6da2c2a48e12140bc805df7b2ee4670ca7e414" env="fork" short />
+- Missing fee, on purpose: <LocalRef value="0x444b6a852d89e7774ea5414a77298fb515ecc1423771c0228abce44b08d0ae9f" env="fork" short />
+- Real V2 atomic liquidation: <LocalRef value="0x2c23365730935cf83b164494eaef65978ad0168b725eb000a28d7b77167e46f2" env="fork" short />
+- Fairly priced deep pool: <LocalRef value="0x480526575d393ae820396acaa2b958faa0311948ce152614368514d87549ca7f" env="fork" short />
+- Minimum-out revert: <LocalRef value="0x0f2b185a3de3fa4bec34815588c820d2ac05e7e07547ca1693e5fcfe592ec5a5" env="fork" short />
+
+This run started Anvil with `--accounts 0 --silent`, so the log did not print Anvil’s built-in test accounts. The older launcher behind Chapter 17 did not use those flags. Do not rewrite either history. This book does not ship the lab scripts, and it does not suggest copying them onto a real protocol.
+
+</details>
+
+## In short
+
+- A flash loan does not ask for ordinary collateral first, because failure reverts the fund changes inside the transaction.
+- Gas and the nonce do not revert. The prefunded 0.500000 fee is outside test money.
+- The pattern can liquidate, swap collateral, reduce leverage, add leverage, migrate a debt, or redeem immediately. Added leverage leaves an ordinary loan. A cross-chain wait usually cannot fit.
+- A larger amount can eat the price gap. A quote is not a fill.
+- The real V2 route did trade. The test-pool price is badly distorted. The local mocks are an extra control. They do not cancel that trade.
+- The 1 wei display gap is index rounding. The optional traces on failed branches have an honest HTTP 429 limit.
+
+The next chapter moves the question to the price itself. What happens if another contract treats a thin-pool spot price, just pushed by one large trade, as a reliable value for collateral?

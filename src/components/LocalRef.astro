@@ -1,0 +1,26 @@
+---
+// A local Anvil hash or address. Copyable, never linked to Sepolia Etherscan.
+// env="fork": a write on a local fork of a historical Sepolia block (chainId 31337).
+// env="local": a fully local teaching model with no public-chain fork.
+interface Props { value: string; kind?: 'tx' | 'address'; env: 'fork' | 'local'; short?: boolean }
+const { value, kind = 'tx', env, short = false } = Astro.props
+const zh = !Astro.url.pathname.includes('/en/')
+const shown = short ? `${value.slice(0, 8)}…${value.slice(-6)}` : value
+const badge = env === 'fork'
+  ? (zh ? '本地 fork' : 'Local fork')
+  : (zh ? '本地模型' : 'Local model')
+const what = kind === 'tx' ? (zh ? '交易哈希' : 'transaction hash') : (zh ? '地址' : 'address')
+const note = env === 'fork'
+  ? (zh
+    ? '本地 Anvil 回执，chainId 31337，分叉自只读的历史状态。不要在 Sepolia Etherscan 查询。'
+    : 'Local Anvil receipt, chainId 31337, on a read-only historical fork. Do not look it up on Sepolia Etherscan.')
+  : (zh
+    ? '完全本地的教学模型回执，没有分叉公共链。不要在 Sepolia Etherscan 查询。'
+    : 'Receipt from a fully local teaching model. There was no public-chain fork. Do not look it up on Sepolia Etherscan.')
+const copy = zh ? '复制' : 'Copy'
+---
+<span class="chip chip-local">
+  <span class:list={['env-badge', env === 'local' && 'is-local']}>{badge}</span>
+  <span class="local-hex" aria-label={`${note} ${what} ${value}`}>{short ? <><span aria-hidden="true">{shown}</span><span class="visually-hidden">{value}</span></> : value}</span>
+  <button type="button" class="copy-btn" data-copy={value} data-done={zh ? '已复制' : 'Copied'} aria-label={`${copy} ${what} ${value}`}>{copy}</button>
+</span>

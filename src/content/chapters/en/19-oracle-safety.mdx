@@ -1,0 +1,104 @@
+---
+title: "Oracles: a thin-pool spot price is not a reliable collateral value"
+description: "A local comparison with no fork. If a lender trusts a spot price that the same trade just pushed up, it leaves an ordinary debt. An independent fixed price rejects the same request. This is not an Aave bug and not a realized loss."
+navTitle: "19 · Oracles and DeFi safety"
+part: p2-credit
+order: 190
+status: published
+updated: "2026-11-25"
+lab: anvil-local
+---
+
+<p class="lead">The prices in the last two chapters came from the lender’s own <Term id="oracle">oracle</Term>. In that test, the source stored a fixed 4,000. This chapter asks a different question. What collateral value appears if another contract ignores an independent quote and reads only the spot price it just pushed up in a thin pool?</p>
+
+<Callout type="warn" title="This demo has no fork, and it is not Aave">
+
+The run around 2026-11-25 11:31 used a fresh local Anvil node. The interface was `127.0.0.1:18549`, chainId **31337**, starting at the genesis block. There was no public RPC, no Sepolia state, and no call to real Aave or Uniswap.
+
+The tokens are tUSD and tCOL. They are not dollars and not WETH. The price unit is tUSD per tCOL. The shortfall and the gap below are readings inside a teaching model. They are not a dollar loss that already happened, and they are not evidence that a real protocol was broken.
+
+</Callout>
+
+## Start with an everyday picture
+
+A corner shop paints today’s price in the window. You have just pushed that shallow counter price up with one large order. If the pawn shop looks only at the card you just changed, it treats your collateral as valuable and lends against it.
+
+A high number on that card does not mean the whole town will buy at that price. Goods already inside the pawn shop cannot be sold next door as well. If a separate price list ignores the card completely, the same borrow request is refused.
+
+In this lab the separate list is fixed at 1. It shows only that this thin-pool trade cannot move it. It does not prove that a real-world oracle is safe forever.
+
+## Same parameters, only the valuation source changes
+
+The opening state is small. The pool holds 10,000 of each token. The price is 1. The lender holds 50,000 tUSD. The loan-to-value ratio is 75%. A toy flash-loan pool holds 100,000 tUSD at the same 0.05% fee. The simulator starts with zero of both tokens. Every step is inside one transaction.
+
+<OracleSplit />
+
+The fragile transaction actually did this:
+
+1. The flash-loan pool transfers out 10,000 tUSD.
+2. The simulator spends 9,000 tUSD on tCOL and keeps 1,000. It receives **4,729.352237389975227955** tCOL. The thin-pool spot price rises to **3.604869999999999999**.
+3. It deposits **3,000** tCOL into the lender. Those 3,000 are locked. They cannot be sold later in the same trade.
+4. At the pushed spot price, 3,000 of collateral is worth about 10,814.61. Times 75%, the cap is **8,110.957499999999997750**. The request for 8,000 is allowed. At the anchor price of 1, 3,000 is worth 3,000, so the 75% cap is only **2,250**.
+5. It sells only the unlocked **1,729.352237389975227955** tCOL and receives **4,683.345270534929823185** tUSD.
+6. The flash-loan pool takes back 10,000 principal and a fee of 5.
+7. The simulator keeps **3,678.345270534929823185** tUSD. The lender keeps an ordinary debt of 8,000 and the locked 3,000 tCOL.
+
+The price does not return to 1, because those 3,000 tCOL are still in the lender. They were not sold back. The pool ends with 7,000 tCOL, and the spot price is **2.045236389923581453**. Do not finish the story by pretending the collateral was sold too.
+
+The loan-to-value ratio is already 75%, not 100%. The buffer does not stop this oversized loan, because the price itself was pushed up. A conservative borrowing ratio does not repair a valuation that follows a thin-pool spot price.
+
+## Three numbers, and none of them is “the money already lost”
+
+The lender’s cash falls by 8,000 tUSD. The books also gain a claim of 8,000 and hold 3,000 tCOL. This demo repaid the flash loan. It did not repay the ordinary loan. The toy contract has no liquidation function. So:
+
+- **8,000** is ordinary debt that remains, and it is also the cash that left. Do not call the whole cash outflow a realized loss.
+- **5,000** is the collateral shortfall at the independent anchor price of 1. The debt is 8,000. The collateral is worth 3,000.
+- **3,714.031198495643589346** is the quote gap if someone could sell all 3,000 tCOL into the ending reserves, including the 0.3% fee. The recovery quote is about **4,285.968801504356410654**. That is a calculated “if it could be sold”. It is not a sale that ran. A trade ahead of it, a change in reserves, or extra incentives and gas would change the recovery.
+
+The money is not a gift from the flash-loan pool, and the exchange did not mint it from nothing. It comes mainly from the 8,000 the lender paid out under the bad valuation. In integers:
+
+8,000 leaves the lender = the simulator gains 3,678.345270534929823185 + the flash-loan pool gains 5 + the exchange gains 4,316.654729465070176815.
+
+The token totals stay 200,000 tUSD and 20,000 tCOL. The flash loan got its principal and fee back on time. That shows only that the flash loan settled. It does not show that the lender has no risk.
+
+Record the success as **3,678.345270534929823185** more tUSD for the simulator, and **0.000312342** mock ETH of gas. The sender did not prefund tUSD. The fees were paid with the badly lent funds. The 100 mock ETH given to the operator pays gas only. It does not enter the token accounts.
+
+## An independent fixed price stops the same request
+
+Restore the same opening snapshot. Change only the valuation source to the fixed price 1. The buy still pushes the thin pool to the same peak for a moment. The trade still tries to post 3,000 and borrow 8,000. The fixed price does not move, so the cap stays 2,250. The contract returns `BorrowLimit`.
+
+The failed receipt has no confirmed events. The pool returns to 10,000 and 10,000, and the price returns to 1. The flash-loan pool still holds 100,000. It did not collect a fee, and it did not lose principal. The lender still holds 50,000. Debt and collateral are 0. The simulator holds 0 of both tokens. The operator nonce increases by 1, and mock ETH falls by **0.000258899**.
+
+An internal trace can show a buy and a deposit attempt before the revert. Those temporary steps are not final balances. The peak price of the failed trade also lives only in the trace. It is not a state the transaction left behind.
+
+<Callout type="note" title="A different quote is not a safety certificate">
+
+The fixed price of 1 shows one thing. If the valuation does not follow this thin-pool trade, the request for 8,000 does not pass. A real system still has stale quotes, a broken peg, disturbed data sources, admin power and thin liquidity.
+
+A <Term id="twap">time-weighted average price</Term> is usually harder to push all the way inside one transaction than a spot price. Someone who keeps pushing a thin market across many blocks, or a window that is too short, can still move the average. This lab did not test any real product’s average. Do not read “switch the source” as “oracle risk is gone”.
+
+Useful guards are separate from the loan itself. Read a quote that is independent of the pool the borrower just traded. Refuse a borrow, a withdrawal or a liquidation when the quote is too far from a reference, or when it is too old. Add borrow caps, isolated markets and a pause when something looks wrong. Audits and open source have value. A system designed to read a pool spot price still follows that design when the source is public.
+
+</Callout>
+
+## Hashes from this saved run
+
+<details>
+<summary>Local-model receipts (no fork, do not open Etherscan)</summary>
+
+- Fragile branch, ordinary debt of 8,000 left behind: <LocalRef value="0xc00659ac6179fcb69292949ea0c90b16a7d45890ae8520405c85da8fd8cf4438" env="local" short />
+- Control branch, reverted with `BorrowLimit`: <LocalRef value="0x0983452c237884324c860ac1ee1b5563bed2718cb6136fc16f5225cccbcddcc6" env="local" short />
+
+A rerun changes temporary addresses and local hashes. Under the same rules, the economic integers should stay. This book does not ship the toy contract source. That source exists only as evidence inside a closed chainId 31337. It is not instructions for a real protocol.
+
+</details>
+
+## In short
+
+- A flash loan amplifies how much money one moment can move. The harm sits in the system that treats a thin-pool spot price, movable inside that same transaction, as the collateral value.
+- The locked 3,000 tCOL cannot be sold again. That is why the ending price does not return to 1.
+- 8,000, 5,000 and 3,714.031198495643589346 are ordinary debt, the shortfall at the anchor price, and an unexecuted recovery-quote gap.
+- An independent fixed price blocks the same request. It is not a certificate for real oracles. A time-weighted average is not manipulation-proof either.
+- Deviation checks, staleness checks, caps and pauses act on the valuation rule. Safety does not come from the fact that a flash loan was available.
+
+The book has now gone from Chapter 16’s swaps, through lending and a loan that must be repaid immediately, to the question of where a price comes from. Appendix A states the boundary around local hashes and the fork source. Appendix C holds the self-check for these three chapters. The historical snapshot and the published Chapter 16 URL are unchanged.

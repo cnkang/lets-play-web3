@@ -5,5 +5,6 @@
   { "id": "upgradeable", "order": 40, "phase": "p0", "zh": "第四部分 · 可升级合约", "en": "Part IV · Upgradeable contracts" },
   { "id": "wrapup", "order": 50, "phase": "p0", "zh": "第五部分 · 证据与收尾", "en": "Part V · Evidence and wrap-up" },
   { "id": "p1-defi", "order": 60, "phase": "p1", "zh": "第六部分 · DeFi 实验", "en": "Part VI · DeFi labs" },
-  { "id": "appendices", "order": 80, "phase": "p1", "zh": "附录", "en": "Appendices" }
+  { "id": "p2-credit", "order": 10, "phase": "p2", "zh": "第七部分 · 借贷、闪电贷与定价安全", "en": "Part VII · Lending, flash loans and price safety" },
+  { "id": "appendices", "order": 80, "phase": "ref", "zh": "附录", "en": "Appendices" }
 ]
