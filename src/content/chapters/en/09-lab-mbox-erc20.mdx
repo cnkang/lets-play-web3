@@ -18,7 +18,7 @@ Think of points issued by one shop. Any one of its points counts the same as any
 - `approve(spender, amount)` and `allowance(owner, spender)`: grant and look up an allowance (Chapter 10)
 - `transferFrom(owner, to, amount)`: an approved <Term id="spender">spender</Term> moves tokens within the allowance
 
-For beginners it is more useful to picture a token as "points shared by a group of partner shops" than as "an asset that goes up". A standard interface is only an agreement about how to interact: a token can still have special restrictions, fees or admin powers. Being "ERC-20 compliant" does not mean the economics are the same.
+For beginners, picture a token as points shared by a group of partner shops. A standard interface is only an agreement about how to interact. A token can still have special restrictions, fees or admin powers. Being "ERC-20 compliant" does not mean the economics are the same.
 
 <T label="ERC-20 operations and everyday analogies">
 
@@ -59,7 +59,7 @@ The 1,000 MBox went to this demo address:
 
 <Callout type="danger" title="Do not send anything else to this address">
 
-This was a deliberate teaching point, not an accident. Please **do not** send any more tokens or test ETH to `0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E`: anything sent there is locked the same way. In real life, sending assets to a wrong or uncontrolled address has exactly the same result.
+This was a deliberate teaching point, not an accident. Please **do not** send any more tokens or test ETH to `0x878fFf967331D01E97c8DdCD76C3Dd97333BcA6E`. Anything sent there is locked the same way. In real life, sending assets to a wrong or uncontrolled address has exactly the same result.
 
 </Callout>
 

@@ -18,12 +18,12 @@ V3 要做的事：让 **10,000 个旧 UBOX = 1 个新 UBOX**。
 ## 设计：全局缩放
 
 - 内部的**原始余额仍按旧单位存放**，不重写任何<Term id="storage">存储</Term>。
-- 新增一个全局系数 `scale = 10000`，放在原有 `__gap`（slot 8–57）之后的 **slot 58**，不重排旧的存储槽。
+- 新增一个全局系数 `scale = 10000`，放在原有 `__gap`（slot 8-57）之后的 **slot 58**，不重排旧的存储槽。
 - `balanceOf` / `totalSupply` / `allowance` 返回「原始值 ÷ 10,000」。
 - `transfer` / `approve` / `burn` 和 V2 的批量函数都按**新单位**工作：传入 1e18 表示 1 个新币，实际扣 10,000 倍的原始量。
 - <strong>`decimals()`（<Term id="decimals">小数位</Term>）仍然是 18</strong>。用户直接读 `balanceOf()` 就能看到新数字。
 
-另一种没有采用的做法是把 `decimals()` 改成 22：<Term id="wallet">钱包</Term>显示也会缩小 10,000 倍，但 `balanceOf()` 仍然返回旧的原始数。本次希望一读 `balanceOf()` 就是新数字。
+另一种做法是把 `decimals()` 改成 22：<Term id="wallet">钱包</Term>显示也会缩小 10,000 倍，但 `balanceOf()` 仍然返回旧的原始数。本次希望一读 `balanceOf()` 就是新数字，所以没有采用那种做法。
 
 <Figure name="redenomination" n="6" alt="左边是代理存储中的原始值（旧单位）：A 999,900e18、B 100e18、总供应 1,000,000e18；除以 scale 10000 后，右边读出 A 99.99、B 0.01、总供应 100，decimals 仍为 18。下方警告：历史 Transfer 日志仍是旧单位，若按新单位读会大 10,000 倍。">
 存储不改写，读出时统一除以 scale。历史日志是旧单位，不会被改写。
@@ -34,7 +34,7 @@ V3 要做的事：让 **10,000 个旧 UBOX = 1 个新 UBOX**。
 - V1 的 `initialize()` 已经把 `_initialized` 设成 1，而且 V1 没有使用 <Term id="openzeppelin">OpenZeppelin</Term> 的 `Initializable`，所以这里不是 `reinitializer(2)`，而是检查 `_scale == 0` 后写入 `_scale = 10000`。
 - 它**不得**再调用 V1 的 `initialize`，也不<Term id="mint">铸币</Term>、不转账。
 - V3 实现的<Term id="constructor">构造函数</Term>会在<strong><Term id="implementation">实现合约</Term>自己的存储</strong>里先把 `_scale` 锁上，防止有人直接对实现合约做初始化。
-- 为了让 V3 能覆盖 `balanceOf` 等 getter，V1 的**源码**把原来的 public 变量改成了同槽位的 internal 变量加 virtual 函数。这不改变<Term id="storage-layout">存储布局</Term>，也不改变已经部署的 V1/V2 <Term id="bytecode">字节码</Term>——但它让「当前源码」不再能精确复现历史 V1/V2（第 15 章会看到后果）。
+- 为了让 V3 能覆盖 `balanceOf` 等 getter，V1 的**源码**把原来的 public 变量改成了同槽位的 internal 变量加 virtual 函数。这不改变<Term id="storage-layout">存储布局</Term>，也不改变已经部署的 V1/V2 <Term id="bytecode">字节码</Term>。但它让「当前源码」不再能精确复现历史 V1/V2（第 15 章会看到后果）。
 
 ## 上链：只有两笔交易
 
@@ -50,7 +50,7 @@ V3 要做的事：让 **10,000 个旧 UBOX = 1 个新 UBOX**。
 
 </T>
 
-升级交易发出了 `Upgraded(V3)` 和 `Redenominated(10000)` 两个事件，**没有任何 Transfer 事件**——确认没有铸币、没有转账。`initializeV3()` 只运行了这一次。两笔的 gasUsed 都与升级前的<Term id="simulate">模拟</Term>完全一致。
+升级交易发出了 `Upgraded(V3)` 和 `Redenominated(10000)` 两个事件，**没有任何 Transfer 事件**，确认没有铸币、没有转账。`initializeV3()` 只运行了这一次。两笔的 gasUsed 都与升级前的<Term id="simulate">模拟</Term>完全一致。
 
 ## 快照：通过代理读取（新单位）
 
@@ -70,15 +70,15 @@ V3 要做的事：让 **10,000 个旧 UBOX = 1 个新 UBOX**。
 
 换算示例：A 的原始余额 999,900e18 ÷ 10,000 = 99.99e18。99.99 + 0.01 = 100。
 
-模拟里还试过「A 转 1 个新 UBOX 给 B」（会变成 A 98.99、B 1.01，供应仍 100）——<strong>那笔演示转账没有被授权<Term id="broadcast">广播</Term></strong>，链上并不存在。
+模拟里还试过「A 转 1 个新 UBOX 给 B」（会变成 A 98.99、B 1.01，供应仍 100）。<strong>那笔演示转账没有被授权<Term id="broadcast">广播</Term></strong>，链上并不存在。
 
 ## 历史事件不会被改写
 
-这是本章最重要的一点：
+请记住：
 
 - 第 12 章成功批次里「100 给 B」的 `Transfer` 日志，记录的是**旧单位的 100e18**。
 - 重标之后，B 的 `balanceOf` 是 **0.01**。
-- 如果有人把那条旧日志**按新单位**去读，就会以为 B 收到了 100——**偏大 10,000 倍**。
+- 如果有人把那条旧日志**按新单位**去读，就会以为 B 收到了 100，**偏大 10,000 倍**。
 
 <Term id="redenomination">面额重标</Term>能改的是**从现在起**的记账和新事件的单位，不能改写已经上链的旧日志，也不能决定任何市场价格。读历史数据时，必须按「升级前/升级后」的分界分别换算。
 
@@ -89,7 +89,7 @@ V3 要做的事：让 **10,000 个旧 UBOX = 1 个新 UBOX**。
 
 <Callout type="note" title="生活类比：积分单位换算">
 
-商家在数据库里用最小单位记积分，App 上按 1/10000 换算显示。底层余额不是 10,000 的整数倍时，界面上会「看不到」一小段零头——这就是粉尘。而支付服务想设置行业常见的「长期足额授权」时，内部换算公式在最大数值处溢出，导致接入失败——这就是 F-V3-001。
+商家在数据库里用最小单位记积分，App 上按 1/10000 换算显示。底层余额不是 10,000 的整数倍时，界面上会「看不到」一小段零头，这就是粉尘。支付服务想设置行业常见的「长期足额授权」时，内部换算公式在最大数值处溢出，导致接入失败，这就是 F-V3-001。
 
 </Callout>
 

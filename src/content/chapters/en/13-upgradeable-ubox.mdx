@@ -13,7 +13,7 @@ status: published
 
 Chapters 8 and 9 showed that once an ordinary contract is <Term id="deploy">deployed</Term>, its logic is frozen at that address. UBOX used a proxy pattern from the start: the address users always call is fixed as the **proxy**, and the logic lives in a replaceable **<Term id="implementation">implementation contract</Term>**.
 
-It used <Term id="openzeppelin">OpenZeppelin</Term> 5.6.1's `TransparentUpgradeableProxy` and `ProxyAdmin` rather than a home-made proxy, so the <Term id="storage">storage slots</Term> (ERC-1967) and upgrade interface can be checked against the official ones.
+It used <Term id="openzeppelin">OpenZeppelin</Term> 5.6.1's `TransparentUpgradeableProxy` and `ProxyAdmin`, not a home-made proxy, so the <Term id="storage">storage slots</Term> (ERC-1967) and upgrade interface can be checked against the official ones.
 
 <Figure name="proxy" n="5" alt="Users call the fixed UBOX proxy. The proxy keeps balances and other storage and runs the current V3 implementation via delegatecall; V1 and V2 code remains but is unused; V4 is local only. ProxyAdmin, owned by account A, can call upgradeAndCall to switch implementations.">
 Users talk to a fixed proxy; the proxy runs the implementation's code against its own storage; upgrade power sits with ProxyAdmin.
@@ -25,7 +25,7 @@ Users talk to a fixed proxy; the proxy runs the implementation's code against it
 
 ## initialize is not a constructor
 
-A <Term id="constructor">constructor</Term> runs when a contract is created. The constructor for the implementation can set up that contract’s own storage. UBOX needs the token name, supply and owner at the proxy address, where users will look them up. Calling the <Term id="initialize">initializer</Term> `initialize()` through the proxy writes those values there. UBOX allows this setup once. If someone could repeat it, they might <Term id="mint">mint</Term> tokens again or change the owner.
+A <Term id="constructor">constructor</Term> runs when a contract is created. The constructor for the implementation can set up that contract's own storage. UBOX needs the token name, supply and owner at the proxy address, where users will look them up. Calling the <Term id="initialize">initializer</Term> `initialize()` through the proxy writes those values there. UBOX allows this setup once. If someone could repeat it, they might <Term id="mint">mint</Term> tokens again or change the owner.
 
 ## Step 1: deploy V1 and the proxy (no V2 yet)
 
@@ -50,7 +50,11 @@ Token name `可升级沙盒代币` ("upgradeable sandbox token"), symbol `UBOX`,
 
 </T>
 
-Three problems came up and were fixed during <Term id="simulate">simulation</Term>, all before <Term id="broadcast">broadcasting</Term>: the Chinese name needs `unicode"..."`; `_initialized` was first a `bool`, which the compiler packed into the same storage slot as `owner`, so a simulation that wrote "one variable per slot" read garbage, and it became a `uint256` alone in slot 0; and when simulating two contract creations in a row, the nonce has to be set to "after V1 is deployed", or you hit `CreateCollision`.
+Three problems came up and were fixed during <Term id="simulate">simulation</Term>, all before <Term id="broadcast">broadcasting</Term>:
+
+1. The Chinese name needs `unicode"..."`.
+2. `_initialized` was first a `bool`, which the compiler packed into the same storage slot as `owner`, so a simulation that wrote "one variable per slot" read garbage; it became a `uint256` alone in slot 0.
+3. When simulating two contract creations in a row, the nonce has to be set to "after V1 is deployed", or you hit `CreateCollision`.
 
 ## Step 2: upgrade to V2 (without calling initialize again)
 
@@ -68,7 +72,7 @@ V2 adds no state variables and does not reorder storage. It only adds the <Term 
 
 </T>
 
-After the upgrade the name, supply, balances and owner were all unchanged, and **so was the proxy address**: still `0xc3F20D5488784D922aC3428a54125715fA98db04`. The upgrade transaction used only 41,724 <Term id="gas">gas</Term>, far less than deploying a whole new proxy: that is the benefit of keeping the address and state and swapping only the logic.
+After the upgrade the name, supply, balances and owner were all unchanged, and **so was the proxy address**: still `0xc3F20D5488784D922aC3428a54125715fA98db04`. The upgrade transaction used only 41,724 <Term id="gas">gas</Term>, far less than deploying a whole new proxy. The address and state stayed; only the logic swapped.
 
 ## Every upgrade stays on-chain
 

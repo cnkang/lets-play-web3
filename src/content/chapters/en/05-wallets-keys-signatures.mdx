@@ -48,7 +48,7 @@ Appendix B explains how to obtain and store an <Term id="api-key">API key</Term>
 ## How the labs handled this
 
 - Accounts A and B were both **freshly generated locally** as disposable test accounts. No real wallet seed phrase was ever imported, and neither was ever used on <Term id="mainnet">mainnet</Term>.
-- The private keys lived only in a local, Git-ignored folder (folder permission 700, file permission 600). They were never printed and never written into public records or this book.
+- The private keys lived only in a local folder kept out of the public code repository (folder permission 700, file permission 600). They were never printed and never written into public records or this book.
 - Broadcast scripts checked that the account's ETH balance was **no more than 0.1 ETH**, as a guard against accidentally using a key that might hold mainnet funds.
 
 That balance cap was only an extra guard in the lab scripts. **It cannot prove the same key holds no assets on another network.** Isolation comes from fresh, dedicated test accounts and checking the network before acting. Reading this guide needs no wallet creation or connection.
@@ -56,7 +56,7 @@ That balance cap was only an extra guard in the lab scripts. **It cannot prove t
 The public addresses of the two test accounts (addresses only, not keys):
 
 - Account A (deployer, <Term id="owner">owner</Term> of UBOX): <Addr a="0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC" />
-- <Addr a="0x1dB261d3d5BE16E1A81582E8786A6FAB82Fe218c" />: account B, the approved <Term id="spender">spender</Term>
+- Account B (approved <Term id="spender">spender</Term>): <Addr a="0x1dB261d3d5BE16E1A81582E8786A6FAB82Fe218c" />
 
 <Callout type="danger" title="Least-cost principle">
 

@@ -8,7 +8,7 @@ status: published
 updated: "2026-11-18"
 ---
 
-<p class="lead">这一章只回答一个问题：怎么判断一次操作「真的上链了」。</p>
+<p class="lead">怎么判断一次操作「真的上链了」？看手续费、交易序号，再打开区块浏览器核对。</p>
 
 ## 启动资金从哪里来
 
@@ -62,7 +62,7 @@ updated: "2026-11-18"
 小费越低，在拥堵时越可能排在后面。实验专门做了低小费练习：
 
 - **nonce 3**：一笔只给 **1 wei 小费**的 increment。当时链不拥堵，它仍然被打包了：<Tx h="0xd61e57686959b7c4c9d774a6aa35b0fb9dac72e8317055146da4676a9e4e4b31" short />（区块 12111091）。
-- **nonce 4**：替换脚本 `replace-stuck.mjs` 的设计是：先在 nonce 4 发一笔 1 wei 小费、故意很难被打包的交易并观察；如果它还在待处理队列（<Term id="mempool">内存池</Term>）里，就用<strong>同一个 nonce、更高的小费（2 wei）</strong>发一笔替换交易。链上 nonce 4 的那笔交易，形态与这个脚本完全一致（gas limit 140,000，小费 2 wei）：<Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short />（区块 12111181）。
+- **nonce 4**：替换脚本 `replace-stuck.mjs` 的设计是：先在 nonce 4 发一笔 1 wei 小费、故意很难被打包的交易并观察；如果它还在待处理队列（<Term id="mempool">内存池</Term>，等待被打包进区块的暂存区）里，就用<strong>同一个 nonce、更高的小费（2 wei）</strong>发一笔替换交易。链上 nonce 4 的那笔交易，形态与这个脚本完全一致（gas limit 140,000，小费 2 wei）：<Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short />（区块 12111181）。
 
 **链上只能看到最终被打包的那一笔。** 本书没有把待处理交易当成已上链结果。钱包或脚本可以在广播前就算出<Term id="tx-hash">哈希</Term>。有编号既不能证明广播成功，也不能证明已经进区块，还要继续查收据和区块号。
 

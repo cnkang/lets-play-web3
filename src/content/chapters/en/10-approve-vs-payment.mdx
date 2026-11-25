@@ -22,11 +22,13 @@ The [allowance lab](../../labs/erc20-allowance/) uses fictional tokens in your b
 
 Many <Term id="dex-amm">decentralised exchanges</Term> and services use two steps. First, the holder **approves** a <Term id="smart-contract">smart contract</Term> to use up to a set amount of a token. This is `approve`. Later, when you act, that contract calls `transferFrom`.
 
-- **`approve` is not a payment**: it only writes into the token contract "B may move up to this much of A's tokens". **Balances do not change at all.**
-- What actually moves balances is a later `transferFrom` (move) or `burnFrom` (<Term id="burn">destroy</Term>) sent by the spender.
+What each step changes:
+
+- **`approve` (approval)**: writes into the token contract "B may move up to this much of A's tokens". **Token balances do not change at all.**
+- **Later spending**: the spender sends `transferFrom` (move) or `burnFrom` (<Term id="burn">destroy</Term>). That is when balances change.
 - An <Term id="approve">approval</Term> **stays valid** until the <Term id="allowance">allowance</Term> is used up or the holder sends another `approve` to change it.
 
-So although an approval is not "money already gone", a long-lived approval is a standing permission for future deductions.
+A long-lived approval is a standing permission for future deductions. It is not the same as money already leaving your account.
 
 “Balances do not change” refers to this token’s balances. Sending an approval transaction still costs a network fee. Looking up the allowance is read-only and needs no signature or fee.
 
@@ -58,6 +60,6 @@ A revocation <Term id="transaction">transaction</Term> must be sent by the **hol
 
 You let a food-delivery platform deduct up to 100 loyalty points in total. Nothing is deducted yet. Each use reduces the remaining allowance. **It does not reset every month.** When you stop using the service, set the limit to 0. That withdraws permission. It does not hand anyone 100 points.
 
-The lab initially left an allowance of 100. D-01 later revoked it. The next chapter links that successful transaction. Look for an `Approval` event with value 0. Confirm that no token transfer occurred. The early leftover amount is not the snapshot state.
+The lab initially left an allowance of 100. D-01 later revoked it. The next chapter links that successful transaction. In the explorer, look for an `Approval` event with value 0. Confirm that no token transfer occurred. The early leftover amount is not the snapshot state.
 
 The next chapter is this whole process as a real experiment on Sepolia.

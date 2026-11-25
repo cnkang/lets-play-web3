@@ -12,17 +12,19 @@ updated: "2026-11-18"
 
 <h2 id="inspect-a-transaction">Inspect a transaction without a wallet</h2>
 
-Open the first `increment` transaction, which added one to the counter:
+Click the link below. This is the first `increment` transaction, which added one to the counter:
 
 <Tx h="0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73" />
 
-This completed experiment appears in the table below, at Sepolia block **12110964**. You only need a browser. You need no wallet connection, faucet or account. Check three things:
+The page opens the Sepolia block explorer. This transaction is in block **12110964**, and it also appears in the table below. You only need a browser. You need no wallet connection, faucet or account.
+
+On the page, look for these three items from top to bottom. What you should see:
 
 1. **Status** shows **Success**. The call completed.
-2. **Tokens Transferred** shows no token transfer for this call. Increasing a counter is not a payment. The sender still paid a network fee.
+2. **Tokens Transferred** is empty, or says none. Raising a counter does not move tokens. The sender still paid a network fee.
 3. **Logs** record the `Incremented` event. If the explorer can decode the log, `newCount` is **1**. If you cannot see the field, do not guess. Decoding needs the interface description. Compare the code and the record below instead.
 
-This describes that one call, not the counter today. The historical snapshot’s `count()` of 2 comes after the later calls.
+These numbers describe that one call. The historical snapshot’s `count()` of 2 comes after the later calls.
 
 ### Optional: read the same receipt in a terminal
 
@@ -63,7 +65,7 @@ contract Counter {
 }
 ```
 
-Anyone may call `increment`. It adds one and emits the `Incremented` <Term id="event">event</Term>. Only the <Term id="deploy">deployer</Term>, `owner`, may call `reset`. That sets the count to zero. It was <Term id="compile">compiled</Term> with solc 0.8.34.
+Anyone may call `increment`. It adds one and emits the `Incremented` <Term id="event">event</Term>. Only the <Term id="deploy">deployer</Term>, `owner`, may call `reset`. That sets the count to zero. It was <Term id="compile">compiled</Term> with solc (the Solidity compiler) 0.8.34.
 
 ## On-chain result
 
@@ -94,14 +96,14 @@ All five succeeded. Use the links or the Copy buttons for full hashes. Appendix 
 ## What the numbers teach
 
 - **The chain keeps the books for you**: `count`, `owner` and the event logs all live on-chain. Changing state means paying <Term id="gas">gas</Term> yourself.
-- **Deploying costs far more than calling**: deployment used 1,652,641 gas, reset only 23,626. Most of the cost is writing the contract's code into chain state, not the few lines of arithmetic.
+- **Deploying costs far more than calling**: deployment used 1,652,641 gas, reset only 23,626. Most of the cost is writing the contract's code into chain state. The few lines of arithmetic are cheap by comparison.
 - **The same function can cost different gas**: the increment from 0 to 1 used 127,229 gas, from 1 to 2 only 29,309. Writing a <Term id="storage">storage slot</Term> from zero to non-zero is expensive. Changing an already non-zero value is much cheaper.
 - **Confirmed <Term id="transaction">transactions</Term> cannot be undone**: reset sets the number back to zero but cannot erase the earlier increment transactions or events. The history is still there.
-- **This contract cannot gain features**: to add batch operations or upgradeability you must choose an <Term id="upgradeable">upgradeable</Term> pattern at deployment time, which leads straight to UBOX (Chapter 13).
+- **This contract cannot gain features**: to add batch operations or upgradeability you must choose an <Term id="upgradeable">upgradeable</Term> pattern at deployment time. That is what UBOX does in Chapter 13.
 
 ## Everyday equivalent
 
-Picture a public counter outside a shop. Every partner merchant can check it. Each call changes the count by one. If the count tracks raffle entries or completed public tasks, an on-chain counter reduces disputes. It stops one side from changing the number alone. But it cannot prove that a real person ever stood at the counter.
+Picture a public counter outside a shop. Every partner merchant can check it. Each call changes the count by one. If the count tracks raffle entries or completed public tasks, an on-chain counter reduces disputes. It stops one side from changing the number alone. It cannot prove that a real person ever stood at the counter.
 
 <Callout type="note" title="Reflection question">
 

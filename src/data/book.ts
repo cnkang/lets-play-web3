@@ -13,8 +13,9 @@ export const ui = {
     /** wordmark: lead text + accented part */
     brandLead: '一起玩',
     brandAccent: 'Web3',
-    siteTagline: '从生活例子看懂区块链，用测试网实验核对',
-    seoTagline: '双语区块链入门指南',
+    siteTagline: '用日常例子弄懂区块链，再在测试网核对',
+    seoTagline: '中英双语的区块链入门',
+
     contents: '目录',
     start: '开始阅读',
     labs: '实验',
@@ -28,16 +29,18 @@ export const ui = {
     switchLabel: '切换到英文版',
     skip: '跳到正文',
     footer:
-      '非官方的个人学习资料，与 Ethereum、Etherscan 或任何公司无关 · 公共广播仅 Ethereum Sepolia · 第 17–19 章为本地实验 · 不构成投资建议',
+      '个人学习笔记，与 Ethereum、Etherscan 或任何公司无关 · 公开广播仅在 Ethereum Sepolia · 第 17–19 章是本机实验 · 不是投资建议',
     snapshot: '链上数字截至 2026-11-12 15:39:55（新加坡时间，UTC+8）· Sepolia 区块 12117419',
+
     menu: '菜单'
   },
   en: {
     siteTitle: 'Let’s Play Web3',
     brandLead: 'Let’s Play',
     brandAccent: 'Web3',
-    siteTagline: 'Learn how blockchains work. See for yourself on a testnet.',
-    seoTagline: 'A hands-on blockchain guide',
+    siteTagline: 'See how blockchains work, then check it yourself on a testnet.',
+    seoTagline: 'A beginner blockchain guide in two languages',
+
     contents: 'Contents',
     start: 'Start reading',
     labs: 'Labs',
@@ -51,8 +54,9 @@ export const ui = {
     switchLabel: 'Switch to Chinese',
     skip: 'Skip to content',
     footer:
-      'Unofficial personal study notes, not affiliated with Ethereum, Etherscan or any company · Public broadcasts on Ethereum Sepolia only · Chapters 17–19 are local labs · Not financial advice',
+      'Personal study notes, not affiliated with Ethereum, Etherscan, or any company · Public broadcasts only on Ethereum Sepolia · Chapters 17–19 run locally · Not financial advice',
     snapshot: 'On-chain figures as of 2026-11-12 15:39:55 Singapore time (UTC+8) · Sepolia block 12117419',
+
     menu: 'Menu'
   }
 } as const

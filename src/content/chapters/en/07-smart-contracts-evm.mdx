@@ -17,7 +17,7 @@ While executing a transaction, the **Ethereum Virtual Machine (EVM)** reads stat
 
 ## Reads and writes
 
-- **Reading** (for example, asking the Counter for its current number) is usually an `eth_call` through <Term id="rpc">RPC</Term>, executed locally on a node: **no signature, no <Term id="gas">gas</Term> fee, no change to on-chain state**.
+- **Reading** (for example, asking the Counter for its current number) is usually an `eth_call` through <Term id="rpc">RPC</Term> (a local dry-run on a node, nothing goes on-chain): **no signature, no <Term id="gas">gas</Term> fee, no change to on-chain state**.
 - **Writing** (for example, calling `increment`) requires <Term id="signature">signing</Term> and sending a <Term id="transaction">transaction</Term>; state changes only after it is mined, and it costs gas.
 - **When a check fails**, such as a `require` in the code, the transaction **reverts**: none of the state changes from that execution are kept, but the gas has already been spent.
 
@@ -45,6 +45,6 @@ Once an ordinary contract is deployed, its code is **fixed at that address**. It
 
 <Callout type="note" title="Key idea">
 
-Smart contracts can run loyalty points, tickets, shared-fund rules, public auctions and on-chain governance, but that **does not mean** those scenarios must use them (remember the three questions in Chapter 2).
+Smart contracts can run loyalty points, tickets, shared-fund rules, public auctions and on-chain governance. Those scenarios do **not** have to use smart contracts (remember the three questions in Chapter 2).
 
 </Callout>

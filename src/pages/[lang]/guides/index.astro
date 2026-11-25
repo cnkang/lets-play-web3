@@ -14,7 +14,8 @@ const zh = lang === 'zh'
 const title = zh ? '问题指南' : 'Question guides'
 const description = zh
   ? '五个从具体问题出发的短指南：授权、资金池定价、合约升级、清算，以及怎样不花真钱学习。'
-  : 'Five short guides that start from a question: approvals, pool prices, upgrades, liquidation, and learning without real money.'
+  : 'Five short guides that start from a question: approvals, pool prices, upgrades, liquidation, and learning without spending real money.'
+
 const path = 'guides/'
 const site = ui[lang].siteTitle
 const pageUrl = absolute(`${lang}/${path}`)
@@ -43,8 +44,8 @@ const jsonLd = [
     <Crumb lang={lang} items={[{ href: `${lang}/`, name: site }, { name: title }]} />
     <h1>{title}</h1>
     <p>{zh
-      ? '每一篇都先回答问题，再指向已有的章节和浏览器实验。它们不是新的教材章节，也不重复整章内容。'
-      : 'Each guide answers the question first, then points to a chapter and, where it helps, a browser lab. These are not new textbook chapters, and they do not repeat a whole chapter.'}</p>
+      ? '每一篇先直接回答问题，再链到相关章节，有时也链到浏览器实验。它们是短指南，不会把整章重写一遍。'
+      : 'Each guide answers the question first, then links to a chapter and, when useful, a browser lab. They are short guides; they do not rewrite a whole chapter.'}</p>
     <ul class="cards">
       {guides.map((guide) => (
         <li class="card">

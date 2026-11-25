@@ -1,6 +1,6 @@
 ---
 title: "UBOX V3: redenomination"
-description: "10,000 old units = 1 new unit via a global scale rather than enumerating holders; storage stays in old units while reads and transfers use new units; decimals stays 18; historical Transfer events are not rewritten and would be 10,000 times too large if read as new units. Snapshot - supply 100, A 99.99, B 0.01, implementation V3. Medium finding F-V3-001."
+description: "10,000 old units = 1 new unit via a global scale, not by enumerating holders; storage stays in old units while reads and transfers use new units; decimals stays 18; historical Transfer events are not rewritten and would be 10,000 times too large if read as new units. Snapshot: supply 100, A 99.99, B 0.01, implementation V3. Medium finding F-V3-001."
 navTitle: "14 · UBOX V3: redenomination"
 part: upgradeable
 order: 140
@@ -13,17 +13,17 @@ status: published
 
 V3's job: make **10,000 old UBOX = 1 new UBOX**.
 
-The <Term id="erc20">ERC-20</Term> standard lets you ask “How many tokens does this address hold?” It does not require a way to ask “Which addresses hold tokens?” Updating only A and B could miss another holder. One rule must hold before and after the conversion: the balances must add up to the total supply. A rule like that is called an <Term id="invariant">invariant</Term>.
+The <Term id="erc20">ERC-20</Term> standard lets you ask "How many tokens does this address hold?" It does not require a way to ask "Which addresses hold tokens?" Updating only A and B could miss another holder. One rule must hold before and after the conversion: the balances must add up to the total supply. A rule like that is called an <Term id="invariant">invariant</Term>.
 
 ## Design: a global scale
 
 - **Raw balances stay stored in old units**; no <Term id="storage">storage</Term> is rewritten.
-- A new global factor `scale = 10000` lives in **slot 58**, after the existing `__gap` (slots 8–57), without reordering any old slot.
+- A new global factor `scale = 10000` lives in **slot 58**, after the existing `__gap` (slots 8-57), without reordering any old slot.
 - `balanceOf` / `totalSupply` / `allowance` return "raw value ÷ 10,000".
 - `transfer` / `approve` / `burn` and V2's batch functions all work in **new units**: passing 1e18 means one new token, and 10,000 times as many raw units are moved.
 - **`decimals()` (the number of <Term id="decimals">decimal places</Term>) stays 18.** Reading `balanceOf()` directly shows the new number.
 
-An alternative that was not chosen: change `decimals()` to 22. <Term id="wallet">Wallets</Term> would also display amounts 10,000 times smaller, but `balanceOf()` would still return the old raw number. The goal here was for `balanceOf()` itself to show the new figure.
+An alternative: change `decimals()` to 22. <Term id="wallet">Wallets</Term> would also display amounts 10,000 times smaller, but `balanceOf()` would still return the old raw number. The goal here was for `balanceOf()` itself to show the new figure, so that approach was not chosen.
 
 <Figure name="redenomination" n="6" alt="Left: raw proxy storage in old units, A 999,900e18, B 100e18, supply 1,000,000e18. Divided by scale 10000, the right side reads A 99.99, B 0.01, supply 100, with decimals still 18. Warning below: historical Transfer logs stay in old units and are 10,000 times too large if read as new units.">
 Storage is not rewritten; every read divides by the scale. Historical logs stay in old units and are never rewritten.
@@ -34,7 +34,7 @@ Storage is not rewritten; every read divides by the scale. Historical logs stay 
 - V1's `initialize()` had already set `_initialized` to 1, and V1 does not use <Term id="openzeppelin">OpenZeppelin</Term>'s `Initializable`, so this is not `reinitializer(2)`: it checks `_scale == 0` and then writes `_scale = 10000`.
 - It **must not** call V1's `initialize` again, and it neither <Term id="mint">mints</Term> nor transfers.
 - The V3 implementation's <Term id="constructor">constructor</Term> locks `_scale` in **the <Term id="implementation">implementation</Term>'s own storage**, so nobody can initialise the implementation directly.
-- So that V3 could override getters such as `balanceOf`, the V1 **source** turned the original public variables into internal variables in the same slots plus virtual functions. That changes neither the <Term id="storage-layout">storage layout</Term> nor the already-deployed V1/V2 <Term id="bytecode">bytecode</Term>, but it means the current source no longer reproduces the historical V1/V2 exactly (Chapter 15 shows the consequence).
+- So that V3 could override getters such as `balanceOf`, the V1 **source** turned the original public variables into internal variables in the same slots plus virtual functions. That changes neither the <Term id="storage-layout">storage layout</Term> nor the already-deployed V1/V2 <Term id="bytecode">bytecode</Term>. It does mean the current source no longer reproduces the historical V1/V2 exactly (Chapter 15 shows the consequence).
 
 ## On-chain: just two transactions
 
@@ -74,7 +74,7 @@ The simulation also tried "A sends 1 new UBOX to B" (which would give A 98.99, B
 
 ## Historical events are not rewritten
 
-This is the most important point of the chapter:
+Keep this in mind:
 
 - The `Transfer` log for "100 to B" in Chapter 12's successful batch records **100e18 in old units**.
 - After the redenomination, B's `balanceOf` is **0.01**.
@@ -89,7 +89,7 @@ A <Term id="redenomination">redenomination</Term> changes the bookkeeping and th
 
 <Callout type="note" title="Everyday analogy: converting points">
 
-A shop stores loyalty points in a tiny base unit and the app shows them divided by 10,000. If the underlying balance is not a multiple of 10,000, the app hides a small remainder: that is dust. And when a payment service tries to set the industry-standard "unlimited standing approval", the internal conversion overflows at the maximum value and the integration fails: that is F-V3-001.
+A shop stores loyalty points in a tiny base unit and the app shows them divided by 10,000. If the underlying balance is not a multiple of 10,000, the app hides a small remainder: that is dust. When a payment service tries to set the industry-standard "unlimited standing approval", the internal conversion overflows at the maximum value and the integration fails: that is F-V3-001.
 
 </Callout>
 

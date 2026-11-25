@@ -13,11 +13,11 @@ status: published
 
 自动售货机收到正确的付款后，按预设条件出货；条件不满足就退回。<Term id="smart-contract">智能合约</Term>同样把规则写成程序，<Term id="deploy">部署</Term>到链上，由所有<Term id="node">节点</Term>按同样的方式执行。
 
-**以太坊虚拟机（EVM）** 在执行交易时读取状态、检查条件、更新状态，或者在条件失败时**回滚**。它不会主动上网查实时天气，也不会自己判断货物是否真的发出——那是第 4 章说的「<Term id="oracle">预言机</Term>问题」。
+**以太坊虚拟机（EVM）** 在执行交易时读取状态、检查条件、更新状态，或者在条件失败时**回滚**。它不会主动上网查实时天气，也不会自己判断货物是否真的发出。那是第 4 章说的「<Term id="oracle">预言机</Term>问题」。
 
 ## 读与写
 
-- **读**（例如查询 Counter 当前的数字）：通常通过 <Term id="rpc">RPC</Term> 做一次 `eth_call`，在节点本地执行，<strong>不签名、不支付 <Term id="gas">gas</Term> 手续费、不改变链上状态</strong>。
+- **读**（例如查询 Counter 当前的数字）：通常通过 <Term id="rpc">RPC</Term> 做一次 `eth_call`（在节点上本地试跑，不上链），在节点本地执行，<strong>不签名、不支付 <Term id="gas">gas</Term> 手续费、不改变链上状态</strong>。
 - **写**（例如调用 `increment`）：要<Term id="signature">签名</Term>并发送<Term id="transaction">交易</Term>，被打包成功后状态才改变，并消耗 gas。
 - **条件失败**：代码里的 `require` 等检查不通过时，交易**回滚**（revert）：这次执行做的所有状态改动都不保留，但 gas 已经花掉了。
 
@@ -45,6 +45,6 @@ status: published
 
 <Callout type="note" title="记忆点">
 
-智能合约能做会员积分、票券、共享资金规则、公开拍卖和链上治理，但这**不意味着**这些场景都必须用它（回想第 2 章的三个判断问题）。
+智能合约能做会员积分、票券、共享资金规则、公开拍卖和链上治理。这些场景**不必**都用智能合约（回想第 2 章的三个判断问题）。
 
 </Callout>

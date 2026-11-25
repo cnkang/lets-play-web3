@@ -24,7 +24,7 @@ export const prompts = [
     difficulty: { en: 'Beginner', zh: '入门' },
     en: {
       title: 'Learn blockchain fundamentals',
-      objective: 'Explain blocks, transactions, addresses, hashes, and a block explorer with the site’s Chapter 3 and Chapter 8. Stay on reading and the browser hash lab.',
+      objective: 'Explain blocks, transactions, addresses, hashes, and a block explorer using Chapter 3 and Chapter 8. Stay on reading and the browser hash lab.',
       prerequisites: 'A web browser. No wallet.',
       tools: 'The Let’s Play Web3 site. Optional: a block explorer opened by the learner, read-only.',
       steps: [
@@ -128,7 +128,7 @@ export const prompts = [
       ],
       outputs: [
         'Four numbers from the simulation: allowance after approve, balances after approve, balances after transferFrom, allowance after revoke.',
-        'One sentence: approval is not a transfer.',
+        'One sentence: approve writes a spending limit; balances stay put until transferFrom.',
         'A note that the book’s transactions are historical evidence.'
       ],
       verification: 'The balances after approve match the balances before approve. The recipient still holds the spent tokens after revoke.',
@@ -149,7 +149,7 @@ export const prompts = [
       ],
       outputs: [
         '从模拟里记下四个数：授权后的额度、授权后的余额、transferFrom 之后的余额、撤销后的额度。',
-        '一句话：授权不是转账。',
+        '一句话：授权写下可花上限；余额要等 transferFrom 才会动。',
         '注明书中的交易是历史证据。'
       ],
       verification: '授权前后的余额相同。撤销之后，收款人仍然持有已经转走的代币。',

@@ -18,11 +18,9 @@ snapshot:
 
 <Callout type="warn" title="Still a local copy, and the numbers differ from Chapter 17">
 
-Writes in this chapter used another local Anvil port, `127.0.0.1:8547`, chainId **31337**. The read-only fork source is still Sepolia block **12165973**. The run was **2026-11-25 10:56:13–11:00:23** Singapore time. Nothing was broadcast to a public chain.
-
-The lab record and the public repository are two events on the same calendar day. The text entered the public Git repository at 14:24 Singapore time, when pull request 6 merged. The page date is only **2026-11-25**. It is not the minute the live website finished deploying.
-
-The shape matches Chapter 17: post 1 WETH, request a borrow of 2,500 Aave test USDC, then set the quote to 2,800. The position was opened later. Opening debt is **2,499.999999**, one minimal unit under 2,500. After the drop to 2,800, and before liquidation, debt is **2,500.000608** and the health factor is about **0.924** (exactly **0.923999775283254651**). Collateral is still 1. Do not replace these with Chapter 17’s 0.923999549827419324 or 0.9375009135.
+- **A local copy.** Anvil is Foundry’s local chain simulator. Writes in this chapter used another local Anvil port, `127.0.0.1:8547`, chainId **31337**. The node copied Sepolia block **12165973** and then changed only that copy. The run was **2026-11-25 10:56:13 to 11:00:23** Singapore time. Nothing was broadcast to a public chain.
+- **Page date.** The lab record and the public repository are two events on the same calendar day. The text entered the public Git repository at 14:24 Singapore time, when pull request 6 merged. The page date is only **2026-11-25**, separate from when the live site finished deploying.
+- **Numbers differ from Chapter 17.** The shape matches: post 1 WETH, request a borrow of 2,500 Aave test USDC, then set the quote to 2,800. The position was opened later. Opening debt is **2,499.999999**, one minimal unit under 2,500. After the drop to 2,800, and before liquidation, debt is **2,500.000608** and the health factor is about **0.924** (exactly **0.923999775283254651**). Collateral is still 1. Do not replace these with Chapter 17’s 0.923999549827419324 or 0.9375009135.
 
 </Callout>
 
@@ -32,27 +30,35 @@ Before a shop closes, the clerk may let you take the till, finish one errand nex
 
 If you cannot, the clerk restores the till. You do not leave with the money. The taxi fare is still paid. The number you took in the queue is not given back. On chain, those leftovers are gas and the nonce.
 
-A <Term id="flash-loan">flash loan</Term> enforces “settle now”. It is not “no cost”. It is not “no risk”. It does not promise a profit.
+A <Term id="flash-loan">flash loan</Term> enforces “settle now”. You still pay a fee and gas, you can still lose money, and nothing promises a profit.
 
 ## Why the pool can lend
 
 The protocol does not ask for ordinary collateral to cover this flash loan. It uses a different rule. The transaction must not end while the flash loan is still unpaid. After the callback returns, the pool pulls the principal and the fee. If the pull fails, the fund operations in that transaction fail.
 
-This market has USDC flash loans enabled. At the fixed block, about **29,072.222094** test USDC was available. That is more than the later requests of 1,000 and 2,501. `FLASHLOAN_PREMIUM_TOTAL` is **5** basis points, so **0.05%** of the principal. `FLASHLOAN_PREMIUM_TO_PROTOCOL` is **4** basis points of the **premium already calculated**, not of the principal, and not four fifths of the 5. The checked V3.0 source does `totalPremium.percentMul(4)`. Percentages use 10,000 as 100%, so 4 means 0.04% of the total fee. On a borrow of 1,000, the event premium is **0.500000**. The same rounding gives the protocol **0.000200** and the liquidity providers **0.499800**. The event records only the total premium. It does not emit a second transfer for the protocol share. This is not the liquidation bonus, where the protocol takes 10% of the bonus. `flashLoanSimple` does not turn the flash loan into ordinary debt.
+This market has USDC flash loans enabled. At the fixed block, about **29,072.222094** test USDC was available, more than the later requests of 1,000 and 2,501.
+
+How the fee splits:
+
+- `FLASHLOAN_PREMIUM_TOTAL` is **5** basis points, so **0.05%** of the principal.
+- `FLASHLOAN_PREMIUM_TO_PROTOCOL` is **4** basis points of the **premium already calculated**. The checked V3.0 source does `totalPremium.percentMul(4)`. Percentages use 10,000 as 100%, so 4 means 0.04% of the total fee.
+- On a borrow of 1,000, the event premium is **0.500000**. The same rounding gives the protocol **0.000200** and the liquidity providers **0.499800**.
+- The event records only the total premium. It does not emit a second transfer for the protocol share. The liquidation bonus, where the protocol takes 10% of the bonus, is a different rule.
+- `flashLoanSimple` must be repaid inside the same transaction. It does not become ordinary debt you repay later.
 
 <FlashSteps />
 
-In experiment 1, the 0.500000 fee was minted from the local faucet into the receiver before the flash loan. That is outside test money, not profit. The borrow, the approval and the repayment share one receipt. Deployment and the prefund are earlier transactions. Do not describe the whole setup as “only one transaction”.
+In experiment 1, the 0.500000 fee was minted from the local faucet into the receiver before the flash loan. That is outside test money used to pay the fee, not arbitrage profit. The borrow, the approval and the repayment share one receipt. Deployment and the prefund are earlier transactions, so the whole setup is more than one transaction.
 
 Experiment 2 skips the prefund on purpose. The callback holds 1,000 and cannot repay 1,000.5. The receipt is reverted. Its persistent logs are empty. Scaled debt and scaled collateral match the earlier state. The sender’s nonce moves from 1 to 2. ETH falls by **0.000473806**, equal to gas used times the gas price. The transfer fails because the balance cannot cover principal plus fee.
 
-After a failure, the unscaled debt balance can look larger because a new block added interest. That is not a partial liquidation. Check the rollback with scaled balances and underlying tokens.
+After a failure, the unscaled debt balance can look larger because a new block added interest. Check the rollback with scaled balances and underlying tokens. Do not read the interest crumb as a partial liquidation left behind.
 
 ## What else can fit in one transaction
 
 If the protocol allows the steps, and every step can finish inside the same transaction, a flash loan can also:
 
-1. **Liquidate.** You do not have to hold the full repayment first. That is the lab below.
+1. **Liquidate.** You do not have to hold the full repayment first. The lab below does this.
 2. **Change collateral.** Repay the old debt, withdraw the old collateral, post new collateral, and borrow an ordinary loan that repays the flash loan.
 3. **Exit a position that already has debt.** Borrow to repay, withdraw collateral, sell part of it, and repay the flash loan. Keep the rest.
 4. **Reduce leverage partly.** Repay only some debt. The position remains. The health factor often improves. Ordinary debt does not vanish.
@@ -60,7 +66,7 @@ If the protocol allows the steps, and every step can finish inside the same tran
 6. **Move a debt to another market.** Withdrawing, supplying and borrowing again must all fit in the same transaction.
 7. **Redeem or settle immediately.** The underlying asset must be available now. A queue, a cooldown, or delivery in a later block does not fit an ordinary flash loan.
 
-These paths are usually a custom contract, not one button. A cross-chain transfer, or a chance that appears only in the next transaction, is not an ordinary flash loan.
+These paths usually need a custom contract that sequences the calls. A cross-chain transfer, or a chance that appears only in the next transaction, will not fit an ordinary flash loan.
 
 ## A wide price gap is not a reason to borrow more
 
@@ -92,7 +98,7 @@ The order inside the transaction was:
 
 Mark the leftover WETH at the oracle price 2,800. Before gas, that mark is about **2,611.935726505587876800** test USDC. The liquidation bonus itself is only about **112.500054765**. Most of the gap comes from the distorted test pool: a tiny amount of WETH buys a large amount of test USDC. Do not call that repeatable dollar income. Do not call the whole remainder a 5% bonus.
 
-The protocol’s total collateral transfer is **937500456375000000** wei. The displayed balance falls by **937500456375000001** wei. The extra **1** wei comes from two divisions by the liquidity index, then a multiplication. The index is `1000604607782853235519439946`. It is not a fine and not a fee. The integer check did not wave the 1 wei through as “close enough”. Chapter 17’s seized amount is a different run. Do not describe 0.9375009135 as this same rounding.
+The protocol’s total collateral transfer is **937500456375000000** wei. The displayed balance falls by **937500456375000001** wei. The extra **1** wei comes from two divisions by the liquidity index, then a multiplication. The index is `1000604607782853235519439946`. That 1 wei is rounding. The integer check did not wave it through as “close enough”. Chapter 17’s seized amount is a different run. Do not describe 0.9375009135 as this same rounding.
 
 Some V3 fee tiers had zero active liquidity. That does not prove every size is untradable. A swap can cross an empty range. A large token balance also does not prove depth at the current price. This run does not claim it searched every exchange for the best route.
 

@@ -17,7 +17,7 @@ snapshot:
 
 - On-chain figures in this chapter are as of **2026-11-19 11:58:12 Singapore time (UTC+8)**, Sepolia block **12165973**. They are separate from the "2026-11-12 / block 12117419" snapshot used in earlier chapters.
 - Account A is the same test account as before: <Addr a="0xE3e61E8650A1E203Be24a83Ea050Ccc4113e25AC" short />. This chapter sent **23 transactions** in total (nonce 20 → 42). Kang approved each one explicitly in advance.
-- **Test tokens have no real value.** "Earning over a thousand USDC" below is a learning number. It is not income and not investment advice.
+- **Test tokens have no real value.** "Earning over a thousand USDC" below is a learning number.
 - "Fork rehearsal" means a simulation on a local copy of the chain. It is labelled separately and is never presented as an on-chain result.
 
 </Callout>
@@ -64,7 +64,7 @@ A real counter-example: the WETH/USDC 0.05% pool address held 121.46 WETH and 53
 
 - **<Term id="price-impact">Price impact</Term>**: how much your own order moves the price. The odd pool in this chapter held only about 1,630 USDC. Selling a single EURC moved its price from about 152.75 to about 123.9.
 - **<Term id="slippage">Slippage</Term>**: the difference between the amount quoted for your swap and the amount you receive. The quote already accounts for the size of your order. If someone trades before you, the pool can give you a different amount.
-- **<Term id="min-received">Minimum received</Term>**: the floor you set. If the swap would pay less when it runs, the whole transaction reverts and you lose only the fee. It is a floor, not a forecast, and not a limit order. Setting it to 0 removes the protection.
+- **<Term id="min-received">Minimum received</Term>**: the floor you set. If the swap would pay less when it runs, the whole transaction reverts and you lose only the fee. It only protects this fill. It does not forecast a future price, and it is not a limit order. Setting it to 0 removes the protection.
 - **<Term id="deadline">Deadline</Term>**: after this time the transaction is void. Every swap here used a deadline of about 20 minutes.
 
 ## Approvals: give exactly what is needed
@@ -98,7 +98,7 @@ The chain only guarantees that **bytecode** is public. Only <Term id="verificati
 
 1. **Quote**: at block 12165307, the WETH/USDC 0.05% pool (<Addr a="0x3289680dD4d6C10bb19b899729cda5eEF58AEfF1" short />) quoted 0.001 WETH → **30.124575 USDC**. That was 0.165 USDC more than the 1% pool.
 2. **Minimum received**: quote × 99.5% = **29.973952 USDC**. The deadline was about 20 minutes.
-3. **<Term id="simulate">Simulate</Term> first**: the public-node rehearsal succeeded and estimated 388,578 gas. Running it on a local <Term id="fork">fork</Term> used 271,686 gas.
+3. **<Term id="simulate">Simulate</Term> first**: the public-node rehearsal succeeded and estimated 388,578 gas. Running it on a local <Term id="fork">fork</Term> (a copy of the chain state on your own computer) used 271,686 gas.
 4. **No approval to pay in ETH**: the ETH goes with the transaction to the <Term id="router">router</Term> SwapRouter02 (<Addr a="0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E" short />). It wraps the ETH into WETH automatically.
 5. **Send**: sent after Kang approved.
 
@@ -145,7 +145,7 @@ Kang set the minimum received for selling 1 EURC at **130 USDC**. Each group is 
 
 </T>
 
-Transaction 4 was quoted 0.000033234431958439 WETH and received about **0.08%** less. Between the quote and the trade, someone else traded in that pool and moved the price. The amount still beat the minimum of 0.000033068259798646, so the swap went through. **That is slippage, and that is why the minimum exists.**
+Transaction 4 was quoted 0.000033234431958439 WETH and received about **0.08%** less. Between the quote and the trade, someone else traded in that pool and moved the price. The amount still beat the minimum of 0.000033068259798646, so the swap went through. The gap between quote and fill is slippage. The minimum received stops a fill that has drifted too far.
 
 Each approval was used up exactly by its swap, so the allowance went back to 0 by itself.
 
@@ -198,7 +198,7 @@ The script spent 0.5 USDC at a time on whichever pool bought the most EURC. It t
 
 - Transaction 29 sold **54.713104 EURC** for **1053.128756 USDC** (minimum 1047.776677). The four steps were bundled in one transaction: all succeed or none do.
 - A's USDC rose by **968.628756** (planned 969.08). The gap is the 0.150292 EURC extra from v2, which stayed in the account unsold.
-- The odd pool's price fell from about 123.91 to about **2.99 USDC/EURC**, close to the cost of buying EURC elsewhere (about 3). **Selling where the price is high pushes that price down.** That is how arbitrage pulls prices back.
+- The odd pool's price fell from about 123.91 to about **2.99 USDC/EURC**, close to the cost of buying EURC elsewhere (about 3). **Selling where the price is high pushes that price down.**
 - All allowances were 0 afterwards.
 
 </Lab>
@@ -229,7 +229,7 @@ After the arbitrage, A held only 0.150292 EURC, but had started with 20. Kang wa
 
 </T>
 
-**Kang chose plan Y on purpose**: to show the starting amount coming back, plus "earning" a tiny bit more. Plan Y is not the cheapest. It costs about 0.79 USDC more and returns about 0.2 EURC more, with two fewer transactions and no leftover allowance. This was a deliberate trade-off, not a mistake.
+**Kang chose plan Y on purpose**: to show the starting amount coming back, plus "earning" a tiny bit more. Plan Y costs about 0.79 USDC more and returns about 0.2 EURC more, with two fewer transactions and no leftover allowance. The trade-off buys a simpler path.
 
 <Lab title="Plan Y on-chain (4 transactions)" goal="Hold at least 20 EURC again">
 
@@ -261,7 +261,7 @@ In total **63.5 USDC** bought **20.05359 EURC**. A's EURC became **20.203882** (
 
 </T>
 
-**In one sentence**: a simulation only shows what would happen in that block's state. By the time you send, time has passed and others may have traded first, so always set a minimum received.
+A simulation only shows what would happen in that block's state. By the time you send, time has passed and others may have traded first, so always set a minimum received.
 
 ## Impermanent loss on paper
 
@@ -371,7 +371,7 @@ The price fell only about 11%, and all of the position's USDC turned into WETH. 
 
 ## Surprises and easter eggs
 
-These unexpected moments taught the most:
+A few surprises from the labs:
 
 - **The first send attempt failed, and nothing was sent.** It stopped at the fork pre-check with a network error (`fetch failed`). The nonce did not change, which proves no transaction reached the chain. **Pre-check first and stop on failure.** That rule protected the account.
 - **A run was interrupted, but nothing was duplicated.** One send script ended right after printing its last "broadcast" line. The chain shows four transactions with nonces 21, 22, 23 and 24, and no duplicates. **After an interruption, check the nonce and the chain before you re-run anything.**
@@ -379,13 +379,15 @@ These unexpected moments taught the most:
 - **cirBTC has no pools at all.** Being able to get a token does not mean you can sell it. Before buying any token, check for a pool deep enough to sell into.
 - **A self-swap earns back only about 2.3% of its own fee**, and **EURC dipped to about 17.37**. See Lab 5.
 - **ETH goes into v3 and WETH comes out**, and **the fees were 0**. See Lab 6.
-- **The rehearsal and the real run produced the same NFT number, #234636.** The v2 LP amount and withdrawals matched exactly too, because nobody else traded those pools during those minutes. **An exact match is luck, not the norm.**
+- **The rehearsal and the real run produced the same NFT number, #234636.** The v2 LP amount and withdrawals matched exactly too, because nobody else traded those pools during those minutes. The next run will often disagree.
 - **One approval cost 137,757 gas.** On Sepolia, approvals of USDC and EURC each used 137,757 gas, far more than the tens of thousands that tutorials often quote. The reason was not investigated. **Use the current estimate and a fork measurement, not numbers from a tutorial.**
 - **We took someone else's leftover 1 wei.** See the safety warning above.
 
 ## Try it yourself: copyable commands
 
-The labs above used scripts. The commands below do the same steps by hand with <Term id="foundry">Foundry</Term>'s `cast` and `anvil` tools, so you can check the results or practise the labs. **They are split into three levels:**
+The labs above used scripts. The commands below do the same steps by hand with <Term id="foundry">Foundry</Term>'s `cast` and `anvil` tools, so you can check the results or practise the labs. `anvil` is Foundry's local chain simulator. With `--fork-url` it copies live chain state onto your computer; writes stay on that copy.
+
+The commands fall into three levels:
 
 1. **Read-only checks** call contracts through an <Term id="eth-call">eth_call</Term>. They sign nothing and cost nothing.
 2. **Rehearsals on a local fork** run real transactions, but only on a copy of Sepolia on your own computer. Nothing reaches the real chain, and no <Term id="private-key">private key</Term> is needed.
@@ -470,7 +472,7 @@ Expected: `true`, `12165362` and `1000000000000000` (0.001 ETH in wei).
 
 ### Rehearse on a local fork (the real chain is not touched)
 
-Open a **second terminal** and start a local copy of Sepolia. Leave it running:
+Open a **second terminal** and start a local copy of Sepolia with `anvil`. Leave it running:
 
 ```bash
 anvil --fork-url https://ethereum-sepolia-rpc.publicnode.com --port 8545

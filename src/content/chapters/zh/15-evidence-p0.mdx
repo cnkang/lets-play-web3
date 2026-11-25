@@ -11,9 +11,9 @@ status: published
 
 ## Phase-0 是什么
 
-本轮文档核对使用了项目所有者提供的原始实验仓库。[公开的实验记录节选](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/phase-0-notebook-excerpts.md)保留原文行号和源文件校验值，第 10.2–10.6 节的决策结果晚于早期计划。本章的测试结果来自原复核，本轮没有重新执行。本地记录与链上交易分别说明。
+本轮文档核对使用了项目所有者提供的原始实验仓库。[公开的实验记录节选](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/phase-0-notebook-excerpts.md)保留原文行号和源文件校验值，第 10.2-10.6 节的决策结果晚于早期计划。本章的测试结果来自原复核，本轮没有重新执行。本地记录与链上交易分别说明。
 
-Phase-0 指基础实验与复核阶段，不是缺陷优先级。本章讲其中的**技术复核与收尾**，包括链上只读核对、源码与<Term id="storage-layout">存储布局</Term>审查、<Term id="foundry">Foundry</Term> 测试、<Term id="verification">源码公开验证</Term>的准备，最后列出决策 D-01 到 D-05。这是项目自己做的复核，<strong>不是第三方专业<Term id="audit">审计</Term>证书</strong>。
+Phase-0 指基础实验与复核阶段，不是缺陷优先级。本章讲其中的**技术复核与收尾**：链上只读核对、源码与<Term id="storage-layout">存储布局</Term>审查、<Term id="foundry">Foundry</Term> 测试、<Term id="verification">源码公开验证</Term>的准备，以及决策 D-01 到 D-05。这是项目自己做的复核，<strong>不是第三方专业<Term id="audit">审计</Term>证书</strong>。
 
 ## 结论：PASS WITH FINDINGS
 
@@ -53,7 +53,7 @@ Phase-0 指基础实验与复核阶段，不是缺陷优先级。本章讲其中
 
 ### 两个值得讲的小插曲
 
-- **Fuzz 曾失败两次**，原因是**测试预言机**（测试里计算「期望结果」的代码）的断言顺序有问题。修好的是测试，**合约没有改**。这说明测试失败不一定是合约有 bug，也可能是测试本身写错了。
+- **Fuzz 曾失败两次**，原因是**测试预言机**（测试里计算「期望结果」的代码）的断言顺序有问题。修好的是测试，**合约没有改**。测试失败不一定是合约有 bug，也可能是测试本身写错了。
 - **16 次 Handler 意外回退**：Invariant 测试中，Handler 是替你随机发起各种调用的辅助代码。`batchTransferFrom` 被调用 3,166 次，其中 16 次（约 0.5%）出现了 Handler 没有预料到的<Term id="revert">回退</Term>。整笔 Handler 调用回滚，不变量仍然成立。Phase-0 把它判断为**测试脚手架（预言机边界）的残留**，不是合约漏洞。更稳妥的做法是以后做一个最小复现，确认它属于预期约束。
 
 <Callout type="warn" title="49/49 通过 ≠ 没有漏洞">
@@ -135,7 +135,7 @@ D-05 说的是实验合约仓库当时的本地归档，不是这个公开指南
 4. 对需要证明的状态变化，在目标区块附近核对交易、<Term id="event">事件</Term>和存储读取。
 5. 记录来源、时间、区块高度、命令、结果和**不确定的地方**。
 
-这一步就像检查 App 升级。不只看安装包版本，还要核对线上真正运行的版本、配置和迁移后的用户数据。
+这一步像检查 App 升级：不只看安装包版本，还要核对线上真正运行的版本、配置和迁移后的用户数据。
 
 ## Phase-0 的边界
 

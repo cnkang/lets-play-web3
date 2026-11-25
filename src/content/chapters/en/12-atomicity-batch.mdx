@@ -1,13 +1,13 @@
 ---
 title: "Two calls are not one transaction: atomicity"
-description: "Two separate transferFrom calls are not atomic; UBOX V2's batchTransfer is - an intentionally failing batch (100 to B plus 2,000,000 to C) reverted entirely, and a successful batch sent 100 to B and 200 to A itself. Confirmed transactions cannot be undone."
+description: "Two separate transferFrom calls are not atomic; UBOX V2's batchTransfer is atomic: an intentionally failing batch (100 to B plus 2,000,000 to C) reverted entirely, and a successful batch sent 100 to B and 200 to A itself. Confirmed transactions cannot be undone."
 navTitle: "12 · Two calls are not one transaction: atomicity"
 part: tokens
 order: 120
 status: published
 ---
 
-<p class="lead">Suppose you want to make two transfers. If you send each as a separate transaction, the first can succeed even if the second fails. In this lab you also see a batch that puts both transfers in one transaction and rolls both back if either fails. This all-or-nothing property is called <Term id="atomicity">atomicity</Term>.</p>
+<p class="lead">In everyday life it works like this: you want to send money to two people. If you tap "confirm" twice, and the first payment already lands while the second fails, the first does not bounce back on its own. On-chain it is the same. This lab also shows a batch that puts both transfers in one transaction and rolls both back if either fails. This all-or-nothing property is called <Term id="atomicity">atomicity</Term>.</p>
 
 ## Lab 1: two separate transferFrom calls (not atomic)
 
@@ -26,7 +26,7 @@ Both succeeded. Result: A held 998,800, B held 100, 100 of the allowance remaine
 
 Those were the values immediately after these two calls. D-01 in Chapter 11 later revoked the remaining 100; the allowance was 0 at the snapshot.
 
-**The key point**: these are two independent transactions. Once the first is mined, the 100 it moved is **not returned automatically** even if the second one fails (allowance too low, not enough <Term id="gas">gas</Term>, a <Term id="node">node</Term> problem…).
+**Keep this in mind**: these are two independent transactions. Once the first is mined, the 100 it moved is **not returned automatically** even if the second one fails (allowance too low, not enough <Term id="gas">gas</Term>, a <Term id="node">node</Term> problem…).
 
 <Callout type="note" title="Self-transfer: an event, but zero net change">
 
@@ -45,10 +45,12 @@ A sent a batch whose second item could not possibly succeed:
 
 <Tx h="0x7dd2f8636c730acd9b1dbe095a1d6ebd6f9b327f5090042bcd448a80f60c1243" />
 
-- 2026-11-12 12:32:12 Singapore time, <Term id="block">block</Term> **12116493**, status **reverted (failed)**, which is exactly what the experiment wanted
+After you open the link, what you should see:
+
+- 2026-11-12 12:32:12 Singapore time, <Term id="block">block</Term> **12116493**, status **reverted (failed)**. That is exactly what the experiment wanted.
 - Revert reason (confirmed by an `eth_call` before sending): `insufficient balance`
 - Gas used **51,719**, fee **3,516,892 <Term id="wei">wei</Term>**; A's nonce 15 → 16
-- Afterwards A still had 1,000,000, B still 0, C still 0: the first item's 100 **did not** reach B either
+- Afterwards A still had 1,000,000, B still 0, C still 0: the first item's 100 **did not** reach B either.
 
 Demo address C (generated in memory, key never stored, received nothing): <Addr a="0x6E7F8eF4353DB8012Dea3F70eb523aB1A3051711" />
 
@@ -73,7 +75,7 @@ The 200 self-transfer is subtracted and added inside the same atomic transaction
 
 ## Confirmed transactions cannot be undone
 
-Success or failure, once a transaction is mined and confirmed it **cannot be reversed**. The 100 sent to B in the successful batch cannot be "cancelled"; getting it back would need B to send a brand-new transfer, and the original stays in history forever.
+Success or failure, once a transaction is mined and confirmed it **cannot be reversed**. The 100 sent to B in the successful batch cannot be "cancelled"; getting it back would need B to send a brand-new transfer. The original stays in history forever.
 
 <T label="Non-atomic vs atomic">
 
