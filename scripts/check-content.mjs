@@ -70,7 +70,7 @@ for (const slug of [...slugs].sort()) {
   if (fm.zh && fm.en) {
     const snaps = Object.fromEntries(langs.map((l) => [l, snapshotBlock(join(dir, l, `${slug}.mdx`))]))
     if (snaps.zh !== snaps.en) errors.push(`"${slug}": "snapshot" differs (zh: ${snaps.zh || 'none'}, en: ${snaps.en || 'none'}); keep it identical in both languages`)
-    for (const k of ['part', 'order', 'status', 'lab']) {
+    for (const k of ['part', 'order', 'status', 'lab', 'released', 'unreleased', 'experiment']) {
       if ((fm.zh[k] ?? (k === 'status' ? 'published' : '')) !== (fm.en[k] ?? (k === 'status' ? 'published' : ''))) errors.push(`"${slug}": "${k}" differs (zh: ${fm.zh[k]}, en: ${fm.en[k]}); keep it identical in both languages`)
     }
     const lab = fm.zh.lab || ''

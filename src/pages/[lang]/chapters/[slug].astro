@@ -41,7 +41,10 @@ const prev = idx > 0 ? book.pages[idx - 1] : undefined
 const next = idx < book.pages.length - 1 ? book.pages[idx + 1] : undefined
 const part = partOf(book, slug)
 const isDraft = entry.data.status === 'draft'
-const modified = entry.data.updated ?? PUBLISHED
+const unreleased = entry.data.unreleased === true
+const releaseDate = unreleased ? undefined : (entry.data.released ?? PUBLISHED)
+const modified = entry.data.updated ?? releaseDate
+const experiment = entry.data.experiment
 const lab = entry.data.lab ?? 'sepolia'
 const snap = entry.data.snapshot ?? (lab === 'sepolia' ? { at: SNAPSHOT_ISO, block: SNAPSHOT_BLOCK } : null)
 const snapLabel = snap ? `${snap.at.slice(0, 10)} ${snap.at.slice(11, 19)} (UTC+8)` : ''
@@ -68,8 +71,8 @@ const jsonLd: object[] = [
     inLanguage: htmlLang[lang],
     url: absolute(`${lang}/${path}`),
     mainEntityOfPage: absolute(`${lang}/${path}`),
-    datePublished: PUBLISHED,
-    dateModified: modified,
+    ...(releaseDate ? { datePublished: releaseDate } : {}),
+    ...(modified ? { dateModified: modified } : {}),
     author,
     publisher: author,
     image: absolute(`og/${lang}.png`),
@@ -113,14 +116,20 @@ const components = { Addr, Tx, Figure, Callout, T, SafetyNotice, Snapshot, Quiz,
         <h1 id="chapter-title"><Nw text={title} /></h1>
         <p class="meta-line">
           <span>{lang === 'zh' ? `整理：${byline}` : `By ${byline}`}</span>
-          <span>{lang === 'zh' ? '页面发布：' : 'Published: '}<time class="nw" datetime={PUBLISHED}>{PUBLISHED}</time>{modified !== PUBLISHED && <> · <span class="nw">{lang === 'zh' ? '更新：' : 'Updated: '}<time datetime={modified}>{modified}</time></span></>}</span>
+          <span>
+            {unreleased
+              ? (lang === 'zh' ? '尚未公开发布' : 'Not yet released')
+              : <>{lang === 'zh' ? '页面发布：' : 'Published: '}<time class="nw" datetime={releaseDate}>{releaseDate}</time></>}
+            {experiment && <> · <span class="nw">{lang === 'zh' ? '实验记录：' : 'Lab record: '}<time datetime={experiment}>{experiment}</time></span></>}
+            {modified && modified !== releaseDate && <> · <span class="nw">{lang === 'zh' ? '正文日期：' : 'Text date: '}<time datetime={modified}>{modified}</time></span></>}
+          </span>
           {lab === 'sepolia' && snap && <span>{lang === 'zh' ? '链上快照：' : 'Chain snapshot: '}<time datetime={snap.at}>{snapLabel}</time>{lang === 'zh' ? <>，<span class="nw">区块 {snap.block}</span></> : <>, <span class="nw">block {snap.block}</span></>}</span>}
           {lab === 'anvil-fork' && snap && <span>{lang === 'zh'
             ? <>只读分叉来源：<time datetime={snap.at}>{snapLabel}</time>，Sepolia 区块 {snap.block}。写操作在本地 Anvil（chainId 31337）。这些哈希不能到 Etherscan 查询。</>
             : <>Fork source: <time datetime={snap.at}>{snapLabel}</time>, Sepolia block {snap.block}. Writes ran on local Anvil (chainId 31337). Do not look up these hashes on Etherscan.</>}</span>}
           {lab === 'anvil-local' && <span>{lang === 'zh'
-            ? <>本书历史快照仍是 <time datetime={SNAPSHOT_ISO}>{`${SNAPSHOT_ISO.slice(0, 10)} ${SNAPSHOT_ISO.slice(11, 19)} (UTC+8)`}</time>，Sepolia 区块 {SNAPSHOT_BLOCK}。本章是完全本地模型，chainId 31337，没有分叉该区块。记录日期 2026-11-25。</>
-            : <>The book’s historical snapshot remains <time datetime={SNAPSHOT_ISO}>{`${SNAPSHOT_ISO.slice(0, 10)} ${SNAPSHOT_ISO.slice(11, 19)} (UTC+8)`}</time>, Sepolia block {SNAPSHOT_BLOCK}. This chapter is a fully local model, chainId 31337, and does not fork that block. Recorded on 2026-11-25.</>}</span>}
+            ? <>本书历史快照仍是 <time datetime={SNAPSHOT_ISO}>{`${SNAPSHOT_ISO.slice(0, 10)} ${SNAPSHOT_ISO.slice(11, 19)} (UTC+8)`}</time>，Sepolia 区块 {SNAPSHOT_BLOCK}。本章是完全本地模型，chainId 31337，没有分叉该区块。</>
+            : <>The book’s historical snapshot remains <time datetime={SNAPSHOT_ISO}>{`${SNAPSHOT_ISO.slice(0, 10)} ${SNAPSHOT_ISO.slice(11, 19)} (UTC+8)`}</time>, Sepolia block {SNAPSHOT_BLOCK}. This chapter is a fully local model, chainId 31337, and does not fork that block.</>}</span>}
         </p>
       </header>
       <div class="prose">

@@ -36,8 +36,18 @@ const chapterSchema = z.object({
    * draft     — excluded from production builds entirely (visible in `npm run dev`).
    */
   status: z.enum(['published', 'upcoming', 'draft']).default('published'),
-  /** Optional date of the last significant edit to this translation. */
+  /** Optional date of the last significant edit to this translation. Becomes schema.org dateModified. */
   updated: z.iso.date().optional(),
+  /**
+   * Public release date of this chapter (schema.org datePublished).
+   * Omit it to use the book date in src/data/site.ts. Set `unreleased: true` instead
+   * when the chapter is in the build but has not been published on the public site.
+   */
+  released: z.iso.date().optional(),
+  /** True when this chapter must not claim the book’s first publication date. */
+  unreleased: z.boolean().optional(),
+  /** Date the recorded lab ran. This is not a publication date. */
+  experiment: z.iso.date().optional(),
   /**
    * Where this chapter's recorded actions ran.
    * sepolia — public Sepolia broadcasts (the default for earlier chapters).
