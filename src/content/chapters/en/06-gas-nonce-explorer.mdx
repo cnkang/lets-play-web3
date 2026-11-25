@@ -8,7 +8,7 @@ status: published
 updated: "2026-11-18"
 ---
 
-<p class="lead">This chapter answers one question: how do you tell that something really landed on-chain?</p>
+<p class="lead">How do you tell that something really landed on-chain? Check the fee, the transaction counter, then verify it in a block explorer.</p>
 
 ## Where the starting funds came from
 
@@ -62,7 +62,7 @@ At the snapshot, **account A's nonce was 20**. A had sent 20 transactions includ
 A lower tip makes a transaction more likely to wait at the back of the queue when the network is busy. The lab practised this on purpose:
 
 - **Nonce 3**: an increment with a tip of only **1 wei**. The chain was not busy, so it was still mined: <Tx h="0xd61e57686959b7c4c9d774a6aa35b0fb9dac72e8317055146da4676a9e4e4b31" short /> (block 12111091).
-- **Nonce 4**: the replacement script `replace-stuck.mjs` was designed to first send a 1 wei tip transaction at nonce 4 that would be hard to mine, and to watch it. If it was still waiting in the pending queue (the <Term id="mempool">mempool</Term>), it would send a replacement with **the same nonce and a higher tip (2 wei)**. The transaction mined at nonce 4 matches that script exactly (gas limit 140,000, tip 2 wei): <Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short /> (block 12111181).
+- **Nonce 4**: the replacement script `replace-stuck.mjs` was designed to first send a 1 wei tip transaction at nonce 4 that would be hard to mine, and to watch it. If it was still waiting in the pending queue (the <Term id="mempool">mempool</Term>, a holding area for transactions waiting to be included in a block), it would send a replacement with **the same nonce and a higher tip (2 wei)**. The transaction mined at nonce 4 matches that script exactly (gas limit 140,000, tip 2 wei): <Tx h="0x8141d5f30dc7abd76c7c2ebfcc9f4861af625e38ca11220605057e1275512da8" short /> (block 12111181).
 
 **Only the transaction that was finally mined is visible on-chain.** This book does not count a pending transaction as an on-chain result. A wallet or script can compute a <Term id="tx-hash">hash</Term> before broadcasting, so an ID alone proves neither successful broadcast nor inclusion in a block. Check its receipt and block number.
 

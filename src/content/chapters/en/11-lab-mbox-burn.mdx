@@ -1,6 +1,6 @@
 ---
 title: "Lab: MBox-Burn, burning and revoking"
-description: "The MBox-Burn lab (0x2AE6BbE8b524381535D1f443fe95018b1f64e3F2) - burn is not a transfer to address zero; approve 500, burnFrom 100, the leftover allowance later fell to 100; decision D-01 revoked it with approve(B, 0) in block 12117312, leaving balances and supply unchanged."
+description: "The MBox-Burn lab (0x2AE6BbE8b524381535D1f443fe95018b1f64e3F2): burn is not a transfer to address zero; approve 500, burnFrom 100, the leftover allowance later fell to 100; decision D-01 revoked it with approve(B, 0) in block 12117312, leaving balances and supply unchanged."
 navTitle: "11 · Lab: MBox-Burn, burning and revoking"
 part: tokens
 order: 110
@@ -35,9 +35,11 @@ Both can show a "transfer to 0x0" <Term id="event">event</Term> in an <Term id="
 
 ## D-01: revoking the leftover 100
 
-The Phase-0 review recorded this leftover allowance as a Low finding (F-ALLOW-001): not a compromised contract but a leftover from the experiment. If B <Term id="signature">signed</Term>, it could still move up to 100 test tokens. Decision **D-01** approved revoking it. After re-reading the allowance, <Term id="nonce">nonce</Term> and balances and <Term id="simulate">simulating</Term> again, A <Term id="broadcast">broadcast</Term> **exactly one** `approve(B, 0)`:
+The Phase-0 review recorded this leftover allowance as a Low finding (F-ALLOW-001). The contract was not compromised; this was a leftover from the experiment. If B <Term id="signature">signed</Term>, it could still move up to 100 test tokens. Decision **D-01** approved revoking it. After re-reading the allowance, <Term id="nonce">nonce</Term> and balances and <Term id="simulate">simulating</Term> again, A <Term id="broadcast">broadcast</Term> **exactly one** `approve(B, 0)`:
 
 <Tx h="0x4571e581958308c820ab16da26aa9d1a2622caa7c720ebe164b5d2c29a3747f2" />
+
+After you open the link, what you should see:
 
 - Block **12117312**, status success; gasUsed 24,538, effective gas price 69 <Term id="wei">wei</Term>, fee 1,693,122 wei
 - `allowance(A, B)`: **100 → 0**
@@ -84,6 +86,6 @@ B's two `transferFrom` calls are in Chapter 12.
 
 <Callout type="note" title="Least privilege">
 
-The core security lesson here is "least necessary privilege". It often matters more than piling ever more features into a token contract.
+Giving only as much allowance as needed usually cuts the blast radius of a mistake more than adding ever more features to a token contract.
 
 </Callout>

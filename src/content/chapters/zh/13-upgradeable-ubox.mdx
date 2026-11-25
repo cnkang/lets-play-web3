@@ -11,7 +11,7 @@ status: published
 
 ## 可升级必须在部署时就设计好
 
-第 8、9 章看到：普通合约一旦<Term id="deploy">部署</Term>，逻辑就冻在那个地址上。UBOX 从一开始就用了代理模式，把「用户永远调用的地址」固定为**代理**，把逻辑放在可替换的<strong><Term id="implementation">实现合约</Term></strong>里。
+第 8、9 章看到：普通合约一旦<Term id="deploy">部署</Term>，逻辑就冻在那个地址上。UBOX 从一开始就用了代理模式：用户永远调用的地址固定为**代理**，逻辑放在可替换的<strong><Term id="implementation">实现合约</Term></strong>里。
 
 采用的是 <Term id="openzeppelin">OpenZeppelin</Term> 5.6.1 的 `TransparentUpgradeableProxy` 和 `ProxyAdmin`，没有自己写代理，便于对照官方的<Term id="storage">存储槽</Term>规范（ERC-1967）和升级接口。
 
@@ -50,7 +50,11 @@ status: published
 
 </T>
 
-<Term id="simulate">模拟</Term>阶段遇到并修正过三个问题（都发生在<Term id="broadcast">广播</Term>之前）：中文名必须用 `unicode"..."`；`_initialized` 起初是 `bool`，会和 `owner` 打包进同一个存储槽，导致按「各占一槽」写入的模拟读到错乱数据，后来改成单独占用 slot 0 的 `uint256`；在同一次模拟里连续创建两个合约时，要把 nonce 设成「V1 已部署之后」的值，否则会碰到 `CreateCollision`。
+<Term id="simulate">模拟</Term>阶段遇到并修正过三个问题（都发生在<Term id="broadcast">广播</Term>之前）：
+
+1. 中文名必须用 `unicode"..."`。
+2. `_initialized` 起初是 `bool`，会和 `owner` 打包进同一个存储槽，导致按「各占一槽」写入的模拟读到错乱数据；后来改成单独占用 slot 0 的 `uint256`。
+3. 在同一次模拟里连续创建两个合约时，要把 nonce 设成「V1 已部署之后」的值，否则会碰到 `CreateCollision`。
 
 ## 第二步：升级到 V2（不再调用 initialize）
 
@@ -68,7 +72,7 @@ V2 不新增状态变量、不重排存储，只增加<Term id="atomicity">原�
 
 </T>
 
-升级后名称、供应、余额、owner 全部不变，**代理地址也不变**：仍是 `0xc3F20D5488784D922aC3428a54125715fA98db04`。升级交易本身只用了 41,724 <Term id="gas">gas</Term>，远少于重新部署一整套代理——这就是「地址和状态保留、只换逻辑」的好处。
+升级后名称、供应、余额、owner 全部不变，**代理地址也不变**：仍是 `0xc3F20D5488784D922aC3428a54125715fA98db04`。升级交易本身只用了 41,724 <Term id="gas">gas</Term>，远少于重新部署一整套代理。地址和状态保留，只换了逻辑。
 
 ## 所有升级都留在链上
 
@@ -83,7 +87,7 @@ V2 不新增状态变量、不重排存储，只增加<Term id="atomicity">原�
 - **技术风险**：新版本的<Term id="storage-layout">存储布局</Term>如果不兼容（重排、插入变量），会把旧数据「读错位置」。规则是**只追加、不重排**。
 - **治理问题**：谁有升级权？是不是<Term id="multisig">多签</Term>？有没有延迟、公告和退出机制？
 
-在本实验里，ProxyAdmin 的 owner 是单个测试账户 A——这是一个明确接受的教学模型，**不是**去中心化发行。
+在本实验里，ProxyAdmin 的 owner 是单个测试账户 A。这是一个明确接受的教学模型，**不是**去中心化发行。
 
 <Callout type="warn" title="使用可升级代币时">
 

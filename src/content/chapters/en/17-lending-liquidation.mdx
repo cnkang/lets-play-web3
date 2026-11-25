@@ -18,11 +18,10 @@ snapshot:
 
 <Callout type="warn" title="Which kind of evidence this is">
 
-The writes in this chapter ran on the author’s local Anvil node, at loopback `127.0.0.1:8546`, chainId **31337**. The node copied Sepolia block **12165973** (2026-11-19 11:58:12, Singapore time) and then changed only that copy. The run was **2026-11-20 10:26:53–10:26:58** Singapore time.
-
-These transactions are not new Sepolia transactions. Do not open the local hashes on Etherscan. A new run draws new temporary accounts, so the hashes change. With the same block and the same order, the amounts stay stable. The next chapter forks the same block, but its debt and health factor differ. Do not copy numbers from one chapter into the other.
-
-This chapter’s text entered the public Git repository on **2026-11-25** (pull request 6 merged at 2026-11-25 14:24 Singapore time). The page date is that calendar day. It is not the minute the live website finished deploying. The lab record remains 2026-11-20.
+- **A local copy.** Anvil is Foundry’s local chain simulator. The writes in this chapter ran on the author’s local Anvil node, at loopback `127.0.0.1:8546`, chainId **31337**. The node copied Sepolia block **12165973** (2026-11-19 11:58:12, Singapore time) and then changed only that copy. The run was **2026-11-20 10:26:53 to 10:26:58** Singapore time.
+- **Not new public transactions.** Do not open the local hashes on Etherscan. A new run draws new temporary accounts, so the hashes change. With the same block and the same order, the amounts stay stable.
+- **Do not mix numbers with Chapter 18.** The next chapter forks the same block, but its debt and health factor differ.
+- **Page date.** This chapter’s text entered the public Git repository on **2026-11-25** (pull request 6 merged at 2026-11-25 14:24 Singapore time). The page date is that calendar day, separate from when the live site finished deploying. The lab record remains 2026-11-20.
 
 </Callout>
 
@@ -54,7 +53,7 @@ The faucet cannot mint this WETH. A simulated mint reverts with `not mintable`. 
 
 One 12-second local block later, the debt is not a clean 2,500. The reading is **2,500.000610**. The health factor is about **1.32**. Collateral is still **1** WETH.
 
-This test pool is heavily used. The variable borrow rate, in ray units, is `639970093802817705403628356`, about **64%** a year. Each block adds a visible crumb of interest. A napkin formula that ignores interest misses the protocol by a little. That interest is the main gap. It is not a hidden penalty.
+This test pool is heavily used. The variable borrow rate, in ray units, is `639970093802817705403628356`, about **64%** a year. Each block adds a visible crumb of interest. A napkin formula that ignores interest misses the protocol by a little; the gap is mostly that interest.
 
 <HfBoard />
 
@@ -82,9 +81,9 @@ The valuation moved from 4,000 to 2,800. The balance did not lose one wei. Colla
 
 At the moment of liquidation, the repaid debt is **2,500.002436** test USDC. Interest grew again after the earlier reading. The health factor is at or below 0.95, so this deployment allows one call to cover **100%**. The request said “maximum”. The protocol cut it to the full debt.
 
-The borrower loses **0.9375009135** WETH. Of that, **0.933036623435714286** goes to the liquidator. **0.004464290064285714** goes to the protocol treasury as a deposit receipt. At the 2,800 oracle mark, the 5% liquidation bonus is about 112.50 for the liquidator and about 12.50 for the protocol. The protocol’s share is 10% of the bonus, not 10% of the collateral, and not the flash-loan fee split in the next chapter. That mark is a test-token valuation, not dollar income. The borrower still holds the 2,500 test USDC already borrowed, plus about 0.0624990865 WETH of deposit receipt.
+The borrower loses **0.9375009135** WETH. Of that, **0.933036623435714286** goes to the liquidator. **0.004464290064285714** goes to the protocol treasury as a deposit receipt. At the 2,800 oracle mark, the 5% liquidation bonus is about 112.50 for the liquidator and about 12.50 for the protocol. The protocol’s share is 10% of the bonus (the bonus itself is about 5% of the seized collateral). The flash-loan fee split in the next chapter is a different rule. The mark is a test-token valuation, with no dollar income. The borrower still holds the 2,500 test USDC already borrowed, plus about 0.0624990865 WETH of deposit receipt.
 
-The same transaction also shows a mint to the treasury. That mint records interest the treasury had **already** accrued. It is not an extra bonus. The treasury’s balance rises by exactly the protocol fee.
+The same transaction also shows a mint to the treasury. That mint records interest the treasury had **already** accrued, separate from this liquidation bonus. The treasury’s balance rises by exactly the protocol fee.
 
 ## Repay 750, and the same price is safe
 
@@ -94,7 +93,7 @@ The debt is now **1,750.002252**. The health factor is still about **1.32**, abo
 
 Why is this so close to the opening 1.32? Repaying about 30% of the debt offsets the 30% drop from 4,000 to 2,800. The price matches. The debt does not. The ratio changes.
 
-The later full repayment transfers **1,750.004383**. The two repayments exceed the original 2,500 principal by **0.004383** test USDC. That is the interest across these blocks. The account was short by that crumb, so it minted 1 test USDC from the faucet. After closing, it withdraws exactly 1 WETH and the allowances are zero. With no debt, the protocol reports a huge sentinel health factor, not zero.
+The later full repayment transfers **1,750.004383**. The two repayments exceed the original 2,500 principal by **0.004383** test USDC: the interest across these blocks. The account was short by that crumb, so it minted 1 test USDC from the faucet. After closing, it withdraws exactly 1 WETH and the allowances are zero. With no debt, the protocol reports a huge sentinel health factor instead of zero.
 
 ## Calculate the boundary with the right percentage
 
@@ -104,7 +103,7 @@ Set the health factor to 1:
 
 With the opening debt 2,500.000610, that price is about **3,030.30376970**. A read-only probe on the same block finds the edge. A price at or below **3,030.30376969** can be liquidated. At **3,030.30376970** the health factor is exactly 1, so it **cannot** be liquidated. The probe matches the on-copy reading.
 
-Using the 80% loan-to-value ratio instead gives 3,125. That is the price where you can no longer borrow as much. It is not the liquidation price.
+Using the 80% loan-to-value ratio instead gives 3,125. That is the price where you can no longer borrow as much. The liquidation boundary uses 82.5%.
 
 Interest slowly lifts the boundary. About every 12 seconds, a 2,500 debt grows by about 0.000608, and the boundary moves up by about 0.00074. A principal-only figure of 3,030.30303030 sits about 0.00074 below the protocol’s opening boundary.
 
@@ -112,7 +111,7 @@ After the 750 repayment, the highest liquidatable price is **2,121.21433453**. T
 
 ## 50% and 100% are caps, and this is V3.0
 
-The <Term id="close-factor">close factor</Term> is a maximum, not an amount the protocol always takes. On this V3.0 deployment:
+The <Term id="close-factor">close factor</Term> is the most one call may cover. The protocol does not always take that full amount. On this V3.0 deployment:
 
 - At a health factor of 1 or more, liquidation is refused.
 - Above 0.95 and below 1, one call may cover at most 50%.
@@ -120,7 +119,7 @@ The <Term id="close-factor">close factor</Term> is a maximum, not an amount the 
 
 This deployment does **not** have the later V3.3 rule that lets a small debt be closed in full. The 100% cap here exists only because the health factor is at or below 0.95. The debt size of 2,500 is not the reason.
 
-A control uses the same snapshot and a price of **2,950**. The health factor is about **0.973**, between 0.95 and 1. A maximum request repays only **1,250.001218**. The borrower loses **0.444915687762711864** WETH. Afterwards the health factor is about **1.08**. The remaining debt is 2 minimal units under a perfect half. That is index rounding, not an extra fine.
+A control uses the same snapshot and a price of **2,950**. The health factor is about **0.973**, between 0.95 and 1. A maximum request repays only **1,250.001218**. The borrower loses **0.444915687762711864** WETH. Afterwards the health factor is about **1.08**. The remaining debt is 2 minimal units under a perfect half, from index rounding.
 
 ## Do not mix these numbers with the next chapter
 
@@ -149,7 +148,7 @@ The public hash of the fork-source block is `0x38d7b288efbc2cf0d80ebbc2b897329be
 
 The historical P2A launcher did not disable Anvil’s built-in test accounts, so a node log printed Anvil’s own test keys. Those were not a reader’s wallet. The log is not published. If you repeat the idea on your own computer, start Anvil with `--accounts 0 --silent`, and do not commit the node log.
 
-The saved receipt excerpt is [p2a-readings.json](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/p2a-readings.json). It can check the hashes, state and gas above while offline. It is not an Anvil state dump. It cannot restore that run’s blocks, receipts or traces, and it does not remove the need for a historical Sepolia read node. This repository does not ship a replay script for the fork lab. A new run gets new hashes. See the [evidence folder](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/README.md).
+The saved receipt excerpt is [p2a-readings.json](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/p2a-readings.json). It can check the hashes, state and gas above while offline. The excerpt cannot stand in for an Anvil state dump: it cannot restore that run’s blocks, receipts or traces, and you still need a historical Sepolia read node. This repository does not ship a replay script for the fork lab. A new run gets new hashes. See the [evidence folder](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/README.md).
 
 </details>
 
@@ -162,4 +161,4 @@ The saved receipt excerpt is [p2a-readings.json](https://github.com/cnkang/lets-
 - This deployment is V3.0. The caps on either side of 0.95 are 50% and 100%. There is no V3.3 small-debt rule.
 - The 64% test rate adds debt every block. Cite Chapter 18’s readings only in Chapter 18.
 
-The next chapter asks a different question. Can one transaction borrow, liquidate, and repay before it ends? That is still not free, and it does not promise a profit. The lending questions in Appendix C are the self-check.
+The next chapter asks a different question. Can one transaction borrow, liquidate, and repay before it ends? You still pay a fee and gas, and nothing promises a profit. The lending questions in Appendix C are the self-check.

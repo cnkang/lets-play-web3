@@ -13,7 +13,7 @@ status: published
 
 **节点**是运行<Term id="blockchain">区块链</Term>软件的计算机。不同节点可以各自按同一套规则核对同一笔交易。你能查到什么，取决于节点保存了哪些数据。比如，想知道某个账户在很久以前的某个区块有多少余额，可以查<Term id="archive-node">归档节点（archive node）</Term>。
 
-本书实验用的是一个<strong>免费的公共 <Term id="rpc">RPC</Term> 节点</strong>：
+本书实验用的是一个<strong>免费的公共 <Term id="rpc">RPC</Term> 节点</strong>（通过网址向节点发查询的接口）：
 
 ```text
 https://ethereum-sepolia-rpc.publicnode.com
@@ -34,7 +34,7 @@ https://ethereum-sepolia-rpc.publicnode.com
 3. **私钥丢失**：丢了<Term id="private-key">私钥</Term>不像忘记网站密码，没有「找回密码」按钮。
 4. **合约缺陷**：代码可以被公开执行，也可以被公开地执行**错误的逻辑**。
 
-<Callout type="warn" title="关键区别">
+<Callout type="warn" title="别搞混">
 
 「难以被单方篡改」不等于「永远真实」「永远安全」或「永远不可改变」。第 13 章会看到：<Term id="upgradeable">可升级合约</Term>的管理员，完全可以合法地改变同一个地址背后的规则。
 
@@ -42,5 +42,5 @@ https://ethereum-sepolia-rpc.publicnode.com
 
 ## 在实验里的影子
 
-- 第 9 章：1,000 枚 MBox 被转到一个**没有私钥**的<Term id="address">地址</Term>，永远取不出来——这是「私钥丢失」的极端版本。
-- 第 14–15 章：Phase-0 复核仍发现了 1 个 Medium 级问题——「合约缺陷」并不会因为代码上链就消失。
+- 第 9 章：1,000 枚 MBox 被转到一个**没有私钥**的<Term id="address">地址</Term>，永远取不出来。这是「私钥丢失」的极端版本。
+- 第 14–15 章：Phase-0 复核仍发现了 1 个 Medium 级问题。「合约缺陷」并不会因为代码上链就消失。

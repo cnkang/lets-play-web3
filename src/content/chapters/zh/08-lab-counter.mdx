@@ -12,17 +12,19 @@ updated: "2026-11-18"
 
 <h2 id="inspect-a-transaction">先看一笔交易：不用钱包的练习</h2>
 
-打开第一次 `increment`（计数加一）的交易：
+点开下面的链接。这是第一次 `increment`（计数加一）的交易：
 
 <Tx h="0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73" />
 
-这是本章表格中的已完成实验，位于 Sepolia 区块 **12110964**。只需浏览网页，不用连接钱包、领测试币或注册账号。先看三项：
+页面会打开 Sepolia 区块浏览器。这笔交易在区块 **12110964**，也列在本章表格里。只需浏览网页，不用连接钱包、领测试币或注册账号。
 
-1. **Status** 显示 **Success**，说明这次调用执行成功。
-2. **Tokens Transferred** 显示这次没有代币转账。计数加一不等于付款，但发送者仍付了网络手续费。
-3. **Logs**（事件日志）记录 `Incremented`。若页面能解码，`newCount` 为 **1**。看不到字段时不要猜。解码需要接口说明，先对照下方代码和记录。
+在页面上从上往下找这三项。你应该看到：
 
-这说的是那一次调用，不是今天的计数。全书历史快照中的 `count()` 为 2，来自后面的操作。
+1. **Status** 显示 **Success**。说明这次调用执行成功。
+2. **Tokens Transferred** 为空，或写着没有代币转账。计数加一不会转走代币；发送者仍付了网络手续费。
+3. **Logs**（事件日志）里有 `Incremented`。若页面已解码，`newCount` 为 **1**。看不到字段时不要猜。解码需要接口说明，先对照下方代码和记录。
+
+这些数字描述的是那一次调用。全书历史快照中的 `count()` 为 2，来自后面的操作。
 
 ### 可选：在终端只读查询同一笔收据
 
@@ -34,7 +36,7 @@ curl -sS https://ethereum-sepolia-rpc.publicnode.com \
   --data '{"jsonrpc":"2.0","id":1,"method":"eth_getTransactionReceipt","params":["0x9e63d7a2bf89d4dd7330623a6729ce35f1c249c9d735de0e7fb770b380a98e73"]}'
 ```
 
-看返回的 `result.status`（`0x1` 表示成功）、`blockNumber` 和 `logs`。RPC 返回的区块号是十六进制，浏览器显示十进制。若返回 `null` 或服务报错，先检查网络，也可以稍后重试。不要把「没查到」当作「交易失败」。
+看返回的 `result.status`（`0x1` 表示成功）、`blockNumber` 和 `logs`。RPC 返回的区块号是十六进制，浏览器显示十进制。若返回 `null` 或服务报错，先检查网络，也可以稍后重试。查询失败不等于交易失败。
 
 ## 合约做了什么
 
@@ -63,7 +65,7 @@ contract Counter {
 }
 ```
 
-任何人都能调用 `increment`，加一并发出 `Incremented` <Term id="event">事件</Term>。只有<Term id="deploy">部署</Term>者 `owner` 能调用 `reset`，把计数清零。实际用 solc 0.8.34 <Term id="compile">编译</Term>。
+任何人都能调用 `increment`，加一并发出 `Incremented` <Term id="event">事件</Term>。只有<Term id="deploy">部署</Term>者 `owner` 能调用 `reset`，把计数清零。实际用 solc（Solidity 编译器）0.8.34 <Term id="compile">编译</Term>。
 
 ## 链上结果
 
@@ -94,14 +96,14 @@ Counter 每一步都是一笔已上链的交易，读取 <code>count()</code> �
 ## 从数字里能学到什么
 
 - **链在替你记账**：`count` 和 `owner` 都写在链上，事件日志也在链上。要改状态必须自己付 <Term id="gas">gas</Term>。
-- **部署远比调用贵**：部署用了 1,652,641 gas，reset 只用 23,626 gas。主要成本是把合约代码写进链上状态，而不是那几行加减逻辑。
+- **部署远比调用贵**：部署用了 1,652,641 gas，reset 只用 23,626 gas。主要成本是把合约代码写进链上状态；几行加减逻辑本身并不贵。
 - **同一个函数的 gas 会变**：从 0 变成 1 的 increment 用了 127,229 gas，从 1 变成 2 只用了 29,309 gas。原因是<Term id="storage">存储槽</Term>从零写成非零更贵，已经非零再改就便宜得多。
 - <strong>已确认的<Term id="transaction">交易</Term>不能撤销</strong>：reset 把数字清零，但抹不掉之前 increment 的交易和事件，历史仍在。
-- **这段合约不能再加功能**：想增加批量操作或升级能力，必须在部署时就采用<Term id="upgradeable">可升级</Term>模式——这直接引出了后面的 UBOX（第 13 章）。
+- **这段合约不能再加功能**：想增加批量操作或升级能力，必须在部署时就采用<Term id="upgradeable">可升级</Term>模式。第 13 章的 UBOX 就是这样。
 
 ## 生活对应
 
-把它想成一家店门口「所有合作商户都能核对」的公共计数器，调用一次，计数变化一次。如果计数涉及活动抽奖总次数或公开任务完成次数，链上计数能减少争议，避免单方改数。但它证明不了柜台前真的来过一个人。
+把它想成一家店门口「所有合作商户都能核对」的公共计数器，调用一次，计数变化一次。如果计数涉及活动抽奖总次数或公开任务完成次数，链上计数能减少争议，避免单方改数。它证明不了柜台前真的来过一个人。
 
 <Callout type="note" title="复盘问题">
 

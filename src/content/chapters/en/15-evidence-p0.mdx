@@ -11,9 +11,9 @@ status: published
 
 ## What Phase-0 was
 
-This documentation review used the original lab repository supplied by the project owner. [Public notebook excerpts](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/phase-0-notebook-excerpts.md) retain source line ranges and a file checksum. The outcomes in §10.2–10.6 come after the early plans. Test results below are from that original review. They were not rerun for this documentation edit. Local records and on-chain transactions are identified separately.
+This documentation review used the original lab repository supplied by the project owner. [Public notebook excerpts](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/phase-0-notebook-excerpts.md) retain source line ranges and a file checksum. The outcomes in §10.2-10.6 come after the early plans. Test results below are from that original review. They were not rerun for this documentation edit. Local records and on-chain transactions are identified separately.
 
-Phase-0 names the completed basics, experiments and review stage, not an issue priority. This chapter covers the **technical review and wrap-up**. It includes read-only on-chain checks, source and <Term id="storage-layout">storage-layout</Term> review, <Term id="foundry">Foundry</Term> tests, preparation for public <Term id="verification">source verification</Term>, and decisions D-01 to D-05. It was the project’s own review, **not a certificate from a professional third-party <Term id="audit">audit</Term>**.
+Phase-0 names the completed basics, experiments and review stage, not an issue priority. This chapter covers the **technical review and wrap-up**: read-only on-chain checks, source and <Term id="storage-layout">storage-layout</Term> review, <Term id="foundry">Foundry</Term> tests, preparation for public <Term id="verification">source verification</Term>, and decisions D-01 to D-05. It was the project's own review, **not a certificate from a professional third-party <Term id="audit">audit</Term>**.
 
 ## Conclusion: PASS WITH FINDINGS
 
@@ -113,7 +113,7 @@ Decision D-04 designed a UBOX V4 locally to fix F-V3-001 and the dust issues:
 
 ## Decision status at the historical snapshot
 
-D-05 describes the lab contract repository’s local archive at that time, not the current Git state of this public guide repository.
+D-05 describes the lab contract repository's local archive at that time, not the current Git state of this public guide repository.
 
 <T label="Outcome of Phase-0 decisions D-01 to D-05">
 
@@ -141,4 +141,4 @@ It is like checking an app upgrade. Look at the installer version. Also look at 
 
 - The public <Term id="rpc">RPC</Term> has no <Term id="archive-node">archive</Term> data. Pre-upgrade blocks could not be forked. Phase-0 rebuilt the upgrade path locally instead. It said so plainly. It did not report an unperformed fork as passing.
 - The static analyser Slither (a tool that scans source code for common problems without running it) was not run (not installed, optional).
-- The next round only needs to track D-02's final result and reproduce the 16 Handler reverts, rather than extending Phase-0 forever.
+- The next round only needs to track D-02's final result and reproduce the 16 Handler reverts, without extending Phase-0 forever.

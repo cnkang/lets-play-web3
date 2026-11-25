@@ -35,9 +35,11 @@ status: published
 
 ## D-01：撤销遗留的 100 授权
 
-Phase-0 复核把这笔遗留授权记为一个 Low 级发现（F-ALLOW-001）：不是合约被攻破，而是实验残留——B 若<Term id="signature">签名</Term>，仍然可以动用最多 100 枚测试币。决策 **D-01** 批准撤销：重新读取额度、<Term id="nonce">nonce</Term>、余额并<Term id="simulate">模拟</Term>之后，由 A <Term id="broadcast">广播</Term>**仅此一笔** `approve(B, 0)`：
+Phase-0 复核把这笔遗留授权记为一个 Low 级发现（F-ALLOW-001）。合约没有被攻破；这是实验残留。B 若<Term id="signature">签名</Term>，仍然可以动用最多 100 枚测试币。决策 **D-01** 批准撤销：重新读取额度、<Term id="nonce">nonce</Term>、余额并<Term id="simulate">模拟</Term>之后，由 A <Term id="broadcast">广播</Term>**仅此一笔** `approve(B, 0)`：
 
 <Tx h="0x4571e581958308c820ab16da26aa9d1a2622caa7c720ebe164b5d2c29a3747f2" />
+
+点开链接后，你应该看到：
 
 - 区块 **12117312**，状态成功；gasUsed 24,538，有效气价 69 <Term id="wei">wei</Term>，手续费 1,693,122 wei
 - `allowance(A, B)`：**100 → 0**
@@ -84,6 +86,6 @@ B 的两笔 `transferFrom` 见第 12 章。
 
 <Callout type="note" title="最小必要权限">
 
-这项练习的核心安全意义是「最小必要权限」。它的重要性，往往高于把代币合约的功能越写越复杂。
+只给对方刚好够用的额度，比把代币合约功能写得越来越复杂，更能减少出事时的损失面。
 
 </Callout>

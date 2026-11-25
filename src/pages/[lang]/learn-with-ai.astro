@@ -13,8 +13,9 @@ const { lang } = Astro.params as { lang: Lang }
 const zh = lang === 'zh'
 const title = zh ? '请 AI 带你练' : 'Learn with an AI agent'
 const description = zh
-  ? '五段可以复制的练习提示词。先用浏览器模拟，再考虑隔离的测试网。不要把助记词交给任何代理。'
-  : 'Five prompts you can copy into an AI agent. Start with browser simulations. Move to an isolated testnet only when you choose to. Never give an agent a seed phrase.'
+  ? '五段可复制的练习提示词。先在浏览器里模拟，再按需要换到隔离测试网。不要把助记词交给任何代理。'
+  : 'Five prompts you can copy into an AI agent. Start with browser simulations. Use an isolated testnet only when you choose to. Never give an agent a seed phrase.'
+
 const path = 'learn-with-ai/'
 const site = ui[lang].siteTitle
 const pageUrl = absolute(`${lang}/${path}`)
@@ -47,11 +48,11 @@ const jsonLd = [
     <h1>{title}</h1>
     <div class="prose">
       <p>{zh
-        ? '你可以把下面的提示词交给 Grok、ChatGPT、Claude、Hermes、Codex 或其他能阅读网页的代理。它们的工具并不相同。提示词不假设代理能签名、能联网，或能访问你的钱包。'
-        : 'You can give these prompts to Grok, ChatGPT, Claude, Hermes, Codex, or another agent that can read a web page. Their tools differ. A prompt does not assume the agent can sign, reach a network, or open your wallet.'}</p>
+        ? '你可以把下面的提示词交给 Grok、ChatGPT、Claude、Hermes、Codex，或其他能打开网页的代理。各家工具不一样。这些提示词不假定代理能签名、能联网，或能打开你的钱包。'
+        : 'You can give these prompts to Grok, ChatGPT, Claude, Hermes, Codex, or another agent that can open a web page. Their tools differ. These prompts do not assume the agent can sign, reach a network, or open your wallet.'}</p>
       <p class="callout warn">{zh
-        ? '不要把私钥、助记词或真实钱包交给代理。浏览器实验不需要这些。测试网练习要用新的空钱包。'
-        : 'Do not give an agent a private key, a seed phrase, or a wallet that holds assets. The browser labs need none of those. A testnet exercise uses a new empty wallet.'}</p>
+        ? '不要把私钥、助记词或装有资产的钱包交给代理。浏览器实验不需要这些。若做测试网练习，请用新的空钱包。'
+        : 'Do not give an agent a private key, a seed phrase, or a wallet that holds assets. The browser labs need none of those. For a testnet exercise, use a new empty wallet.'}</p>
       <h2>{name.safety}</h2>
       <ul>
         {safety[lang].map((rule) => <li>{rule}</li>)}
@@ -87,10 +88,10 @@ const jsonLd = [
     <p>
       <a class="btn ghost" data-track="learning_path_start" data-path="play" href={href(`${lang}/labs/`)}>{zh ? '先自己做三个实验' : 'Try the three labs yourself'}</a>
     </p>
-    <h2>{zh ? '学习事件里可能有什么' : 'What a learning event can include'}</h2>
+    <h2>{zh ? '复制时可能记下什么' : 'What may be logged on copy'}</h2>
     <p>{zh
-      ? '复制成功时，如果这次构建启用了统计，可能发送 prompt_copy、提示词编号和语言。不会发送提示词正文。加上 ?events=local 时，事件只留在这个浏览器里。'
-      : 'After a successful copy, a build with analytics enabled can send prompt_copy, the prompt id, and the language. It does not send the prompt text. With ?events=local, the event stays in this browser.'}</p>
+      ? '复制成功时，若这次构建开了统计，可能发送 prompt_copy、提示词编号和语言，不会发送提示词正文。地址栏加上 ?events=local 时，事件只留在这个浏览器里。'
+      : 'After a successful copy, a build with analytics on may send prompt_copy, the prompt id, and the language. It does not send the prompt text. With ?events=local in the URL, the event stays in this browser.'}</p>
     <div data-event-panel hidden>
       <h3>{zh ? '留在这个浏览器里的事件' : 'Events kept in this browser'}</h3>
       <pre data-event-log></pre>

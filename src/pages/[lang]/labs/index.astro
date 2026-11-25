@@ -13,8 +13,9 @@ const { lang } = Astro.params as { lang: Lang }
 const zh = lang === 'zh'
 const title = zh ? '互动实验' : 'Interactive labs'
 const description = zh
-  ? '三个只在浏览器里运行的实验：授权额度、恒定乘积兑换，以及 SHA-256 哈希链。不需要钱包，也不花真钱。'
-  : 'Three browser-only labs: an ERC-20 allowance, a constant-product swap, and a SHA-256 hash chain. No wallet and no real money.'
+  ? '三个只在浏览器里跑的实验：授权额度、恒定乘积兑换，以及 SHA-256 哈希链。不需要钱包，也不花真钱。'
+  : 'Three labs that run only in your browser: an ERC-20 allowance, a constant-product swap, and a SHA-256 hash chain. No wallet and no real money.'
+
 const path = 'labs/'
 const site = ui[lang].siteTitle
 const pageUrl = absolute(`${lang}/${path}`)
@@ -47,8 +48,8 @@ const jsonLd = [
     <p class="kicker">{zh ? '亲手试，不签名' : 'Practice here. Sign nothing.'}</p>
     <h1>{title}</h1>
     <p>{zh
-      ? '这三个实验都在你的浏览器里计算。它们不是 Sepolia 上的交易，也不是书里的历史记录。书里的交易仍然是证据。这里是练习。'
-      : 'These three labs calculate in your browser. They are not Sepolia transactions, and they are not the book’s historical records. The book’s transactions remain the evidence. This section is practice.'}</p>
+      ? '这三个实验都在你的浏览器里计算。它们不是 Sepolia 上的交易，也不是书里记下的历史交易。书里的交易仍是证据；这里只是练习。'
+      : 'These three labs calculate in your browser. They are not Sepolia transactions, and they are not the historical records in the book. The book\'s transactions stay as evidence; this page is practice.'}</p>
     <ul class="cards">
       {cards.map((card) => (
         <li class="card">

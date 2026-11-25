@@ -15,22 +15,22 @@ const { lang } = Astro.params as { lang: Lang }
 const t = ui[lang]
 const zh = lang === 'zh'
 const description = zh
-  ? '在浏览器里玩懂 Web3：授权、兑换和哈希链实验，以及一本中英双语入门教材。阅读和实验都不需要钱包，也不花真钱。'
-  : 'Play with Web3 in the browser: allowance, swap, and hash-chain labs, plus a bilingual book for beginners. No wallet and no real money.'
+  ? '在浏览器里练习 Web3：授权、兑换和哈希链实验，外加一本中英入门教材。阅读和实验都不需要钱包，也不花真钱。'
+  : 'Practice Web3 in the browser: allowance, swap, and hash-chain labs, plus a beginner book in Chinese and English. No wallet and no real money.'
 const cards = zh
   ? [
-      { t: '先问「为什么需要」', d: '用社区积分、商场联合收银、自动售货机这些日常场景，弄清区块链什么时候值得用、什么时候不值得。', s: '02-who-needs-blockchain' },
-      { t: '读懂一笔以太坊交易', d: '在 Sepolia Etherscan 打开 Counter 实例，核对交易状态、代币转账和事件日志。', s: '08-lab-counter' },
-      { t: '看懂 ERC-20 授权额度', d: '用链上记录分清 approve、实际代扣和撤销授权。', s: '10-approve-vs-payment' },
-      { t: '在测试网上玩 DeFi', d: '看看 0.001 SepETH 换到了多少 USDC，再跟着交易记录，看给资金池提供代币的人怎样分到手续费。实验使用没有真实价值的测试币。', s: '16-defi-labs' },
-      { t: '看懂借贷和价格从哪来', d: '跌价本身不扣抵押品。闪电贷必须在同一笔交易里还清。薄池现价不能直接当成抵押估值。这些是本地实验，不是新的 Sepolia 交易。', s: '17-lending-liquidation' }
+      { t: '先想「为什么需要」', d: '用社区积分、商场联合收银、自动售货机这些日常场景，判断区块链什么时候有用、什么时候多余。', s: '02-who-needs-blockchain' },
+      { t: '读懂一笔以太坊交易', d: '在 Sepolia Etherscan 打开 Counter 例子，核对交易是否成功、代币怎么转、日志记了什么。', s: '08-lab-counter' },
+      { t: '看懂 ERC-20 授权额度', d: '用链上记录分清：批准额度、对方代扣、以及把额度改回零。', s: '10-approve-vs-payment' },
+      { t: '在测试网上试 DeFi', d: '看 0.001 SepETH 换到了多少 USDC，再顺着交易记录，看往资金池存币的人怎样分到手续费。用的都是没有真实价值的测试币。', s: '16-defi-labs' },
+      { t: '看懂借贷和价格从哪来', d: '价格下跌本身不会先拿走抵押品。闪电贷必须在同一笔交易里还清。很薄的池子里的现价，不适合直接当抵押估值。这些是本机实验，不是新的 Sepolia 交易。', s: '17-lending-liquidation' }
     ]
   : [
-      { t: 'Ask "why" before "how"', d: 'Community points, a shared mall checkout, a vending machine: everyday scenes that show when a blockchain is worth it and when it is not.', s: '02-who-needs-blockchain' },
-      { t: 'Read an Ethereum transaction', d: 'Open the Counter example on Sepolia Etherscan and check the status, token transfers and event logs.', s: '08-lab-counter' },
-      { t: 'Understand ERC-20 allowances', d: 'Follow on-chain records to see what happens when you approve, spend or revoke an allowance.', s: '10-approve-vs-payment' },
-      { t: 'Try DeFi on a testnet', d: 'See how much USDC one swap returned for 0.001 SepETH. Then follow the transactions to see how people who supply tokens to a pool earn fees. The labs use test tokens with no real value.', s: '16-defi-labs' },
-      { t: 'See loans and where a price comes from', d: 'A price drop does not take collateral by itself. A flash loan must be repaid inside one transaction. A thin-pool spot price is a poor collateral value. These are local labs, not new Sepolia transactions.', s: '17-lending-liquidation' }
+      { t: 'Ask why you need a chain', d: 'Community points, a shared mall checkout, a vending machine: everyday scenes that show when a blockchain helps and when a normal database is enough.', s: '02-who-needs-blockchain' },
+      { t: 'Read an Ethereum transaction', d: 'Open the Counter example on Sepolia Etherscan and check whether it succeeded, how tokens moved, and what the logs say.', s: '08-lab-counter' },
+      { t: 'See an ERC-20 allowance', d: 'Follow on-chain records for approve, a later spend against that allowance, and setting the allowance back to zero.', s: '10-approve-vs-payment' },
+      { t: 'Try DeFi on a testnet', d: 'See how much USDC 0.001 SepETH bought in one swap. Then follow the transactions that show how people who supply a pool share the fees. The labs use test tokens with no real value.', s: '16-defi-labs' },
+      { t: 'See loans and where a price comes from', d: 'A price drop does not take collateral by itself. A flash loan must be repaid inside one transaction. A thin pool\'s spot price is a poor collateral value. These are local labs, not new Sepolia transactions.', s: '17-lending-liquidation' }
     ]
 const jsonLd = [
   {
@@ -66,24 +66,24 @@ const jsonLd = [
    <div class="hero-deco" aria-hidden="true"><span class="glow"></span><span class="d1"></span><span class="d2"></span><span class="d3"></span><span class="d4"></span></div>
    <div class="hero">
     <div>
-      <p class="kicker"><span class="pill">{zh ? '不只是阅读 Web3，而是亲手玩懂 Web3。' : 'Don’t just read about Web3. Play with it.'}</span></p>
+      <p class="kicker"><span class="pill">{zh ? '在浏览器里亲手试 Web3。' : 'Try Web3 in the browser.'}</span></p>
       <h1 id="hero-title">{t.siteTagline}</h1>
       <p class="sub">
         <Nw text={zh
-          ? '给会用电脑的初学者。先分清什么时候需要区块链，再在浏览器里改授权、兑换和哈希。阅读和这三个实验都不需要钱包，也不花真钱。书里的 Sepolia 记录是证据。实验页是模拟。'
-          : 'For beginners who can use a computer. Learn when a blockchain helps, then change an allowance, a swap, and a hash chain in the browser. Reading and these three labs need no wallet and no real money. Recorded Sepolia experiments are evidence. The labs are simulations.'} />
+          ? '写给会用电脑的初学者。先弄清什么时候需要区块链，再在浏览器里改授权、试兑换、看哈希链。阅读和这三个实验都不需要钱包，也不花真钱。书里的 Sepolia 记录是证据；实验页只是本地模拟。'
+          : 'For beginners who can use a computer. First see when a blockchain helps, then change an allowance, try a swap, and follow a hash chain in the browser. Reading and these three labs need no wallet and no real money. The Sepolia records in the book are evidence; the lab pages are local simulations.'} />
       </p>
       <div class="btn-row">
         <a class="btn primary" data-track="curriculum_start" href={href(`${lang}/chapters/01-how-to-read/`)}>{zh ? '开始学习' : 'Start learning'}</a>
         <a class="btn ghost" data-track="learning_path_start" data-path="play" href={href(`${lang}/labs/`)}>{zh ? '做互动实验' : 'Try an interactive lab'}</a>
         <a class="btn ghost" data-track="learning_path_start" data-path="ai" href={href(`${lang}/learn-with-ai/`)}>{zh ? '请 AI 带练' : 'Learn with an AI agent'}</a>
-        <a class="btn ghost" href="#contents-title">{zh ? '查看课程目录' : 'Explore the curriculum'}</a>
+        <a class="btn ghost" href="#contents-title">{zh ? '查看目录' : 'Browse the contents'}</a>
       </div>
-      <p><Nw text={zh ? '三条路都可以从零开始。实验不会签名，也不会发送交易。' : 'You can start from zero on any path. A lab does not sign or send a transaction.'} /></p>
+      <p><Nw text={zh ? '三条路都可以从零开始。实验页不会签名，也不会发交易。' : 'You can start from zero on any path. A lab page never signs or sends a transaction.'} /></p>
     </div>
     <div class="hero-art">
       <img src={href(`diagrams/${lang}/counter.svg`)} width="960" height="540"
-        alt={zh ? 'Counter 实验：计数从 0 加到 1，清零，再加到 2；每一步都留下交易记录，清零不会抹掉历史。' : 'The Counter lab: the count rises from 0 to 1, resets, then reaches 2. Each step leaves a transaction record; resetting does not erase history.'} />
+        alt={zh ? 'Counter 实验：计数从 0 加到 1，清零，再加到 2。每一步都留下交易记录，清零不会抹掉历史。' : 'The Counter lab: the count rises from 0 to 1, resets, then reaches 2. Each step leaves a transaction record. Resetting does not erase history.'} />
     </div>
    </div>
   </section>
@@ -98,21 +98,21 @@ const jsonLd = [
     <ul class="cards path-grid">
       <li class="card">
         <h3><a data-track="learning_path_start" data-path="start" href={href(`${lang}/chapters/02-who-needs-blockchain/`)}>{zh ? '从零开始' : 'Start from zero'}</a></h3>
-        <p><Nw text={zh ? '还没有区块链背景。先用日常例子判断什么时候需要共享账本，再从第 1 章学习怎么读这本书。' : 'No blockchain background yet. Use an everyday example to decide when a shared ledger helps, then read Chapter 1 on how to use the book.'} /></p>
+        <p><Nw text={zh ? '还没有区块链背景也没关系。先用日常例子判断什么时候需要共享账本，再从第 1 章看怎么读这本书。' : 'No blockchain background needed. Use an everyday example to decide when a shared ledger helps, then read Chapter 1 on how to use this book.'} /></p>
       </li>
       <li class="card">
-        <h3><a data-track="learning_path_start" data-path="play" href={href(`${lang}/labs/`)}>{zh ? '做互动实验' : 'Play with an experiment'}</a></h3>
-        <p><Nw text={zh ? '想亲手看授权、兑换价格和哈希链。三个实验都在浏览器里，可以重置。它们不是链上交易。' : 'See an allowance, a swap price, and a hash chain for yourself. All three labs run in the browser and can be reset. They are not chain transactions.'} /></p>
+        <h3><a data-track="learning_path_start" data-path="play" href={href(`${lang}/labs/`)}>{zh ? '做互动实验' : 'Try an experiment'}</a></h3>
+        <p><Nw text={zh ? '想亲手看授权、兑换价格和哈希链。三个实验都在浏览器里跑，可以随时重置。它们不是链上交易。' : 'See an allowance, a swap price, and a hash chain yourself. All three labs run in the browser and can be reset. They are not on-chain transactions.'} /></p>
       </li>
       <li class="card">
         <h3><a data-track="learning_path_start" data-path="ai" href={href(`${lang}/learn-with-ai/`)}>{zh ? '请 AI 带练' : 'Learn with an AI agent'}</a></h3>
-        <p><Nw text={zh ? '把一段提示词交给代理，让它带你读章节、做实验、核对结果。提示词禁止索取助记词和动用真钱。' : 'Give an agent a prompt that walks chapters, labs, and checks. The prompt forbids seed phrases and real money.'} /></p>
+        <p><Nw text={zh ? '把一段提示词交给 AI 代理，让它带你读章节、做实验、核对结果。提示词禁止索取助记词，也禁止动用真钱。' : 'Paste a prompt into an AI agent so it can walk you through chapters, labs, and checks. The prompt forbids seed phrases and real money.'} /></p>
       </li>
     </ul>
   </section>
 
   <section class="home-section" aria-labelledby="why-title">
-    <h2 id="why-title">{zh ? '这本书有什么不同' : 'What makes this book different'}</h2>
+    <h2 id="why-title">{zh ? '这本书怎么教' : 'How this book teaches'}</h2>
     <ul class="cards">
       {cards.map((c) => (
         <li class="card">

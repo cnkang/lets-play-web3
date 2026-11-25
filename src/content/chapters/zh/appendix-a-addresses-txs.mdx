@@ -1,17 +1,17 @@
 ---
 title: "附录 A　地址与交易总表"
-description: "本书提到的 Sepolia 合约、账户，以及已广播交易，附 Etherscan 链接；另附第 16 章的地址与交易。第 17–19 章的本地哈希单独列出，不链接到浏览器。"
+description: "本书提到的 Sepolia 合约、账户，以及已广播交易，附 Etherscan 链接；另附第 16 章的地址与交易。第 17-19 章的本地哈希单独列出，不链接到浏览器。"
 navTitle: "附录 A　地址与交易总表"
 part: appendices
 order: 200
 status: published
 ---
 
-<p class="lead">Sepolia 上的地址和已广播交易附有完整值和 <Term id="etherscan">Etherscan</Term> 链接。表格由脚本从实验记录生成。第 17–19 章的本地哈希写在本页最后，不链到浏览器。</p>
+<p class="lead">Sepolia 上的地址和已广播交易附有完整值和 <Term id="etherscan">Etherscan</Term> 链接。表格由脚本从实验记录生成。第 17-19 章的本地哈希写在本页最后，不链到浏览器。</p>
 
 <Snapshot lang="zh" />
 
-本页保留历史快照，可从[原始实验记录节选](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/phase-0-notebook-excerpts.md)核对第 5 节交易表与第 10 节收尾结果。查询不需要钱包。
+本页是历史快照。可与[原始实验记录节选](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/phase-0-notebook-excerpts.md)第 5 节交易表、第 10 节收尾结果对照。查询不需要钱包。
 
 ## 合约地址（8 个）
 
@@ -52,7 +52,7 @@ status: published
 
 <Tx h="0xc8b5c548e4e42c69c9f0b9cd8a9a8c4381d7cb2a1e0823b1ef22f539d344d92b" />
 
-下表是账户 A 的全部交易（nonce 0–19）和账户 B 的全部交易（nonce 0–2），按发生顺序排列。手续费单位为 <Term id="wei">wei</Term>。
+下表是账户 A 的全部交易（nonce 0-19）和账户 B 的全部交易（nonce 0-2），按发生顺序排列。手续费单位为 <Term id="wei">wei</Term>。
 
 <T label="全部已广播交易">
 
@@ -86,10 +86,10 @@ status: published
 
 ### 对账
 
-- 账户 A 在 D-01 之前（nonce 0–18）的 gas 手续费合计 **4,217,798,783 wei**；加上 D-01 的 1,693,122 wei，共 **4,219,491,905 wei**。
+- 账户 A 在 D-01 之前（nonce 0-18）的 gas 手续费合计 **4,217,798,783 wei**；加上 D-01 的 1,693,122 wei，共 **4,219,491,905 wei**。
 - 另外 A 向 B 转出 **0.0001 SepETH**。
 - 0.05 − 0.0001 − 0.000000004219491905 = **0.049899995780508095 SepETH**，与快照时 A 的余额完全一致。
-- 快照时：A 的 nonce 为 **20**，B 的 nonce 为 **3**；B 的余额 0.000099999982630182 SepETH。
+- 快照时 A 的 nonce 为 **20**，B 的 nonce 为 **3**；B 的余额 0.000099999982630182 SepETH。
 
 ## 实验环境
 
@@ -128,7 +128,7 @@ status: published
 
 ## 第 16 章：DeFi 实验的地址与交易
 
-第 16 章用自己的快照：2026-11-19 11:58:12（新加坡时间），区块 **12165973**。上面各表是 2026-11-12 的历史快照，不受影响。
+第 16 章用自己的快照：2026-11-19 11:58:12（新加坡时间），区块 **12165973**。上面各表仍是 2026-11-12 的历史快照。
 
 <T label="第 16 章用到的合约地址">
 
@@ -138,7 +138,7 @@ status: published
 | NFPM | <Addr a="0x1238536071E1c677A632429e3655c799b22cDA52" /> | Uniswap v3 仓位管理合约（NonfungiblePositionManager） |
 | V2Router02 | <Addr a="0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3" /> | Uniswap v2 路由 |
 | v2 USDC/EURC 交易对 | <Addr a="0x1E22A91dd582f2b69D8c375a08578314399058D0" /> | Uniswap v2 USDC/EURC 交易对（实验 5） |
-| 怪价池 | <Addr a="0x68adf381B8F9e9e100bb6E13d50b14094e3b6a9d" /> | v3 USDC/EURC 0.05% 怪价池（实验 2–4） |
+| 怪价池 | <Addr a="0x68adf381B8F9e9e100bb6E13d50b14094e3b6a9d" /> | v3 USDC/EURC 0.05% 怪价池（实验 2-4） |
 | WETH/USDC 0.05% | <Addr a="0x3289680dD4d6C10bb19b899729cda5eEF58AEfF1" /> | v3 WETH/USDC 0.05% 池（实验 6） |
 | USDC | <Addr a="0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238" /> | Circle 测试 USDC，6 位小数 |
 | EURC | <Addr a="0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4" /> | Circle 测试 EURC，6 位小数 |
@@ -161,7 +161,7 @@ status: published
 
 </T>
 
-账户 A 在第 16 章的全部交易（nonce 20–42，共 23 笔，全部成功）。手续费单位为 wei。
+账户 A 在第 16 章的全部交易（nonce 20-42，共 23 笔，全部成功）。手续费单位为 wei。
 
 <T label="第 16 章的全部已广播交易">
 
@@ -196,9 +196,9 @@ status: published
 - 23 笔交易的手续费合计 **6,936,564,251,954 wei**（0.000006936564251954 SepETH），与第 16 章的总账一致。
 - 快照时 A 的 nonce 为 **43**。
 
-## 第 17–19 章：本地证据，不是新的 Sepolia 交易
+## 第 17-19 章：本地证据，不是新的 Sepolia 交易
 
-上面各表保持原样。这里只标出边界。完整数字在各章、[公开摘要](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2-public-digest.json) 和 [已保存读数](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/README.zh-CN.md)。
+完整数字在各章、[公开摘要](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2-public-digest.json) 和 [已保存读数](https://github.com/cnkang/lets-play-web3/blob/main/docs/evidence/p2/README.zh-CN.md)。
 
 - 第 17、18 章的写操作在本地 Anvil（chainId 31337），只读分叉源是 Sepolia 区块 **12165973**。资金池是 <Addr a="0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951" short />。那是这个历史区块上的真实 Aave 合约。本地交易哈希不是这个合约的新 Sepolia 交易。
 - 第 17 章全额清算的一次本地回执：<LocalRef value="0x73f963d97d0fe20b67c859a76f0cd4cb766d08c7ce687a38a211bbd242e92cca" env="fork" short />

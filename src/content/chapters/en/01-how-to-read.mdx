@@ -19,14 +19,14 @@ No problem. When you meet an unfamiliar word, press the small <strong>?</strong>
 
 ## Start by looking, or read in order
 
-Reading needs no wallet, test coins or account. To see a real action first, try the [read-only exercise in Chapter 8](../08-lab-counter/#inspect-a-transaction). Open an existing transaction. Check its status, token transfers and event. Then return to the reading path below. Learning to inspect a record is a useful first step.
+Reading needs no wallet, test coins or account. To see a real action first, try the [read-only exercise in Chapter 8](../08-lab-counter/#inspect-a-transaction). Open an existing transaction. Check its status, token transfers and event. Then return to the reading path below.
 
 ## Four kinds of content
 
-1. **Principles and everyday analogies** explain <Term id="blockchain">blockchains</Term> and <Term id="smart-contract">smart contracts</Term>, using shared records and vending machines as examples. An analogy helps explain an idea. It is not a definition. It is not an experimental result.
+1. **Principles and everyday analogies** explain <Term id="blockchain">blockchains</Term> and <Term id="smart-contract">smart contracts</Term>, using shared records and vending machines as examples. An analogy helps you get the idea; it is not a definition or an experimental result.
 2. **On-chain results** come from deployments, <Term id="transaction">transactions</Term> and upgrades on <Term id="ethereum">Ethereum</Term>’s Sepolia testnet on 11–12 November 2026 (Singapore time). Look up addresses, <Term id="tx-hash">transaction hashes</Term> (the IDs used to find transactions) and <Term id="block-number">block numbers</Term> on Sepolia <Term id="etherscan">Etherscan</Term>. Read balances at the recorded block. Today’s values do not replace the historical snapshot.
 3. **Local tests and simulations** supply test counts, assertions and the UBOX V4 simulation. These are local records, not explorer transactions. V4 was never deployed on-chain. Chapter 15 explains the review’s results and limits.
-4. **Plans and later phases** are kept apart from results. Phase-0 basics, experiments and review are complete. The Phase-1 DeFi labs ran on Sepolia on 2026-11-19. Chapter 16 covers them with its own snapshot (block 12165973). Chapters 17–19 are later local labs. Chapters 17 and 18 fork that same block read-only and then write locally. Chapter 19 builds every contract locally and does not fork. A plan is not a completed experiment.
+4. **Plans and later phases** are kept apart from results. Phase-0 (the basic labs) and review are complete. The Phase-1 DeFi labs ran on Sepolia on 2026-11-19. Chapter 16 covers them with its own snapshot (block 12165973). Chapters 17–19 are later local labs. Chapters 17 and 18 fork that same block read-only and then write locally. Chapter 19 builds every contract locally and does not fork. The book keeps plans separate from completed experiments.
 
 <Snapshot lang="en" />
 
@@ -46,17 +46,17 @@ Reading needs no wallet, test coins or account. To see a real action first, try 
 
 </T>
 
-Each chapter can be read on its own. Reading in order works best because later experiments use earlier ideas. The experiments are not collected in a separate "lab log". Each one lives in the chapter it illustrates. The Counter contract follows the chapter on smart contracts. The allowance revocation follows "Approval is not payment".
+Each chapter can be read on its own. Reading in order works best because later experiments use earlier ideas. Each experiment lives in the chapter it illustrates. There is no separate lab log. The Counter contract follows the chapter on smart contracts. The allowance revocation follows "Approval is not payment".
 
-## Rules for the Phase-0 labs
+## Rules for the starter labs (Phase-0)
 
-The whole lab followed a few rules. The rules are themselves habits worth learning:
+The whole lab followed a few rules:
 
 - **The budget was strictly $0.** No crypto was bought, no mainnet funds were used, and no real wallet seed phrase or private key was imported.
-- **Only the Ethereum Sepolia testnet** was used, together with free, open-source, widely used tools (solc, <Term id="viem">viem</Term>, the <Term id="openzeppelin">OpenZeppelin</Term> contracts library, <Term id="foundry">Foundry</Term>).
+- **Only the Ethereum Sepolia testnet** was used, together with free, open-source, widely used tools (the solc compiler, the <Term id="viem">viem</Term> library, the <Term id="openzeppelin">OpenZeppelin</Term> contracts library, and <Term id="foundry">Foundry</Term> for local tests).
 - **Every on-chain transaction was <Term id="simulate">simulated</Term> first. Simulation is a free rehearsal. We <Term id="broadcast">broadcast</Term> a transaction only after explicit confirmation.** Broadcasting sends it to the network. Logging in, <Term id="signature">signing</Term>, approving and broadcasting each required confirmation first. If we could not confirm safety, we stopped the work.
 - Every experiment recorded the network, what was done, the transaction hash or contract address, the actual cost, what was learned and the next step.
-- Test-account private keys lived only in a local, Git-ignored, permission-restricted folder. They were never printed or written into any public record. This book contains no private keys, seed phrases or <Term id="api-key">API keys</Term>.
+- Test-account private keys lived only in a local folder that was kept out of the public code repository and locked down with tight permissions. They were never printed or written into any public record. This book contains no private keys, seed phrases or <Term id="api-key">API keys</Term>.
 
 ## After reading, you should be able to answer
 

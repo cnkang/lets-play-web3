@@ -15,7 +15,7 @@ const contentsHref = href(`${lang}/#contents-title`)
   <div class="shell">
     <div class="article" data-pagefind-ignore="all">
       <h1><Nw text={title} /></h1>
-      <p>{zh ? '搜索只是辅助：你也可以随时通过页面顶部的「目录」或首页的目录找到每一章。' : 'Search is only a helper: every chapter is also reachable from the contents in the menu and on the home page.'}</p>
+      <p>{zh ? '也可以用顶部「目录」或首页目录翻到每一章，不必依赖搜索。' : 'You can also reach every chapter from Contents in the menu or on the home page, without using search.'}</p>
       <form class="search-form" role="search" action="" method="get" id="search-form">
         <label for="q">{zh ? '输入关键词（例如 approve、nonce、0xc3F2…）' : 'Enter a keyword (for example approve, nonce, 0xc3F2…)'}</label>
         <input id="q" name="q" type="search" autocomplete="off" enterkeyhint="search" />
@@ -29,19 +29,19 @@ const contentsHref = href(`${lang}/#contents-title`)
   <script define:vars={{ pf: href('pagefind/pagefind.js'), zh, lang }}>
     const msg = zh
       ? {
-          idle: '输入关键词后按回车，或稍等片刻自动显示结果。',
+          idle: '输入关键词后按回车，或稍等片刻就会出结果。',
           loading: '正在搜索…',
           none: '没有找到结果。',
-          n: (shown, total) => (shown < total ? `显示前 ${shown} 条，共 ${total} 条结果。` : `找到 ${total} 条结果。`),
-          unavailable: '搜索索引只在 npm run build 之后可用（开发模式下没有索引）。请用上面的目录链接浏览。',
-          failed: '搜索暂时失败，请稍后重试，或用上面的目录链接浏览。'
+          n: (shown, total) => (shown < total ? `显示前 ${shown} 条，共 ${total} 条。` : `找到 ${total} 条结果。`),
+          unavailable: '搜索索引要在 npm run build 之后才有（开发模式没有）。请改用上面的目录链接。',
+          failed: '搜索暂时失败。请稍后重试，或用上面的目录链接浏览。'
         }
       : {
           idle: 'Type a keyword and press Enter, or wait a moment for results.',
           loading: 'Searching…',
           none: 'No results found.',
           n: (shown, total) => (shown < total ? `Showing ${shown} of ${total} results.` : `${total} result${total === 1 ? '' : 's'} found.`),
-          unavailable: 'The search index only exists after npm run build (not in dev mode). Use the contents link above.',
+          unavailable: 'The search index appears only after npm run build (not in dev mode). Use the contents link above instead.',
           failed: 'Search failed. Try again later, or use the contents link above.'
         }
     const form = document.getElementById('search-form')

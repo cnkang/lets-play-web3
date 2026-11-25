@@ -6,10 +6,10 @@ export const guides = [
     chapters: ['10-approve-vs-payment', '11-lab-mbox-burn'],
     en: {
       title: 'Why does a wallet ask you to approve a token?',
-      description: 'An approval writes an allowance. It does not move the tokens. A later transferFrom does. Learn the difference before you sign.',
+      description: 'An approval writes an allowance (a spending limit). Your balances stay put. A later transferFrom moves the tokens. Learn that split before you sign.',
       answer: [
         'The wallet is asking you to let another address spend up to a limit of one token. That limit is the allowance.',
-        'Your token balance does not change when the approval is recorded. The approval is not a payment.'
+        'Your token balance does not change when the approval is recorded. The approval is a spending limit, not a payment.'
       ],
       why: [
         'Many apps move tokens in two steps. You approve a contract. Later that contract calls transferFrom.',
@@ -17,21 +17,21 @@ export const guides = [
       ],
       example: [
         'In the book’s MBox-Burn lab, account A approved account B for 500 test tokens. Balances did not change.',
-        'Later spending used part of that allowance. A later approve of 0 revoked what remained. It did not bring back tokens that had already moved.',
+        'Later spending used part of that allowance. A later approve of 0 revoked what remained. Tokens that had already moved stayed with the recipient.',
         'Chapter 10 explains the rule. Chapter 11 records the Sepolia transactions. The browser lab lets you try the same steps with fictional PLAY tokens. It does not sign anything.'
       ],
       limits: [
-        'Token contracts differ. In this site’s simplified model, a finite allowance decreases when it is used. The uint256 maximum does not.',
+        'Token contracts differ. In this site’s simplified model, a finite allowance decreases when it is used. The uint256 maximum (the largest number this token type allows) does not.',
         'A new approve overwrites the old number. It does not add to it.',
-        'Do not treat this page as a request to approve a live contract. Read the address and the amount before you sign anything outside this simulation.'
+        'This page is not a request to approve a live contract. Read the address and the amount before you sign anything outside this simulation.'
       ]
     },
     zh: {
       title: '钱包为什么让你授权代币，而不是直接付款？',
-      description: '授权写下的是额度，不是把代币转走。之后的 transferFrom 才会动余额。签名之前先分清这两步。',
+      description: '授权写下的是额度（可花上限），余额不动。之后的 transferFrom 才会动余额。签名之前先分清这两步。',
       answer: [
         '钱包是在请你允许另一个地址，在限额内花掉你的一种代币。这个限额叫做授权额度。',
-        '授权被记下时，你的代币余额不变。授权不是付款。'
+        '授权被记下时，你的代币余额不变。授权是可花上限，不是付款。'
       ],
       why: [
         '很多应用分两步动用代币。你先授权某个合约。之后那个合约再调用 transferFrom。',
@@ -39,11 +39,11 @@ export const guides = [
       ],
       example: [
         '在本书的 MBox-Burn 实验里，账户 A 给账户 B 授权了 500 枚测试代币。两边的余额都没有因此改变。',
-        '后来的代扣用掉了一部分额度。再发一笔 approve 0，撤销的是剩下的额度。已经转走的代币不会回来。',
+        '后来的代扣用掉了一部分额度。再发一笔 approve 0，撤销的是剩下的额度。已经转走的代币仍在收款人那里。',
         '第 10 章讲规则。第 11 章留下了 Sepolia 上的交易记录。浏览器实验用虚构的 PLAY 代币让你走同样的步骤。它不会签名。'
       ],
       limits: [
-        '代币合约的写法并不相同。本站的简化模型里，有限额度在使用后会减少，uint256 的最大值不会。',
+        '代币合约的写法并不相同。本站的简化模型里，有限额度在使用后会减少；uint256 的最大值（这种代币类型允许的最大数字）不会。',
         '新的 approve 会覆盖旧数字，不是在旧数字上相加。',
         '本页不是让你去授权某个真实合约。离开这个模拟之后，签名前要核对地址和数量。'
       ]
@@ -55,19 +55,19 @@ export const guides = [
     chapters: ['16-defi-labs'],
     en: {
       title: 'How can a pool price a swap with no order book?',
-      description: 'A constant-product pool prices a swap from its reserves and a fee. Price impact is already in the quote. Slippage is what changes if the pool moves before you trade.',
+      description: 'A constant-product pool prices a swap from its reserves and a fee. Price impact is already in the quote. Slippage is the gap if the pool moves before you trade.',
       answer: [
         'The pool holds two tokens. A formula, not a list of buy and sell orders, turns your input into an output.',
         'In the constant-product model, the product of the two reserves stays near k. A larger trade moves the price further.'
       ],
       why: [
-        'Price impact is that move. It is caused by your own trade size compared with the pool. The quote already includes it, and it includes the fee.',
-        'Slippage is different. It is the gap between the amount you were quoted and the amount you receive if someone else trades first.',
+        'Price impact is that move. It comes from your own trade size compared with the pool. The quote already includes it, and it includes the fee.',
+        'Slippage is the gap between the amount you were quoted and the amount you receive if someone else trades first.',
         'A slippage tolerance does not change the quote. It sets the minimum you will accept. If the output would be lower, the swap does not run.'
       ],
       example: [
         'Chapter 16 follows a real Sepolia swap of 0.001 SepETH and asks you to compare the quote with the receipt. Those figures are historical testnet records.',
-        'The browser lab uses fictional PLAY and COIN reserves and a default fee of 30 basis points (0.30%), with the Uniswap v2 integer formula. It is not that Sepolia swap and not Uniswap v3.'
+        'The browser lab uses fictional PLAY and COIN reserves and a default fee of 30 basis points (30 bps = 0.30%), with the Uniswap v2 integer formula. It is not that Sepolia swap and not Uniswap v3.'
       ],
       limits: [
         'Real pools add fee tiers, concentrated liquidity, and routers. A thin pool can show a price far from any other market.',
@@ -84,12 +84,12 @@ export const guides = [
       ],
       why: [
         '这个推动就是价格影响。它来自你这笔兑换相对池子有多大。报价里已经包含它，也包含手续费。',
-        '滑点是另一件事。如果有人在你之前成交，你最后拿到的数量可能和报价不同。这个差额才是滑点。',
+        '如果有人在你之前成交，你最后拿到的数量可能和报价不同。这个差额才是滑点。',
         '滑点容忍度不会改报价。它只写下你愿意接受的最少到账。到不了这个数，兑换就不执行。'
       ],
       example: [
         '第 16 章跟着一笔真实的 Sepolia 兑换：0.001 SepETH 换出了多少，并把报价和回执放在一起看。那些数字是当时测试网的记录。',
-        '浏览器实验用虚构的 PLAY 和 COIN，默认手续费是 30 个基点（0.30%），整数算法与 Uniswap v2 相同。它不是那笔 Sepolia 兑换，也不是 Uniswap v3。'
+        '浏览器实验用虚构的 PLAY 和 COIN，默认手续费是 30 个基点（30 bps = 0.30%），整数算法与 Uniswap v2 相同。它不是那笔 Sepolia 兑换，也不是 Uniswap v3。'
       ],
       limits: [
         '真实的池子还有费率档、集中流动性和路由合约。很浅的池子可以给出远离其他市场的价格。',
@@ -111,7 +111,7 @@ export const guides = [
         'That transaction is appended. Older blocks are not edited.'
       ],
       why: [
-        'People mix up two ideas. “The ledger is hard to edit” does not mean “no contract can be designed to switch logic.”',
+        'Two ideas get mixed together. A ledger that is hard to edit can still host a contract designed to switch its logic.',
         'The hash chain shows the first idea. Change an old page and later hashes fail. Recalculating them on your own computer creates a new head. It does not create agreement.',
         'The proxy shows the second idea. New code can be selected for a stable address, if the contract was built to allow that.'
       ],
@@ -134,7 +134,7 @@ export const guides = [
         '这笔交易是追加上去的。更早的区块没有被改掉。'
       ],
       why: [
-        '两件事容易混在一起。「账本很难被篡改」并不等于「没有任何合约被设计成可以更换逻辑」。',
+        '两件事容易混在一起。账本很难被篡改，同时一份合约仍可以被设计成可以更换逻辑。',
         '哈希链对应第一件事。改掉旧的一页，后面的哈希就对不上。只在自己的电脑上重算，会得到一个新的链头，不会因此得到别人的同意。',
         '代理对应第二件事。如果合约一开始就留了升级路径，同一个地址可以改去运行新代码。'
       ],
