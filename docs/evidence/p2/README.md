@@ -2,7 +2,7 @@
 
 **English** · [简体中文](README.zh-CN.md)
 
-These files let you check the local hashes in chapters 17–19 without a blockchain node. They are not a chain you can start, and they are not Sepolia transactions.
+These files let you check the local hashes in chapters 17–19 without a blockchain node. They are not a chain you can start, and they are not Sepolia transactions. They are also not the browser labs under `/labs/`. Those pages are separate simulations.
 
 ## Three different things
 

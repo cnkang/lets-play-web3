@@ -4,6 +4,8 @@
 
 This is a closed lesson. It deploys toy tokens on a new local Anvil node. It does not call Aave, Uniswap, Sepolia, or any other public chain. It is not an exploit tool. The amounts and the counterparties are fixed in `src/LocalOracleLab.sol`.
 
+It is not one of the browser labs under `/labs/` (allowance, constant-product pool, hash chain). Those pages are in-browser simulations with no Anvil. This folder needs Foundry and writes only on `127.0.0.1:18549`.
+
 The saved run is in [`docs/evidence/p2/oracle-readings.json`](../../docs/evidence/p2/oracle-readings.json). A run you start here is a **new** run. The health of the lesson is the integers. The transaction hashes will not match the book.
 
 ## What you need
