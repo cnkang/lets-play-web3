@@ -26,6 +26,8 @@ jobs:
         run: npm run check:content
       - name: "Secret scan (provenance skipped: sources are not in this repo)"
         run: npm run check:facts
+      - name: "External P2 evidence (SKIPPED when the archive is absent; not a pass)"
+        run: npm run check:evidence
       - name: "Build and check the root deployment"
         run: npm run build && npm run check:build
       - name: "Build and check the subpath deployment"

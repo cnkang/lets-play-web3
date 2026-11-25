@@ -2312,21 +2312,47 @@ kbd {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
-.scene-head {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  min-height: 44px;
-}
-.scene-head input {
-  width: 1.25rem;
-  height: 1.25rem;
-  accent-color: var(--brand);
-  flex: 0 0 auto;
-}
-.scene-head label {
-  font-weight: 750;
+.scene-legend { color: var(--ink-2); margin-top: 0; }
+.scene-title {
+  font-size: 1.05rem;
   line-height: 1.35;
+  margin: 0 0 0.35rem;
+}
+.scene-exact {
+  margin: 0;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  font-size: 0.82rem;
+}
+.hf-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 0 0 0.8rem;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+.hf-key span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.tick-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 2px;
+  display: inline-block;
+}
+.price-path {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  list-style: none;
+}
+.price-path li {
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  background: var(--paper-2);
 }
 .scene-hf { margin: 0.35rem 0; }
 .scene-hf strong, .scene-dl dd { overflow-wrap: anywhere; }

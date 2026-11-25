@@ -6,6 +6,8 @@ part: p2-credit
 order: 170
 status: published
 updated: "2026-11-25"
+unreleased: true
+experiment: "2026-11-20"
 lab: anvil-fork
 snapshot:
   at: "2026-11-19T11:58:12+08:00"
@@ -48,7 +50,7 @@ In the local run, an operator deployed a stand-in price source. A local imperson
 
 The faucet cannot mint this WETH. A simulated mint reverts with `not mintable`. The account wraps 1 ETH with `deposit`, approves the pool for exactly that amount, supplies it, and borrows 2,500 test USDC.
 
-One 12-second local block later, the debt is not a clean 2,500. The reading is **2,500.000610**. The health factor is **1.319999677920078588**. Collateral is still **1** WETH.
+One 12-second local block later, the debt is not a clean 2,500. The reading is **2,500.000610**. The health factor is about **1.32**. Collateral is still **1** WETH.
 
 This test pool is heavily used. The variable borrow rate, in ray units, is `639970093802817705403628356`, about **64%** a year. Each block adds a visible crumb of interest. A napkin formula that ignores interest misses the protocol by a little. That interest is the main gap. It is not a hidden penalty.
 
@@ -68,7 +70,7 @@ After the local WETH quote becomes 2,800, and before anyone liquidates:
 
 - The aWETH balance is still **1.000000000000000000**.
 - The debt is **2,500.001218**. One more block added only interest.
-- The health factor is **0.923999549827419324**.
+- The health factor is about **0.924**. It is below 1, and also below 0.95.
 
 The valuation moved from 4,000 to 2,800. The balance did not lose one wei. Collateral moves in the next step, when someone calls liquidation.
 
@@ -78,7 +80,7 @@ The valuation moved from 4,000 to 2,800. The balance did not lose one wei. Colla
 
 At the moment of liquidation, the repaid debt is **2,500.002436** test USDC. Interest grew again after the earlier reading. The health factor is at or below 0.95, so this deployment allows one call to cover **100%**. The request said “maximum”. The protocol cut it to the full debt.
 
-The borrower loses **0.9375009135** WETH. Of that, **0.933036623435714286** goes to the liquidator. **0.004464290064285714** goes to the protocol treasury as a deposit receipt. At the 2,800 oracle mark, the 5% bonus is about 112.50 for the liquidator and about 12.50 for the protocol. That mark is a test-token valuation, not dollar income. The borrower still holds the 2,500 test USDC already borrowed, plus about 0.0624990865 WETH of deposit receipt.
+The borrower loses **0.9375009135** WETH. Of that, **0.933036623435714286** goes to the liquidator. **0.004464290064285714** goes to the protocol treasury as a deposit receipt. At the 2,800 oracle mark, the 5% liquidation bonus is about 112.50 for the liquidator and about 12.50 for the protocol. The protocol’s share is 10% of the bonus, not 10% of the collateral, and not the flash-loan fee split in the next chapter. That mark is a test-token valuation, not dollar income. The borrower still holds the 2,500 test USDC already borrowed, plus about 0.0624990865 WETH of deposit receipt.
 
 The same transaction also shows a mint to the treasury. That mint records interest the treasury had **already** accrued. It is not an extra bonus. The treasury’s balance rises by exactly the protocol fee.
 
@@ -86,7 +88,7 @@ The same transaction also shows a mint to the treasury. That mint records intere
 
 Restore the same open snapshot. Repay **750** test USDC. The debt becomes **1,750.001826**. At a price of 4,000 the health factor is **1.885712318108175505**. Then set the same price, 2,800.
 
-The debt is now **1,750.002252**. The health factor is **1.319998301350757347**, still above 1. The liquidation call reverts with error **45**. The health factor is not below the threshold. Collateral is still 1 WETH.
+The debt is now **1,750.002252**. The health factor is still about **1.32**, above 1. The price is the same 2,800, and collateral is still 1 WETH. The liquidation call reverts with error **45**.
 
 Why is this so close to the opening 1.32? Repaying about 30% of the debt offsets the 30% drop from 4,000 to 2,800. The price matches. The debt does not. The ratio changes.
 
@@ -116,11 +118,11 @@ The <Term id="close-factor">close factor</Term> is a maximum, not an amount the 
 
 This deployment does **not** have the later V3.3 rule that lets a small debt be closed in full. The 100% cap here exists only because the health factor is at or below 0.95. The debt size of 2,500 is not the reason.
 
-A control uses the same snapshot and a price of **2,950**. The health factor is **0.973499525711031074**, between 0.95 and 1. A maximum request repays only **1,250.001218**. The borrower loses **0.444915687762711864** WETH. Afterwards the health factor is **1.080748104576243868**. The remaining debt is 2 minimal units under a perfect half. That is index rounding, not an extra fine.
+A control uses the same snapshot and a price of **2,950**. The health factor is about **0.973**, between 0.95 and 1. A maximum request repays only **1,250.001218**. The borrower loses **0.444915687762711864** WETH. Afterwards the health factor is about **1.08**. The remaining debt is 2 minimal units under a perfect half. That is index rounding, not an extra fine.
 
 ## Do not mix these numbers with the next chapter
 
-The next chapter also posts 1 WETH, asks to borrow 2,500, and then sets the quote to 2,800. It is a different local position. Deployment and funding happened first, so more blocks passed. Its opening debt is **2,499.999999**, one minimal unit under 2,500. After the drop to 2,800, and before liquidation, its health factor is **0.923999775283254651**. The seized collateral differs too. Use Chapter 18’s readings in Chapter 18.
+The next chapter also posts 1 WETH, asks to borrow 2,500, and then sets the quote to 2,800. It is a different local position. Deployment and funding happened first, so more blocks passed. Its opening debt is one minimal unit under 2,500, and its health factor at 2,800 is also about 0.924, with a different exact reading. Use Chapter 18’s readings in Chapter 18.
 
 <Callout type="danger" title="These marks are not income">
 
@@ -130,7 +132,7 @@ The “about 125 extra” at a mark of 2,800 is an oracle valuation of test toke
 
 ## Hashes from this saved run
 
-A rerun draws new temporary accounts. These hashes identify one saved run. The amounts above are the readings to cite.
+A rerun draws new temporary accounts. These hashes identify one saved run. The 0.924 and 1.32 figures above are rounded. The protocol readings are: opening health factor **1.319999677920078588**; at 2,800 before liquidation, **0.923999549827419324**; after repaying 750 and then 2,800, **1.319998301350757347**; at 2,950, **0.973499525711031074**. The next chapter’s health factor at the same displayed price is **0.923999775283254651**, and its opening debt is **2,499.999999**.
 
 <details>
 <summary>Local receipts (chainId 31337, do not open Etherscan)</summary>
