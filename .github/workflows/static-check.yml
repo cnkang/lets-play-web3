@@ -22,6 +22,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: "Unit tests for labs and learning events"
+        run: npm test
       - name: "Content pairs and glossary references"
         run: npm run check:content
       - name: "Secret scan (provenance skipped: sources are not in this repo)"

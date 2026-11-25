@@ -209,6 +209,21 @@ svg {
   white-space: nowrap;
   border: 0;
 }
+.crumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  list-style: none;
+  margin: 0 0 var(--s-4);
+  padding: 0;
+  color: var(--ink-3);
+  font-size: 0.95rem;
+}
+.crumb li {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
 
 /* ---------- Header ---------- */
 .site-header {

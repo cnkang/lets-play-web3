@@ -3,6 +3,7 @@ import sanitizeHtml from 'sanitize-html'
 import { type Lang } from './book'
 import { getPublishedChapters, type BookChapter } from './chapters'
 import { absolute, PUBLISHED, REPO_URL, sepoliaExplorerUrl, SNAPSHOT_BLOCK, SNAPSHOT_ISO } from './site'
+import { learningPaths } from './public-paths.mjs'
 
 const license = `License / 授权: Kang’s original English and Chinese teaching text, term explanations, self-check questions and original teaching diagrams are shared under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/); this does not cover the whole repository. Full scope and contact / 完整范围与联系: [LICENSING.md](${REPO_URL}/blob/main/LICENSING.md).`
 const HEADER = `# Let’s Play Web3 / 一起玩 Web3
@@ -35,6 +36,12 @@ export async function llmsIndex(): Promise<string> {
 
   return `${HEADER}
 ${sections.join('\n\n')}
+
+## Practice / 练习
+
+These browser pages are simulations or study prompts. They are not historical transactions.
+
+${learningPaths().map((path) => `- [${path}](${absolute(`en/${path}`)}) · [${path}](${absolute(`zh/${path}`)})`).join('\n')}
 
 ## Optional
 

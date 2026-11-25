@@ -15,7 +15,7 @@ interface Props {
   ogType?: 'website' | 'article'
   currentSlug?: string
   /** which top-nav item is current */
-  navKey?: 'start' | 'appendix' | 'glossary' | 'search' | 'a11y'
+  navKey?: 'start' | 'labs' | 'appendix' | 'glossary' | 'search' | 'a11y'
   noindex?: boolean
 }
 const { lang, title, description, path, jsonLd = [], ogType = 'website', currentSlug, navKey, noindex = false } = Astro.props
@@ -31,6 +31,7 @@ const ogAlt = lang === 'zh' ? '一起玩 Web3：从生活理解区块链，再�
 const author = authorFor(lang)
 const nav = [
   { key: 'start', text: t.start, href: href(`${lang}/chapters/01-how-to-read/`) },
+  { key: 'labs', text: t.labs, href: href(`${lang}/labs/`) },
   { key: 'appendix', text: t.appendix, href: href(`${lang}/chapters/appendix-a-addresses-txs/`) },
   { key: 'glossary', text: t.glossary, href: href(`${lang}/chapters/appendix-c-glossary-quiz/`) },
   { key: 'search', text: t.search, href: href(`${lang}/search/`) }
@@ -184,6 +185,9 @@ const ga4Enabled = /^G-[A-Z0-9]+$/.test(ga4MeasurementId)
         <p><Nw text={lang === 'zh' ? `整理：${author}（个人学习项目）· 页面发布于 2026-11-13` : `Compiled by ${author} (a personal study project) · Pages published 2026-11-13`} /></p>
         <ul class="footer-links" aria-label={lang === 'zh' ? '页脚链接' : 'Footer links'}>
           {REPO_URL && <li><a href={`${REPO_URL}/blob/main/LICENSING.md`}>{lang === 'zh' ? '教材授权说明' : 'Content licensing'}</a></li>}
+          <li><a href={href(`${lang}/labs/`)} aria-current={navKey === 'labs' ? 'page' : undefined}>{lang === 'zh' ? '互动实验' : 'Interactive labs'}</a></li>
+          <li><a href={href(`${lang}/guides/`)}>{lang === 'zh' ? '问题指南' : 'Question guides'}</a></li>
+          <li><a href={href(`${lang}/learn-with-ai/`)} aria-current={path === 'learn-with-ai/' ? 'page' : undefined}>{lang === 'zh' ? '请 AI 带练' : 'Learn with an AI agent'}</a></li>
           <li><a href={a11yHref} aria-current={navKey === 'a11y' ? 'page' : undefined}>{lang === 'zh' ? '无障碍声明与问题反馈' : 'Accessibility statement & feedback'}</a></li>
           {REPO_URL && <li><a href={`${REPO_URL}/issues`}>{lang === 'zh' ? '报告问题（GitHub Issues）' : 'Report a problem (GitHub Issues)'}</a></li>}
           <li><a href={href('llms.txt')}>llms.txt</a></li>
@@ -525,6 +529,17 @@ const ga4Enabled = /^G-[A-Z0-9]+$/.test(ga4MeasurementId)
           try { ta.select(); copied = document.execCommand('copy') } catch {} finally { ta.remove(); b.focus({ preventScroll: true }) }
         }
         if (seq.get(b) !== mine) return // a newer click or retry superseded this one
+        if (copied && b.dataset.track) {
+          document.dispatchEvent(new CustomEvent('lpw3-track', {
+            detail: {
+              name: b.dataset.track,
+              labId: b.dataset.labId || '',
+              guideId: b.dataset.guideId || '',
+              path: b.dataset.path || '',
+              challengeId: b.dataset.challengeId || ''
+            }
+          }))
+        }
         if (!copied) {
           b.classList.add('is-failed')
           b.setAttribute('title', copyZh ? '复制失败，请手动选择文本' : 'Copy failed. Select the text manually.')
@@ -538,6 +553,9 @@ const ga4Enabled = /^G-[A-Z0-9]+$/.test(ga4MeasurementId)
           : (b.dataset.done ?? (copyZh ? '已复制' : 'Copied'))
         setTimeout(() => { if (seq.get(b) === mine) b.classList.remove('is-copied') }, 1500)
       })
+    </script>
+    <script>
+      import '../scripts/track.mjs'
     </script>
   </body>
 </html>

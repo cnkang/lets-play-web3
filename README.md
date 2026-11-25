@@ -8,6 +8,8 @@ Learn when a shared blockchain helps and when an ordinary database is enough. Th
 
 **[Read the English guide](https://letsplayweb3.liukang.com/en/)** · **[Start with Chapter 1](https://letsplayweb3.liukang.com/en/chapters/01-how-to-read/)** · [中文站](https://letsplayweb3.liukang.com/zh/)
 
+Don’t just read about Web3. Play with it. Three browser labs need no wallet and no real money: [allowances](https://letsplayweb3.liukang.com/en/labs/erc20-allowance/), [a constant-product pool](https://letsplayweb3.liukang.com/en/labs/constant-product-amm/), and a [SHA-256 hash chain](https://letsplayweb3.liukang.com/en/labs/hash-chain/). They are simulations. The recorded experiments in the chapters stay the evidence. [Question guides](https://letsplayweb3.liukang.com/en/guides/) and [prompts for an AI agent](https://letsplayweb3.liukang.com/en/learn-with-ai/) start from those same boundaries.
+
 Prefer to look first? [Inspect a testnet transaction in Chapter 8](https://letsplayweb3.liukang.com/en/chapters/08-lab-counter/#inspect-a-transaction). Check its status, whether tokens moved, and the event it recorded. Reading needs no wallet connection, faucet or account.
 
 ## What is ready
@@ -44,6 +46,7 @@ Search needs a build; it is unavailable in the development server. The site is s
 
 | Command | Purpose |
 | --- | --- |
+| `npm test` | Run the dependency-free unit tests for the browser labs and learning events |
 | `npm run check:content` | Check bilingual chapter pairs, frontmatter and glossary usage; also runs before builds |
 | `npm run check:facts` | Look for addresses/hashes in available lab sources; always run the secret scan |
 | `npm run check:build` | Check built internal links, assets and language/SEO URLs with the same `SITE_URL` and `BASE` as the build |

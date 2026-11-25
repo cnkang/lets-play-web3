@@ -1,0 +1,99 @@
+---
+import '../../styles/labs.css'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import Crumb from '../../components/Crumb.astro'
+import { labels, prompts, promptText, safety } from '../../data/prompts.mjs'
+import { ui, langs, type Lang } from '../../data/book'
+import { absolute, authorLd, href, htmlLang } from '../../data/site'
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }))
+}
+const { lang } = Astro.params as { lang: Lang }
+const zh = lang === 'zh'
+const title = zh ? '请 AI 带你练' : 'Learn with an AI agent'
+const description = zh
+  ? '五段可以复制的练习提示词。先用浏览器模拟，再考虑隔离的测试网。不要把助记词交给任何代理。'
+  : 'Five prompts you can copy into an AI agent. Start with browser simulations. Move to an isolated testnet only when you choose to. Never give an agent a seed phrase.'
+const path = 'learn-with-ai/'
+const site = ui[lang].siteTitle
+const pageUrl = absolute(`${lang}/${path}`)
+const name = labels[lang]
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: title,
+    description,
+    url: pageUrl,
+    inLanguage: htmlLang[lang],
+    learningResourceType: zh ? '练习提示词' : 'Practice prompts',
+    isAccessibleForFree: true,
+    author: authorLd(lang)
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: site, item: absolute(`${lang}/`) },
+      { '@type': 'ListItem', position: 2, name: title, item: pageUrl }
+    ]
+  }
+]
+---
+<BaseLayout lang={lang} title={title} description={description} path={path} jsonLd={jsonLd}>
+  <article class="shell article lab-page" data-pagefind-body>
+    <Crumb lang={lang} items={[{ href: `${lang}/`, name: site }, { name: title }]} />
+    <h1>{title}</h1>
+    <div class="prose">
+      <p>{zh
+        ? '你可以把下面的提示词交给 Grok、ChatGPT、Claude、Hermes、Codex 或其他能阅读网页的代理。它们的工具并不相同。提示词不假设代理能签名、能联网，或能访问你的钱包。'
+        : 'You can give these prompts to Grok, ChatGPT, Claude, Hermes, Codex, or another agent that can read a web page. Their tools differ. A prompt does not assume the agent can sign, reach a network, or open your wallet.'}</p>
+      <p class="callout warn">{zh
+        ? '不要把私钥、助记词或真实钱包交给代理。浏览器实验不需要这些。测试网练习要用新的空钱包。'
+        : 'Do not give an agent a private key, a seed phrase, or a wallet that holds assets. The browser labs need none of those. A testnet exercise uses a new empty wallet.'}</p>
+      <h2>{name.safety}</h2>
+      <ul>
+        {safety[lang].map((rule) => <li>{rule}</li>)}
+      </ul>
+    </div>
+    {prompts.map((prompt) => {
+      const copy = prompt[lang]
+      const body = promptText(prompt, lang)
+      return (
+        <section class="prompt-card lab-panel" id={prompt.id}>
+          <h2>{copy.title}</h2>
+          <p><strong>{name.difficulty}: </strong>{prompt.difficulty[lang]}</p>
+          <p><strong>{name.objective}: </strong>{copy.objective}</p>
+          <p><strong>{name.prerequisites}: </strong>{copy.prerequisites}</p>
+          <p><strong>{name.tools}: </strong>{copy.tools}</p>
+          <h3>{name.steps}</h3>
+          <ol>{copy.steps.map((step) => <li>{step}</li>)}</ol>
+          <h3>{name.outputs}</h3>
+          <ul>{copy.outputs.map((item) => <li>{item}</li>)}</ul>
+          <p><strong>{name.verification}: </strong>{copy.verification}</p>
+          <p><strong>{name.noMoney}: </strong>{copy.noMoney}</p>
+          <p><strong>{name.selfCheck}: </strong>{copy.selfCheck}</p>
+          <h3>{zh ? '复制给代理的全文' : 'Full text to copy'}</h3>
+          <pre id={`${prompt.id}-text`}>{body}</pre>
+          <p>
+            <button type="button" class="btn primary copy-btn" data-copy={body} data-track="prompt_copy" data-challenge-id={prompt.id} data-done={zh ? '提示词已复制' : 'Prompt copied'}>
+              {zh ? '复制这段提示词' : 'Copy this prompt'}
+            </button>
+          </p>
+        </section>
+      )
+    })}
+    <p>
+      <a class="btn ghost" data-track="learning_path_start" data-path="play" href={href(`${lang}/labs/`)}>{zh ? '先自己做三个实验' : 'Try the three labs yourself'}</a>
+    </p>
+    <h2>{zh ? '学习事件里可能有什么' : 'What a learning event can include'}</h2>
+    <p>{zh
+      ? '复制成功时，如果这次构建启用了统计，可能发送 prompt_copy、提示词编号和语言。不会发送提示词正文。加上 ?events=local 时，事件只留在这个浏览器里。'
+      : 'After a successful copy, a build with analytics enabled can send prompt_copy, the prompt id, and the language. It does not send the prompt text. With ?events=local, the event stays in this browser.'}</p>
+    <div data-event-panel hidden>
+      <h3>{zh ? '留在这个浏览器里的事件' : 'Events kept in this browser'}</h3>
+      <pre data-event-log></pre>
+    </div>
+  </article>
+</BaseLayout>

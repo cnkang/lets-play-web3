@@ -20,6 +20,7 @@ node orphan-check.mjs                  # orphan last lines (≤3 CJK chars / one
 node orphan-check.mjs --no-pretty      # same, simulating browsers without text-wrap: pretty (Safari/Firefox)
 node diagram-overflow-check.mjs        # every diagram <text> inside its box / the viewBox, no text-text or text-arrow overlap; default + wide-font stress pass (exit 1 on issues)
 node lang-check.mjs                    # root redirect by saved choice / navigator.languages, no-JS fallback, hint bar on language pages, axe on the hint (exit 1 on failure)
+node labs-check.mjs                   # three browser labs: keyboard, invalid input, zh/en, 1280/390 overflow, local analytics log; BASE_URL and CHROME; needs puppeteer-core in the scratch folder
 node render-og.mjs /path/to/lets-play-web3   # re-render public/og/{zh,en}.png from the SVG sources
 ```
 

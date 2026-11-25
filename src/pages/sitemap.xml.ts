@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content'
 import { langs } from '../data/book'
 import { getPublishedChapters } from '../data/chapters'
 import { absolute, htmlLang } from '../data/site'
+import { learningPaths } from '../data/public-paths.mjs'
 
 const escapeXml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
 
@@ -16,7 +17,8 @@ export const GET: APIRoute = async () => {
     { path: 'accessibility/', updated: {
       zh: pages.find((page) => page.id === 'zh/accessibility')?.data.updated,
       en: pages.find((page) => page.id === 'en/accessibility')?.data.updated
-    } }
+    } },
+    ...learningPaths().map((path) => ({ path, updated: { zh: '2026-11-25', en: '2026-11-25' } }))
   ]
   const urls = paths.flatMap(({ path, updated }) => {
     const loc = { zh: escapeXml(absolute(`zh/${path}`)), en: escapeXml(absolute(`en/${path}`)) }

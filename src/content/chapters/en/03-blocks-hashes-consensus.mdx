@@ -5,6 +5,7 @@ navTitle: "3 · Blocks, hashes and consensus"
 part: everyday
 order: 30
 status: published
+updated: "2026-11-25"
 ---
 
 <p class="lead">How would you notice an old record had been edited? Start with pages that refer to earlier pages, then ask how everyone agrees which record to accept.</p>
@@ -18,6 +19,12 @@ A **hash** works like a fingerprint for a page’s contents. Change “10 points
 <Figure name="blocks" n="1" alt="Three blocks left to right; each holds the previous block's fingerprint, its transactions and its own fingerprint, with arrows linking each fingerprint into the next block.">
 <Term id="block">Blocks</Term> hold transaction data and are linked by the previous block's hash. H(…) in the figure is a symbol, not a real value.
 </Figure>
+
+<Callout type="note" title="Play with a real hash">
+
+The figure uses H(…) as a symbol. The [SHA-256 lab](../../labs/hash-chain/) hashes the text in your browser. Change one block and the later checks fail. Recalculating every hash on your own computer does not make a network accept the edit. The lab sends nothing.
+
+</Callout>
 
 ## Why is consensus still needed?
 

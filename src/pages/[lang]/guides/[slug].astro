@@ -1,0 +1,87 @@
+---
+import '../../../styles/labs.css'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import Crumb from '../../../components/Crumb.astro'
+import { guides } from '../../../data/guides.mjs'
+import { labs } from '../../../data/labs-copy.mjs'
+import { ui, langs, type Lang } from '../../../data/book'
+import { absolute, authorLd, href, htmlLang } from '../../../data/site'
+
+const chapterLabel: Record<string, Record<Lang, string>> = {
+  '01-how-to-read': { en: 'Chapter 1 · How to read this book', zh: '第 1 章 · 怎样阅读这本书' },
+  '03-blocks-hashes-consensus': { en: 'Chapter 3 · Blocks, hashes, and consensus', zh: '第 3 章 · 区块、哈希与共识' },
+  '08-lab-counter': { en: 'Chapter 8 · Inspect a recorded transaction', zh: '第 8 章 · 查看一笔已记录的交易' },
+  '10-approve-vs-payment': { en: 'Chapter 10 · Approval is not payment', zh: '第 10 章 · 授权不是付款' },
+  '11-lab-mbox-burn': { en: 'Chapter 11 · The MBox-Burn record', zh: '第 11 章 · MBox-Burn 的记录' },
+  '13-upgradeable-ubox': { en: 'Chapter 13 · Upgradeable UBOX', zh: '第 13 章 · 可升级的 UBOX' },
+  '16-defi-labs': { en: 'Chapter 16 · The Sepolia DeFi labs', zh: '第 16 章 · Sepolia 上的 DeFi 实验' },
+  '17-lending-liquidation': { en: 'Chapter 17 · Lending and liquidation', zh: '第 17 章 · 借贷与清算' },
+  '19-oracle-safety': { en: 'Chapter 19 · Oracles and a thin-pool price', zh: '第 19 章 · 预言机与薄池价格' }
+}
+
+export function getStaticPaths() {
+  return guides.flatMap((guide) => langs.map((lang) => ({ params: { lang, slug: guide.slug }, props: { guide } })))
+}
+const { lang } = Astro.params as { lang: Lang }
+const { guide } = Astro.props
+const t = guide[lang]
+const path = `guides/${guide.slug}/`
+const site = ui[lang].siteTitle
+const pageUrl = absolute(`${lang}/${path}`)
+const section = lang === 'zh' ? '问题指南' : 'Question guides'
+const lab = guide.lab ? labs[guide.lab][lang] : null
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: t.title,
+    description: t.description,
+    url: pageUrl,
+    inLanguage: htmlLang[lang],
+    author: authorLd(lang),
+    isAccessibleForFree: true,
+    mainEntityOfPage: pageUrl
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: site, item: absolute(`${lang}/`) },
+      { '@type': 'ListItem', position: 2, name: section, item: absolute(`${lang}/guides/`) },
+      { '@type': 'ListItem', position: 3, name: t.title, item: pageUrl }
+    ]
+  }
+]
+---
+<BaseLayout lang={lang} title={t.title} description={t.description} path={path} jsonLd={jsonLd} ogType="article">
+  <article class="shell article" data-pagefind-body>
+    <Crumb lang={lang} items={[{ href: `${lang}/`, name: site }, { href: `${lang}/guides/`, name: section }, { name: t.title }]} />
+    <h1>{t.title}</h1>
+    <div class="prose">
+      {t.answer.map((paragraph) => <p>{paragraph}</p>)}
+      <h2>{lang === 'zh' ? '为什么这件事情重要' : 'Why this matters'}</h2>
+      {t.why.map((paragraph) => <p>{paragraph}</p>)}
+      <h2>{lang === 'zh' ? '一个具体例子' : 'A concrete example'}</h2>
+      {t.example.map((paragraph) => <p>{paragraph}</p>)}
+      <h2>{lang === 'zh' ? '边界' : 'Limits'}</h2>
+      {t.limits.map((paragraph) => <p>{paragraph}</p>)}
+      <h2>{lang === 'zh' ? '接着去哪里' : 'Where to go next'}</h2>
+      <ul>
+        {lab && (
+          <li>
+            <a data-track="guide_to_lab_click" data-guide-id={guide.slug} data-lab-id={guide.lab} href={href(`${lang}/labs/${guide.lab}/`)}>
+              {lang === 'zh' ? '打开浏览器实验：' : 'Open the browser lab: '}{lab.title}
+            </a>
+          </li>
+        )}
+        {guide.chapters.map((slug) => (
+          <li>
+            <a data-track="related_chapter_click" data-guide-id={guide.slug} data-challenge-id={slug} href={href(`${lang}/chapters/${slug}/`)}>
+              {chapterLabel[slug][lang]}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </article>
+</BaseLayout>

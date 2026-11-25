@@ -1,4 +1,5 @@
 ---
+import '../../styles/labs.css'
 import Nw from '../../components/Nw.astro'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import BookToc from '../../components/BookToc.astro'
@@ -14,8 +15,8 @@ const { lang } = Astro.params as { lang: Lang }
 const t = ui[lang]
 const zh = lang === 'zh'
 const description = zh
-  ? '免费的中英双语区块链入门指南：从生活例子理解什么时候需要区块链，再打开 Sepolia 测试网交易记录，观察实验里实际发生了什么。阅读无需钱包。'
-  : 'A free, bilingual guide to blockchains for beginners. Learn through everyday examples, then inspect real Sepolia testnet transactions. No wallet needed to read.'
+  ? '在浏览器里玩懂 Web3：授权、兑换和哈希链实验，以及一本中英双语入门教材。阅读和实验都不需要钱包，也不花真钱。'
+  : 'Play with Web3 in the browser: allowance, swap, and hash-chain labs, plus a bilingual book for beginners. No wallet and no real money.'
 const cards = zh
   ? [
       { t: '先问「为什么需要」', d: '用社区积分、商场联合收银、自动售货机这些日常场景，弄清区块链什么时候值得用、什么时候不值得。', s: '02-who-needs-blockchain' },
@@ -65,18 +66,20 @@ const jsonLd = [
    <div class="hero-deco" aria-hidden="true"><span class="glow"></span><span class="d1"></span><span class="d2"></span><span class="d3"></span><span class="d4"></span></div>
    <div class="hero">
     <div>
-      <p class="kicker"><span class="pill">{t.siteTitle}</span><span>{zh ? '免费入门指南 · 中英双语 · 测试网实验' : 'A hands-on guide for beginners · Free · Bilingual'}</span></p>
+      <p class="kicker"><span class="pill">{zh ? '不只是阅读 Web3，而是亲手玩懂 Web3。' : 'Don’t just read about Web3. Play with it.'}</span></p>
       <h1 id="hero-title">{t.siteTagline}</h1>
       <p class="sub">
         <Nw text={zh
-          ? '会用电脑、会上网，却不知道区块链有什么用？从几家店共用积分这样的例子出发，分清什么时候需要区块链、什么时候普通数据库就够了。再跟着真实实验，看懂交易、合约和授权。实验使用 Sepolia——以太坊专门用来练习的测试网，预算 $0。遇到生词，点旁边的 ?。'
-          : 'Comfortable with a computer, but new to blockchains? Start with everyday examples to learn when a blockchain helps and when a database is enough. Then follow real experiments to understand transactions, contracts and approvals. The labs used Sepolia, Ethereum’s practice network, with a $0 budget. Press ? beside a new term for an explanation.'} />
+          ? '给会用电脑的初学者。先分清什么时候需要区块链，再在浏览器里改授权、兑换和哈希。阅读和这三个实验都不需要钱包，也不花真钱。书里的 Sepolia 记录是证据。实验页是模拟。'
+          : 'For beginners who can use a computer. Learn when a blockchain helps, then change an allowance, a swap, and a hash chain in the browser. Reading and these three labs need no wallet and no real money. Recorded Sepolia experiments are evidence. The labs are simulations.'} />
       </p>
       <div class="btn-row">
-        <a class="btn primary" href={href(`${lang}/chapters/01-how-to-read/`)}>{zh ? '从第 1 章开始读' : 'Start with Chapter 1'}</a>
-        <a class="btn ghost" href={href(`${lang}/chapters/08-lab-counter/#inspect-a-transaction`)}>{zh ? '看一笔测试网交易' : 'Inspect a testnet transaction'}</a>
+        <a class="btn primary" data-track="curriculum_start" href={href(`${lang}/chapters/01-how-to-read/`)}>{zh ? '开始学习' : 'Start learning'}</a>
+        <a class="btn ghost" data-track="learning_path_start" data-path="play" href={href(`${lang}/labs/`)}>{zh ? '做互动实验' : 'Try an interactive lab'}</a>
+        <a class="btn ghost" data-track="learning_path_start" data-path="ai" href={href(`${lang}/learn-with-ai/`)}>{zh ? '请 AI 带练' : 'Learn with an AI agent'}</a>
+        <a class="btn ghost" href="#contents-title">{zh ? '查看课程目录' : 'Explore the curriculum'}</a>
       </div>
-      <p><Nw text={zh ? '只想先看看？第二个入口会带你核对交易状态、代币转账和事件。无需连接钱包、领币或注册账号。' : 'Just looking? The second link walks you through status, token transfers and an event. No wallet connection, faucet or account needed.'} /></p>
+      <p><Nw text={zh ? '三条路都可以从零开始。实验不会签名，也不会发送交易。' : 'You can start from zero on any path. A lab does not sign or send a transaction.'} /></p>
     </div>
     <div class="hero-art">
       <img src={href(`diagrams/${lang}/counter.svg`)} width="960" height="540"
@@ -89,6 +92,24 @@ const jsonLd = [
     <SafetyNotice lang={lang} />
     <Snapshot lang={lang} />
   </div>
+
+  <section class="home-section" aria-labelledby="paths-title">
+    <h2 id="paths-title">{zh ? '三条入门路径' : 'Three ways to start'}</h2>
+    <ul class="cards path-grid">
+      <li class="card">
+        <h3><a data-track="learning_path_start" data-path="start" href={href(`${lang}/chapters/02-who-needs-blockchain/`)}>{zh ? '从零开始' : 'Start from zero'}</a></h3>
+        <p><Nw text={zh ? '还没有区块链背景。先用日常例子判断什么时候需要共享账本，再从第 1 章学习怎么读这本书。' : 'No blockchain background yet. Use an everyday example to decide when a shared ledger helps, then read Chapter 1 on how to use the book.'} /></p>
+      </li>
+      <li class="card">
+        <h3><a data-track="learning_path_start" data-path="play" href={href(`${lang}/labs/`)}>{zh ? '做互动实验' : 'Play with an experiment'}</a></h3>
+        <p><Nw text={zh ? '想亲手看授权、兑换价格和哈希链。三个实验都在浏览器里，可以重置。它们不是链上交易。' : 'See an allowance, a swap price, and a hash chain for yourself. All three labs run in the browser and can be reset. They are not chain transactions.'} /></p>
+      </li>
+      <li class="card">
+        <h3><a data-track="learning_path_start" data-path="ai" href={href(`${lang}/learn-with-ai/`)}>{zh ? '请 AI 带练' : 'Learn with an AI agent'}</a></h3>
+        <p><Nw text={zh ? '把一段提示词交给代理，让它带你读章节、做实验、核对结果。提示词禁止索取助记词和动用真钱。' : 'Give an agent a prompt that walks chapters, labs, and checks. The prompt forbids seed phrases and real money.'} /></p>
+      </li>
+    </ul>
+  </section>
 
   <section class="home-section" aria-labelledby="why-title">
     <h2 id="why-title">{zh ? '这本书有什么不同' : 'What makes this book different'}</h2>
